@@ -1,0 +1,38 @@
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48.91 52.81">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 6.85px;
+      }
+
+      .cls-1, .cls-3, .cls-4, .cls-5 {
+        fill: #231f20;
+      }
+
+      .cls-1, .cls-4, .cls-5 {
+        font-family: FuturaPT-Bold, Futura PT;
+        font-weight: 700;
+      }
+
+      .cls-2 {
+        letter-spacing: 0.03em;
+      }
+
+      .cls-4 {
+        font-size: 18.88px;
+      }
+
+      .cls-5 {
+        font-size: 6.29px;
+      }
+    </style>
+  </defs>
+  <g>
+    <text class="cls-1" transform="translate(7.17 45.76)">PUN<tspan class="cls-2" x="14.56" y="0">C</tspan><tspan x="18.77" y="0">TURE</tspan></text>
+    <g>
+      <path class="cls-3" d="M23.88,38.67a22.28,22.28,0,0,1-12-11.5A21.22,21.22,0,0,1,10,19.9V5.27H38.66V19.89A18.09,18.09,0,0,1,36,28.76a24.77,24.77,0,0,1-11.38,9.89l-.37.17Zm-12-18.83v.1c0,.08,0,.21,0,.37a14,14,0,0,0,.21,1.42,21.21,21.21,0,0,0,1.48,4.68A20.26,20.26,0,0,0,24.22,36.8a22.79,22.79,0,0,0,10.19-9,16.3,16.3,0,0,0,2.4-7.94V7.11h-25Z"/>
+      <text class="cls-4" transform="translate(18.52 30.14)">0</text>
+      <text class="cls-5" transform="translate(17.03 14.15)">ANSI</text>
+    </g>
+  </g>
+</svg>

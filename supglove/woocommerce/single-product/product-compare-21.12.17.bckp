@@ -1,0 +1,483 @@
+<?php
+/**
+ * Product compare
+ *
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+global $product, $woocommerce_loop;
+
+if ( empty( $product ) || ! $product->exists() ) {
+  return;
+}
+
+if ( ! $related = $product->get_related( 3 ) ) {
+  return;
+}
+
+
+
+
+
+function htmlrowforcompare($rowname, array $rowvalues){
+  $result = '<div class="comparerow"><div class="col col-xs-5ths  col-md-5ths  col-md-5ths firstcell">'.$rowname.'</div>';
+  $checkrowvalue = 0;
+  
+  
+  	$countitems = 0;
+  	$thelast = '';
+  	$totalitems = count($rowvalues);
+  		 
+  foreach ($rowvalues as $rowcolumnvalue) {
+  	
+  	    $countitems++;
+  	    if($countitems == $totalitems){$thelast = 'last';}
+
+
+  		 if($rowcolumnvalue == "") { 
+  		 		$checkrowvalue++;
+  		 		$rowcolumnvalue = 'None';
+  		 }
+  		 
+  		 //if we need to convert PIPE values into comma separated
+  		 // Convert pipes to commas and display values
+			 $rowcolumnvalue = array_map( 'trim', explode( WC_DELIMITER, $rowcolumnvalue ) );					
+			 $rowcolumnvalue =  wptexturize( implode( ', ', $rowcolumnvalue )) . ' ';	
+  		 
+       $result .= '<div class="col col-xs-5ths  col-md-5ths  col-md-5ths '.$thelast.'">'.$rowcolumnvalue.'</div>';
+  }
+  
+  //if row is empty then we don't need to show it
+  //basically if the all values in the row are going to be empty then we don't need to show it
+  if( $checkrowvalue == 4 ){
+  	 $result = '';
+  }else{
+  	 $result .= '<div class="clear"></div></div>';  
+  }
+    
+  return $result;
+}
+
+
+
+// Get ID of current product, to exclude it from the related products query
+$current_product_id = $product->get_id();
+
+
+//build product objects
+//Array will hold THIS (FIRST) product
+$products_to_compare =  array(   wc_get_product($current_product_id)  );
+$compareoverrides =  get_post_meta($current_product_id, '_related_ids2', true );
+//var_dump($compareoverrides);
+if( is_array($compareoverrides )  ){
+	$num_of_overrides = count($compareoverrides);
+}else{
+	$num_of_overrides = 0;
+}
+
+$compares_needed = 3;
+$cats_array = array(0);
+
+
+			//count how many override products given, MUST be 1 to 3 ONLY
+			if( $num_of_overrides > 0 && $num_of_overrides < 4 ){	
+		    //Add the users initial compare override products to our main products to compare array
+		    foreach($compareoverrides as $productcompareid){
+		     array_push($products_to_compare,  wc_get_product($productcompareid)   ); 
+		    }
+	    }
+	
+			$compares_needed = $compares_needed - $num_of_overrides; 
+			// get categories
+			$terms = wp_get_post_terms( $product->get_id(), 'product_cat' );
+
+			// select only the category which doesn't have any children
+			foreach ( $terms as $term ) {
+			  $children = get_term_children( $term->term_id, 'product_cat' );
+			  if ( !sizeof( $children ) )
+			  $cats_array[] = $term->term_id;
+			}
+			
+			if($compares_needed > 0){
+				//Here we are getting only the amnount of additional products needed ie if user added 2 overrides then we only need one more, if user added 1 override then we need 2 more etc....
+				$args = apply_filters( 'woocommerce_related_products_args', array(
+				  'post_type' => 'product',
+				  'post__not_in' => $products_to_compare,   // exclude all products currently choosen
+				  'ignore_sticky_posts' => 1,
+				  'no_found_rows' => 1,
+				  'posts_per_page' => $compares_needed,
+				  'orderby' => $orderby,
+				  'tax_query' => array(
+				    array(
+				        'taxonomy' => 'product_cat',
+				        'field' => 'id',
+				        'terms' => $cats_array
+				    ),
+				  )
+				));
+				$loopproducts = new WP_Query( $args );
+				if ( $loopproducts->have_posts() ) : 
+				      while ( $loopproducts->have_posts() ) : $loopproducts->the_post();               
+				            //Add additional products to the array not picked by user but from same category
+				            array_push($products_to_compare,  wc_get_product($loopproducts->post->ID)   );           
+				       endwhile; 
+				   endif;
+				wp_reset_postdata();
+		}
+		
+	
+		
+$comparerecords = array();
+//for each woocommerce product let's create an array to hold the values we want	
+foreach($products_to_compare as $thecompareproduct  ){
+
+    // Hazards array
+    $hazards = [];
+//    //$attr = $thecompareproduct->get_attribute('pa_hazards');
+//    $hazards_terms = wc_get_product_terms( $thecompareproduct->get_id(), 'pa_hazards', array( 'fields' => 'all' ) );
+//    foreach($hazards_terms as $term){
+//        var_dump(222222);
+//        $term_parent = get_term($term->parent, 'pa_hazards');
+//        if($term->parent != 0) {
+//            $term_parent_array[] = $term_parent->slug;
+//            if(in_array($term_parent->slug, $term_parent_array)) {
+//                $first_term_val = $hazards[$term_parent->slug];
+//                $hazards[$term_parent->slug] = ($first_term_val) ? $first_term_val . ', ' . $term->name : $term->name;
+//            } else {
+//                if($term->name) {
+//                    $hazards[$term_parent->slug] = $term->name;
+//                }
+//            }
+//        } else {
+//            $hazards[$term_parent->slug] = 'None';
+//        }
+//    }
+
+    for($i = 0; $i <= 4; $i++) {
+        $hazards_terms = wc_get_product_terms( $thecompareproduct->get_id(), 'pa_hazards', array( 'fields' => 'all' ) );
+        foreach($hazards_terms as $term) {
+            $term_parent = get_term($term->parent, 'pa_hazards');
+            if ( $term_parent->slug == 'abrasion' ) {
+                $hazards['abrasion'] = $term->name;
+            }
+
+            if ( $term_parent->slug == 'Cut' ) {
+                $hazards['Cut'] = $term->name;
+            }
+
+            if ( $term_parent->slug == 'heat' ) {
+                $hazards['heat'] = $term->name;
+            }
+
+            if ( $term_parent->slug == 'arc-flash' ) {
+                $hazards['arc-flash'] = $term->name;
+            }
+
+            if ( $term_parent->slug == 'hypodermic_needle' ) {
+                $hazards['hypodermic_needle'] = $term->name;
+            }
+
+            if ( $term_parent->slug == 'puncture-probe' ) {
+                $hazards['puncture-probe'] = $term->name;
+            }
+        }
+
+        if($hazards['abrasion'] == '') {
+            $hazards['abrasion'] = 'None';
+        }
+
+        if($hazards['arc-flash'] == '') {
+            $hazards['arc-flash'] = 'None';
+        }
+
+        if($hazards['cut'] == '') {
+            $hazards['cut'] = 'None';
+        }
+
+        if($hazards['heat'] == '') {
+            $hazards['heat'] = 'None';
+        }
+
+        if($hazards['hypodermic_needle'] == '') {
+            $hazards['hypodermic_needle'] = 'None';
+        }
+
+        if($hazards['puncture-probe'] == '') {
+            $hazards['puncture-probe'] = 'None';
+        }
+
+    }
+
+		$newcompare_record = array(
+		        'id' => $thecompareproduct->get_id(),
+		        'product_name' => $thecompareproduct->get_name(),
+		        'product_permalink' => $thecompareproduct->get_permalink(),		
+		        'application' => $thecompareproduct->get_attribute( 'application' ),
+		        'arm_anchor_techlogy' => $thecompareproduct->get_attribute( 'pa_arm_anchor_techlogy' ),
+				'arch_flash' => $thecompareproduct->get_attribute( 'pa_arch_flash' ),
+				'abrasion-resistant' => $thecompareproduct->get_attribute( 'pa_abrasion' ),
+		        'available_sizes' => $thecompareproduct->get_attribute( 'pa_available_sizes' ),
+		        'chemical_and_disposable_gloves_material' => $thecompareproduct->get_attribute( 'pa_chem_dispos_gloves_material' ),
+		        'chemical_and_disposable_gloves_thickss' => $thecompareproduct->get_attribute( 'pa_chem_dispos_gloves_thickss' ),
+		        'chemical_and_disposable_gloves_unsupportedsupported' => $thecompareproduct->get_attribute( 'pa_chem_dispos_gloves_unsupsup' ),
+		        'country_of_origin' => $thecompareproduct->get_attribute( 'pa_country_of_origin' ),
+		        'features_and_techlogy' => $thecompareproduct->get_attribute( 'pa_features_and_techlogy' ),
+		        'features_and_techlogy_cuff_length' => $thecompareproduct->get_attribute( 'pa_feat_tech_cuff_length' ),
+		        'features_and_techlogy_cuff_style' => $thecompareproduct->get_attribute( 'pa_feat_tech_cuff_style' ),
+		        'features_and_techlogy_sizes' => $thecompareproduct->get_attribute( 'pa_features_and_techlogy_sizes' ),
+		        'hazards_cold' => $thecompareproduct->get_attribute( 'pa_hazards_cold' ),
+		        'hazards_cut_360' => $thecompareproduct->get_attribute( 'pa_hazards_cut_360' ),
+		        'hazards_heat' => $thecompareproduct->get_attribute( 'pa_hazards_heat' ),
+		        'hypodermic_needle' => $thecompareproduct->get_attribute( 'pa_hypodermic_needle' ),
+		        'impact' => $thecompareproduct->get_attribute( 'pa_impact' ),
+		        'ladies_sizing' => $thecompareproduct->get_attribute( 'pa_ladies_sizing' ),
+		        'laundering_instructions' => $thecompareproduct->get_attribute( 'pa_laundering_instructions' ),
+		        'material' => $thecompareproduct->get_attribute( 'pa_material' ),
+		        'material_gauge' => $thecompareproduct->get_attribute( 'pa_material_gauge' ),
+		        'palm_coating' => $thecompareproduct->get_attribute( 'pa_palm_coating' ),
+		        'palm_coating_dip_type' => $thecompareproduct->get_attribute( 'pa_palm_coating_dip_type' ),
+		        'primary_industry' => $thecompareproduct->get_attribute( 'pa_primary_industry' ),
+		        'product_type' => $thecompareproduct->get_attribute( 'pa_product_type' ),
+		        'puncture_probe' => $thecompareproduct->get_attribute( 'pa_puncture_probe' ),
+		        'recommended_industry' => $thecompareproduct->get_attribute( 'pa_recommended_industry' ),
+		        'ship_pack_quantity' => $thecompareproduct->get_attribute( 'pa_ship_pack_quantity' ),
+		        'sizing_minclature' => $thecompareproduct->get_attribute( 'pa_sizing_minclature' ),
+		        'skid_quantity' => $thecompareproduct->get_attribute( 'pa_skid_quantity' ),
+		        'sleeve_lengths_with_thumbholes_in' => $thecompareproduct->get_attribute( 'pa_sleeve_lengths_w_thumb_in' ),
+		        'sleeve_lengths_without_thumbholes_in' => $thecompareproduct->get_attribute( 'pa_sleeve_lengths_wo_thumbs_in' ),
+		        'sub_brand' => $thecompareproduct->get_attribute( 'pa_sub_brand' ),
+		        'tubular_or_tapered' => $thecompareproduct->get_attribute( 'pa_tubular_or_tapered' ),
+		        'unit_of_measure' => $thecompareproduct->get_attribute( 'pa_unit_of_measure' ),
+		        
+	        
+		        'case_dimensions_in' => get_post_meta( $thecompareproduct->get_id(), 'case_dimensions_in', true ),
+		        'ce_en388_certification_code' => get_post_meta( $thecompareproduct->get_id(), 'ce_en388_certification_code', true ),
+		        'other_ce_certification_codes' => get_post_meta( $thecompareproduct->get_id(), 'other_ce_certification_codes', true ),
+		        'unspsc_code' => get_post_meta( $thecompareproduct->get_id(), 'unspsc_code', true ),
+
+  
+		        
+		);
+        $newcompare_record = array_merge($hazards, $newcompare_record);
+		array_push($comparerecords, $newcompare_record);
+}
+		
+?>
+
+
+<div class="comparearea">
+<div class="row zeromag">
+<div class="containerx">
+	<div class="col col-sm-12 col-md-12">
+		
+		
+		
+  	  					<h3 class="comptitle"><?php echo  __( 'Compare with similar items', 'woocommerce' ); ?></h3>
+  	  		
+  	  				  	
+  	  				  	
+  <div class="special-text">
+  	
+
+  	
+  	<?php 
+  	//var_dump($products_to_compare); 
+  	?>
+  	  	
+  	  	
+
+  	  	
+  	  	
+  	  	<div id="comparetop" class="rowx">
+  	  			<div class="container compareheadcont">
+  	  				
+  	  				
+
+  	  				  	
+  	  				  	
+  	  				
+  	  				<div class="col col-xs-5ths  col-md-5ths  col-md-5ths">
+  	  					&nbsp;
+  	  				</div>
+  	<?php
+  	
+  	//build product objects
+  	$sentinal = 0;
+  	$countitems = 0;
+  	$thelast = '';
+  	$totalitems = count($products_to_compare);
+  	foreach($products_to_compare as $someproduct) {
+  		
+  		$countitems++;
+  		if($countitems == $totalitems){$thelast = 'last';}
+  		
+  		echo '<div class="col col-xs-5ths  col-md-5ths  col-md-5ths compareheader '. $thelast .'">';
+  		
+			$attachment_ids  = $someproduct->get_gallery_image_ids();
+			printf( '<div class="un-product-thumbnail">' );
+			printf( '<a href="%s" class="">', esc_url( get_permalink( $someproduct->get_id() ) ) );
+			$image_size = 'shop_catalog';
+			
+			$image = wp_get_attachment_image_src( get_post_thumbnail_id( $someproduct->get_id() ), $image_size );
+
+            if($image) {
+                $product_image = $image[0];
+            } else {
+                $product_image = wc_placeholder_img_src();
+            }
+        echo  '<img src="'.$product_image.'" data-id="'.$someproduct->get_id().'">';
+	   
+			echo '</a>';
+
+			echo '<div class="footer-button2">';
+
+			echo '<a href="?add-to-cart='.$someproduct->get_id().'" data-quantity="1" data-title="'.$someproduct->get_name().'" class="button product_type_simple add_to_cart_button ajax_add_to_cart buttonogs btn_small btn_theme_color" data-product_id="'.$someproduct->get_id().'" data-product_sku="'.$product->get_sku().'"  rel="nofollow" tabindex="0"><span class="hidebuttxt">Add to Box <i class="t-icon icon-ion-android-add"></i></span><i class="showmobile t-icon icon-cartboxadd"></i>';			
+				
+				
+			
+			echo '</a></div>'; // .footer-button
+			
+
+			echo '<div class="quicky2"><a href="' . $someproduct->get_permalink() . '" data-id="' . esc_attr( $someproduct->get_id() ) . '"  class=" buttonogs  btn_small  btn_dark2 " ><span class="hidebuttxt">View Item</span><i class="showmobile t-icon icon-eye"></i></a>
+			</div>';
+
+			echo '</div>'; // .un-product-thumbnail  
+			
+			
+			
+			echo '<div class="comparedetails">';
+			printf( '<h3><a href="%s">%s</a></h3>', esc_url( $someproduct->get_permalink() ), $someproduct->get_name() );
+		
+    
+	    
+			$terms =  wp_get_post_terms( $someproduct->get_id(), 'product_tag' );
+			$term_array = array();
+			if ( ! empty( $terms ) && ! is_wp_error( $terms ) ){
+				 echo '<div class="productdetails2">';
+			    foreach ( $terms as $term ) {
+			        $term_array[] = $term->name;
+			    }
+			   echo implode(', ',  $term_array); 
+			   echo '</div>'; 
+			}
+	    
+			echo '</div>';
+			echo '</div>';
+			
+			
+			$sentinal++;		 
+  	}
+  	
+  	?>
+  	
+  	
+  	
+  	
+  	
+  	
+  	
+  </div>
+  
+  <div class="container comparebodycont">
+  
+  
+  <?php
+    echo'<div class="coparetable">';
+
+	  echo htmlrowforcompare(__( 'Product name', 'woocommerce' ),  array_column($comparerecords, 'product_name'));
+	  echo htmlrowforcompare(__( 'Abrasion', 'woocommerce' ),  array_column($comparerecords, 'abrasion-resistant'));
+	  echo htmlrowforcompare(__( 'Arc Flash', 'woocommerce' ),  array_column($comparerecords, 'arch_flash'));
+	  echo htmlrowforcompare(__( 'Heat', 'woocommerce' ),  array_column($comparerecords, 'hazards_heat'));
+	  echo htmlrowforcompare(__( 'Hypodermic needle', 'woocommerce' ),  array_column($comparerecords, 'hypodermic_needle'));
+	  echo htmlrowforcompare(__( 'Puncture probe', 'woocommerce' ),  array_column($comparerecords, 'puncture_probe'));
+	  echo htmlrowforcompare(__( 'Arm Anchor', 'woocommerce' ),  array_column($comparerecords, 'arm_anchor_techlogy'));
+	  echo htmlrowforcompare(__( 'Sizes', 'woocommerce' ),  array_column($comparerecords, 'available_sizes')); 
+	  echo htmlrowforcompare(__( 'Chemical/Disposable Material', 'woocommerce' ),  array_column($comparerecords, 'chemical_and_disposable_gloves_material')); 
+	  echo htmlrowforcompare(__( 'Chemical/Disposable Thickness', 'woocommerce' ),  array_column($comparerecords, 'chemical_and_disposable_gloves_thickss')); 
+	  echo htmlrowforcompare(__( 'Chemical/Disposable Supported/Unsupported', 'woocommerce' ),  array_column($comparerecords, 'chemical_and_disposable_gloves_unsupportedsupported')); 
+	  echo htmlrowforcompare(__( 'Country of Origin', 'woocommerce' ),  array_column($comparerecords, 'country_of_origin')); 
+	  echo htmlrowforcompare(__( 'Cut', 'woocommerce' ),  array_column($comparerecords, 'cut')); 
+	  echo htmlrowforcompare(__( 'Features & Tech', 'woocommerce' ),  array_column($comparerecords, 'features_and_techlogy')); 
+	  echo htmlrowforcompare(__( 'Cuff Length', 'woocommerce' ),  array_column($comparerecords, 'features_and_techlogy_cuff_length')); 
+	  echo htmlrowforcompare(__( 'Cuff Style', 'woocommerce' ),  array_column($comparerecords, 'features_and_techlogy_cuff_style')); 
+	  echo htmlrowforcompare(__( 'Sizes', 'woocommerce' ),  array_column($comparerecords, 'features_and_techlogy_sizes'));
+
+	  //echo htmlrowforcompare(__( 'Hazards', 'woocommerce' ),  array_column($comparerecords, 'hazards'));
+
+	  echo htmlrowforcompare(__( 'Cold', 'woocommerce' ),  array_column($comparerecords, 'hazards_cold'));
+	  echo htmlrowforcompare(__( 'Cut360', 'woocommerce' ),  array_column($comparerecords, 'hazards_cut_360')); 
+	  //echo htmlrowforcompare(__( 'Heat', 'woocommerce' ),  array_column($comparerecords, 'hazards_heat'));
+	  echo htmlrowforcompare(__( 'Needle', 'woocommerce' ),  array_column($comparerecords, 'hypodermic_needle')); 
+	  echo htmlrowforcompare(__( 'Impact', 'woocommerce' ),  array_column($comparerecords, 'impact')); 
+	  echo htmlrowforcompare(__( 'Ladies Sizes', 'woocommerce' ),  array_column($comparerecords, 'ladies_sizing')); 
+	  echo htmlrowforcompare(__( 'Laundering Instructions', 'woocommerce' ),  array_column($comparerecords, 'laundering_instructions')); 
+	  echo htmlrowforcompare(__( 'Materials', 'woocommerce' ),  array_column($comparerecords, 'material')); 
+	  echo htmlrowforcompare(__( 'Material Gauge', 'woocommerce' ),  array_column($comparerecords, 'material_gauge')); 
+	  echo htmlrowforcompare(__( 'Palm Coating', 'woocommerce' ),  array_column($comparerecords, 'palm_coating')); 
+	  echo htmlrowforcompare(__( 'Palm Coating Dip Type', 'woocommerce' ),  array_column($comparerecords, 'palm_coating_dip_type')); 
+	  echo htmlrowforcompare(__( 'Primary Industry', 'woocommerce' ),  array_column($comparerecords, 'primary_industry')); 
+	  echo htmlrowforcompare(__( 'Product Type', 'woocommerce' ),  array_column($comparerecords, 'product_type')); 
+	  echo htmlrowforcompare(__( 'Probe', 'woocommerce' ),  array_column($comparerecords, 'puncture-probe')); 
+	  echo htmlrowforcompare(__( 'Industry', 'woocommerce' ),  array_column($comparerecords, 'recommended_industry')); 
+	  echo htmlrowforcompare(__( 'Ship Pack Qty', 'woocommerce' ),  array_column($comparerecords, 'ship_pack_quantity')); 
+	  echo htmlrowforcompare(__( 'Minclature', 'woocommerce' ),  array_column($comparerecords, 'sizing_minclature')); 
+	  echo htmlrowforcompare(__( 'Skid Qty', 'woocommerce' ),  array_column($comparerecords, 'skid_quantity')); 
+	  echo htmlrowforcompare(__( 'Length with Thumbs', 'woocommerce' ),  array_column($comparerecords, 'sleeve_lengths_with_thumbholes_in')); 
+	  echo htmlrowforcompare(__( 'Length without Thumbs', 'woocommerce' ),  array_column($comparerecords, 'sleeve_lengths_without_thumbholes_in')); 
+	  echo htmlrowforcompare(__( 'Sub-Brand', 'woocommerce' ),  array_column($comparerecords, 'sub_brand')); 
+	  echo htmlrowforcompare(__( 'Unit of Measure', 'woocommerce' ),  array_column($comparerecords, 'unit_of_measure')); 
+	  echo htmlrowforcompare(__( 'Case Dimensions', 'woocommerce' ),  array_column($comparerecords, 'case_dimensions_in')); 
+	  echo htmlrowforcompare(__( 'Tubular/Tapered', 'woocommerce' ),  array_column($comparerecords, 'tubular_or_tapered')); 
+	  echo htmlrowforcompare(__( 'CE EN388', 'woocommerce' ),  array_column($comparerecords, 'ce_en388_certification_code')); 
+	  echo htmlrowforcompare(__( 'Other CE', 'woocommerce' ),  array_column($comparerecords, 'other_ce_certification_codes')); 
+	  echo htmlrowforcompare(__( 'UNSPSC', 'woocommerce' ),  array_column($comparerecords, 'unspsc_code'));
+
+	  echo'</div>';
+  ?>
+  
+  
+  
+  
+   </div>
+  </div>
+  <div class="clear"></div>
+  	
+
+
+
+
+
+<?php
+//START COMPARE ROWS HERE
+
+
+
+
+
+
+
+
+
+//END COMPARE ROWS HERE
+?>
+
+    
+    
+    
+    
+    
+    
+  </div>
+  
+    <div class="container comparebodycontbut">
+  <div class="expand-button">
+   	<h5>Show all Features</h5>
+   	<i class="icon icon-uni3F"></i>
+  </div>
+  </div>
+  
+  
+</div>
+</div>
+</div>

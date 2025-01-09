@@ -1,0 +1,38 @@
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48.91 52.81">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 6.74px;
+      }
+
+      .cls-1, .cls-3, .cls-4, .cls-5 {
+        fill: #231f20;
+      }
+
+      .cls-1, .cls-4, .cls-5 {
+        font-family: FuturaPT-Bold, Futura PT;
+        font-weight: 700;
+      }
+
+      .cls-2 {
+        letter-spacing: -0.03em;
+      }
+
+      .cls-4 {
+        font-size: 18.84px;
+      }
+
+      .cls-5 {
+        font-size: 6.18px;
+      }
+    </style>
+  </defs>
+  <g>
+    <text class="cls-1" transform="translate(7.14 45.86)">ABR<tspan class="cls-2" x="13.17" y="0">A</tspan><tspan x="17.79" y="0">SION</tspan></text>
+    <g>
+      <path class="cls-3" d="M24.4,38.05A21.89,21.89,0,0,1,12.62,26.74a20.54,20.54,0,0,1-1.86-7.15V5.2H38.92V19.58a17.8,17.8,0,0,1-2.6,8.73A24.42,24.42,0,0,1,25.14,38l-.37.16ZM12.57,19.53v.1a3.18,3.18,0,0,0,0,.36c0,.33.09.81.2,1.4A21.1,21.1,0,0,0,14.28,26,19.86,19.86,0,0,0,24.74,36.21a22.46,22.46,0,0,0,10-8.82,16.07,16.07,0,0,0,2.36-7.81V7H12.57Z"/>
+      <text class="cls-4" transform="translate(18.96 29.66)">0</text>
+      <text class="cls-5" transform="translate(17.47 13.94)">ANSI</text>
+    </g>
+  </g>
+</svg>

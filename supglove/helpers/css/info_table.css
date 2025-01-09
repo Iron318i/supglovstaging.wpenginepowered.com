@@ -1,0 +1,136 @@
+.table-editor__body,
+.table-editor__controls {
+  margin: 20px 0;
+}
+
+.table-editor .label {
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.new_table_form input {
+  height: 32px;
+}
+
+.new_table_form input.error {
+  border-color: red;
+}
+
+.new_table_form {
+  display: flex;
+  gap: 8px;
+}
+
+.new_table_form .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.new_table_form button {
+  height: 32px;
+  align-self: end;
+}
+
+.table-editor table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.table-editor table, .table-editor th, .table-editor td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.table-editor td {
+  height: 28px;
+  padding: 4px 8px;
+}
+
+.table-editor td:focus {
+  outline: none;
+}
+
+.table-editor tr:nth-child(1) {
+  background-color: rgba(0,0,0,.05);
+  font-weight: bold;
+}
+
+.table-editor td:nth-child(1) {
+  text-align: left;
+}
+
+#info_table_general_settings_metabox .rwmb-field.rwmb-wysiwyg-wrapper {
+  height: 0;
+  overflow: hidden;
+}
+
+#info_table_general_settings_metabox .rwmb-field.rwmb-textarea-wrapper {
+  height: 0;
+  overflow: hidden;
+}
+
+.cell-controls {
+  position: relative;
+  pointer-events: none;
+  position: absolute;
+  background-color: rgba(0,0,0,.05);
+}
+
+.cell-controls .control-button {
+  position: absolute;
+  pointer-events: all;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border: 1px solid;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  font-weight: bold;
+  line-height: 12px;
+  cursor: pointer;
+}
+
+.cell-controls .control-button.top {
+  top: 0;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
+}
+
+.cell-controls .control-button.right {
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) translateX(50%);
+}
+
+.cell-controls .control-button.bottom {
+  bottom: 0;
+  left: 50%;
+  transform: translateY(50%) translateX(-50%);
+}
+
+.cell-controls .control-button.left {
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) translateX(-50%);
+}
+
+#remove-table.disabled {
+  display: none;
+}
+
+.table-controls {
+  width: 14px;
+  height: 14px;
+  background: red;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  font-weight: bold;
+  line-height: 12px;
+  cursor: pointer;
+  display: flex;
+  position: absolute;
+}

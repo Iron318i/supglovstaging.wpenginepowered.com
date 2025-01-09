@@ -1,0 +1,415 @@
+@page {
+    size: A4 portrait;
+}
+
+*, *:before, *:after {
+    color: #58585A !important;
+}
+
+a[href]:after {
+    content: '';
+}
+
+#primary {
+    padding: 0;
+}
+
+/* HEADER START */
+.site-header {
+    position: relative !important;
+    border-bottom: none;
+    top: 0 !important;
+}
+
+.header-main .header-row {
+    display: block;
+}
+
+.header-main .menu-logo {
+    margin: 0 auto;
+}
+
+.header-main .menu-logo .site-logo a.logo {
+    margin: 0 auto;
+}
+
+.header-main .menu-logo .site-logo a.logo img {
+    display: none !important;
+}
+
+.header-main .menu-logo .site-logo a.logo img.visible-lg {
+    display: block !important;
+}
+
+.header-main .menu-nav {
+    display: none;
+}
+
+.header-main .menu-extra {
+    display: none;
+}
+/* HEADER END */
+
+/* PRODUCT CONTENT START */
+#content {
+    min-height: 400px;
+}
+
+.kevlar_icon {
+    bottom: 230px;
+}
+
+.su-header-minimized {
+    display: none;
+    height: 0;
+}
+
+.specsaccord .accordion_content {
+    padding: 10px 0px;
+}
+
+.single-product .site-content {
+    padding-top: 30px;
+}
+
+.minimal_style.horizontal .resp-tab-content {
+    border: 0;
+    padding: 10px 0px 8px;
+}
+
+.woocommerce div.product div.summary {
+    margin-bottom: 0;
+}
+
+#tabnew-specs_tab {
+    min-height: 1050px;
+}
+
+#tabnew-fitsizing_tab .tabgloveheader {
+    font-size: 18px;
+}
+
+.site-footer .footer-widget {
+    padding: 20px 0 20px;
+}
+
+.site-footer .footer-copyright {
+    padding-bottom: 13px;
+}
+
+.sleevespecspic, .glovespecspic {
+    margin-bottom: 10px;
+}
+
+.lead {
+    font-size: 17px;
+    line-height: 23px;
+}
+
+.entry-summary p.lead {
+    margin: 10px 0 0 0;
+    orphans: unset;
+    widows: unset;
+    font-size: 16px;
+    line-height: 23px;
+}
+
+.supro-single-product-detail .product-summary {
+    padding-left: 20px !important;
+}
+
+.woocommerce-product-details__short-description {
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.masonry {
+    height: auto;
+}
+
+.woocommerce-product-details__short-description p {
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.woocommerce div.product form.cart {
+    margin: 0;
+}
+
+.bottomsingle-product {
+    min-height: 500px;
+}
+
+.entry-summary .glovelabels {
+    padding: 0;
+}
+
+.acc_holder.border .acc_item {
+    margin-bottom: 0;
+}
+
+.woocommerce div.product .product_title {
+    font-size: 27px;
+}
+
+.tabct-description li {
+    font-size: 14px;
+}
+
+.site-content .supro-single-product-detail {
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.site-content .supro-single-product-detail .container {
+    display: flex;
+}
+
+.site-content .product-images-wrapper {
+    width: 50% !important;
+    max-height: 441px;
+}
+
+.site-content .product-images-wrapper .woocommerce-product-gallery {
+    padding-right: 50px;
+}
+
+.site-content .product-images-wrapper .woocommerce-product-gallery .flex-control-thumbs {
+    display: none !important;
+}
+
+.site-content .product-images-wrapper .woocommerce-product-gallery__wrapper {
+    width: 100% !important;
+}
+
+.site-content .product-images-wrapper .woocommerce-product-gallery__wrapper div:nth-child(2) {
+    display: none !important;
+}
+
+.site-content .product-images-wrapper .woocommerce-product-gallery__image {
+    width: 100% !important;
+    float: none !important;
+}
+
+.site-content .product-images-wrapper .woocommerce-product-gallery .zoomImg {
+    display: none !important;
+}
+
+.site-content .product-images-wrapper .woocommerce-product-gallery img {
+    width: auto !important;
+    height: auto !important;
+}
+
+.product-gallery-control {
+    display: none;
+}
+
+.site-content .product-summary {
+    width: 50% !important;
+    margin-top: 0 !important;
+}
+
+.site-content .product_title {
+    font-weight: 400;
+    color: #000 !important;
+}
+
+.site-content .glovelabels li img {
+    max-height: 42px;
+}
+
+.site-content .single-button-wrapper {
+    display: none !important;
+}
+
+.print_page {
+    display: none;
+}
+/* PRODUCT CONTENT END */
+
+/* PRODUCT TABS START */
+.resp-tabs-list {
+    display: none;
+}
+
+.resp-tabs-container .new-tabs-container {
+    display: block;
+    min-height: 420px;
+}
+
+h2.resp-accordion {
+    display: none;
+}
+
+.tabct-description {
+    padding-bottom: 15px !important;
+}
+
+.resp-tabs-container .tabct-description:before,
+.resp-tabs-container .tabct-specs_tab:before,
+.resp-tabs-container .tabct-fitsizing_tab:before {
+    display: block;
+    font-family: 'Helvetica Neue Bold Extended';
+    text-transform: uppercase;
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: 20px;
+}
+.resp-tabs-container .tabct-description:before {
+    content: 'Details';
+}
+.resp-tabs-container .tabct-specs_tab:before {
+    content: 'Specs';
+}
+.resp-tabs-container .tabct-fitsizing_tab:before {
+    content: 'Fit & Sizing';
+}
+
+.resp-tabs-container .new-tabs-container {
+    clear: both;
+}
+
+.resp-tabs-container .new-tabs-container .prodetailsleft {
+    float: left;
+    padding: 0 20px 0 0 !important;
+    width: 50%;
+}
+
+.resp-tabs-container .new-tabs-container .col.col-sm-12.col-md-6.prodetailsright {
+    float: left;
+    margin-top: 0 !important;
+    padding: 0 0 0 20px !important;
+    width: 50%;
+}
+
+.resp-tabs-container .new-tabs-container .accordion_content {
+    display: flex !important;
+    flex-wrap: wrap;
+    /*margin: 0 -8px;*/
+}
+
+.resp-tabs-container .new-tabs-container .accordion_content .attributeholder {
+    width: 50%;
+}
+.resp-tabs-container .new-tabs-container .accordion_content .col-xs-12.col-sm-4.col-md-4.col-lg-4.attributeholder {
+    padding: 0 8px !important;
+}
+
+.resp-tabs-container .new-tabs-container .acc_control:before {
+    content: "\f2f4";
+}
+
+.resp-tabs-container .new-tabs-container .accordion_content .specstable .specsrow:nth-child(odd) {
+    background: #F8F6F1 !important;
+}
+
+.tabct-fitsizing_tab .col.col-sm-6.col-md-6 {
+    float: left;
+    width: 50%;
+}
+.tabct-fitsizing_tab .col.col-sm-6.col-md-6 img {
+    max-height: 250px;
+}
+h6, .h6-look {
+    margin: 5px 0;
+}
+/* PRODUCT TABS END */
+
+/* COMPARE START */
+.comparearea .zeromag {
+    display: none;
+}
+
+.comparearea .therelatedones {
+    display: none;
+}
+
+.comparearea .single-product-cta {
+    padding: 40px 0 0px 0px;
+}
+
+.comparearea .single-product-cta .ctatitle {
+    visibility: hidden;
+    font-size: 0;
+}
+.comparearea .single-product-cta .ctatitle:before {
+    content: 'Request a Sample of This Product on SuperiorGlove.com';
+    display: block;
+    visibility: visible;
+    font-size: 30px;
+    font-weight: normal;
+    line-height: 114%;
+    max-width: 925px;
+    color: #1A1817 !important;
+}
+
+.comparearea .single-product-cta .subtitle {
+    visibility: hidden;
+    font-size: 0;
+}
+.comparearea .single-product-cta .subtitle:before {
+    content: 'Or email us at business.development@superiorglove.com';
+    visibility: visible;
+    font-family: 'Helvetica Neue Bold Extended';
+    font-size: 21px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #1A1817 !important;
+    line-height: 114%;
+}
+
+.comparearea .single-product-cta a {
+    display: none;
+}
+/* COMPARE END */
+
+/* FOOTER START */
+.site-footer .offfooter-2,
+.site-footer .offfooter-3,
+.site-footer .offfooter-4,
+.site-footer .offfooter-5 {
+    display: none;
+}
+
+.site-footer .footlogo {
+    text-align: center;
+}
+
+.site-footer .footlogo img {
+    display: none !important;
+}
+.site-footer .footlogo img.visible-md {
+    display: block !important;
+    margin: 0 auto;
+}
+
+.footer-copyright .footer-sidebar.footer-1, .footer-sidebar {
+    width: 50% !important;
+    float: left;
+}
+
+.woocommerce div.product .woocommerce-product-details__short-description {
+    font-size: 14px;
+    line-height: 22px;
+    margin-bottom: 0;
+}
+
+.footer-copyright .footer-sidebar.footer-2 {
+    width: 50% !important;
+}
+
+.footcopylinks a {
+    margin: 0;
+    font-size: 11px;
+}
+
+.footer-copyright .footer-sidebar.footer-3 {
+    display: none;
+}
+/* FOOTER END */
+
+.topmobilefilter {
+    display: none;
+}

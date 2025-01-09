@@ -1,0 +1,236 @@
+.enquire-button {
+  border-radius: unset;
+  box-shadow: unset;
+  border: unset;
+  background-color: transparent;
+  position: absolute;
+  right: 0;
+  top: 6px;
+  padding: 0;
+}
+
+.icon-enquire {
+  display: block;
+  width: 36px;
+  height: 36px;
+  pointer-events: none;
+}
+
+.icon-enquire::before {
+  content: '';
+  background: url(../img/product_attribute_icons/email-icon.svg);
+  background-size: cover;
+  display: block;
+  height: inherit;
+  width: inherit;
+}
+
+.enquire-button-full {
+  min-width: 300px;
+  max-width: 100%;
+  border: 0;
+  border-radius: 0;
+  background-color: #fd8541;
+  line-height: 1em;
+  font-size: 14px;
+  letter-spacing: 1px;
+  padding: 16px 40px;
+  z-index: 1;
+  transition: 0.5s;
+  border-radius: 0;
+  font-weight: 600;
+  font-family: 'Helvetica Neue Bold Extended',Arial,sans-serif;
+  text-transform: uppercase;
+  color: #fff;
+  height: 50px;
+}
+
+.enquire-button-full .icon-enquire::before {
+  filter: brightness(0) invert(1);
+}
+
+.enquire-button-full {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.enquire-button-full:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  z-index: -1;
+  transition: transform 350ms ease-in-out;
+  transform: scalex(0);
+  transform-origin: left;
+}
+
+.enquire-button-full:hover:before {
+  transform: scalex(1);
+}
+
+.enquire-button-full.compare {
+  min-width: unset;
+  width: 100%;
+  margin: 10px 0;
+  height: 43px;
+}
+
+.enquire-button-full.compare:hover {
+  background-color: #1A1817;
+}
+
+.supro-off-canvas-layer {
+  top: 0!important;
+}
+
+.enquire-form-modal {
+  position: fixed;
+  top: 94px;
+  right: -300%;
+  background-color: #f8f6f1;
+  z-index: 9999999999;
+  transition: .3s ease-in-out;
+  max-height: calc(100vh - 188px);
+  overflow-y: scroll;
+}
+
+.enquire-form-modal.show {
+  right: 0;
+}
+
+.enquire-product-form *::placeholder {
+  font-size: 15px!important;
+}
+
+.enquire-product-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 20px 25px !important;
+  padding-top: 72px !important;
+}
+
+.enquire-product-form p, .enquire-product-form p input, .enquire-product-form label, .enquire-product-form select {
+  margin: 0 !important;
+}
+
+.enquire-product-form label, .enquire-product-form span {
+  padding-left: 0 !important;
+}
+
+.enquire-product-form .column-textarea, .enquire-product-form h3 {
+  grid-column: 1 / 3;
+}
+
+.enquire-product-form h3 {
+  margin-top: 0;
+}
+
+.enquire-product-form .selectparent svg {
+  top: calc(50% - 5px);
+}
+
+.enquire-form-modal .close-enquire-modal {
+  font-family: 'Linearicons'!important;
+  speak: never;
+  font-style: normal;
+  font-weight: 400;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  transition: .3s ease-in-out;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.enquire-form-modal .close-enquire-modal::after {
+  content: '\e935';
+  font-size: 26px;
+  transition: .3s ease-in-out;
+  color: #58585A;
+}
+
+.enquire-form-modal .close-enquire-modal:hover:after {
+  color: #FD8541;
+}
+
+.enquire-form-modal .wpcf7-form .wpcf7-submit {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  display: inline-block;
+  height: 50px;
+  line-height: 48px;
+  padding: 0 60px;
+  text-transform: uppercase;
+  border: 0;
+  box-shadow: none;
+  letter-spacing: 0.75px;
+  transition: 0.5s;
+  margin-top: 0px;
+  margin-left: 10px;
+  background-color: #FD8541;
+}
+
+.enquire-product-form .selectparent select, .enquire-product-form *::placeholder {
+  color: #7d759b !important;
+}
+
+.open-enquire-modal > * {
+  pointer-events: none;
+}
+
+@media (max-width: 481px) {
+  .enquire-form-modal {
+    position: fixed;
+    top: 0;
+    right: -300%;
+    max-height: 100vh;
+    overflow-y: scroll;
+  }
+
+  .enquire-product-form .column-input {
+    grid-column: 1 / 3;
+  }
+}
+
+.prdctfltr_filter:not(:has(label input)) {
+  display: none !important;
+}
+
+.open-canvas-panel .supro-off-canvas-layer {
+  display: block !important;
+}
+
+.warning-message {
+  font-size: 10px;
+  line-height: 1.5;
+  display: flex;
+  gap: 12px;
+}
+
+.warning-message img{
+  object-fit: contain;
+}
+
+#primary-print {
+  display: none;
+}
+
+#wpseo-frontend-inspector section {
+  display: none !important;
+  border: unset !important;
+}

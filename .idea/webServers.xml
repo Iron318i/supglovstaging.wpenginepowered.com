@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="7e514baa-22ff-48e3-8b05-39ec8612d947" name="supglovstaging" url="https://supglovstaging.wpenginepowered.com/">
+        <fileTransfer rootFolder="/wp-content" accessType="SFTP" host="supglovstaging.sftp.wpengine.com" port="2222" sshConfigId="1b884bab-27f7-4293-9503-671716f2fae6" sshConfig="supglovstaging-dev@supglovstaging.sftp.wpengine.com:2222 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
