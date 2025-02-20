@@ -521,16 +521,20 @@ if ( !function_exists('handle_shortcode_sg_resources_filter_results') ) {
     if ( empty($atts['default_language']) ) {
       $atts['default_language'] = null;
     }
-    
-    if ( empty($atts['posts_number']) || ($atts['posts_number'] !== -1)) {
-      settype($atts['posts_number'], 'integer');
-      $atts['posts_number'] = intval($atts['posts_number'], 10);
-    }
+	  
+	if ( $atts['posts_number'] === '0' || $atts['posts_number'] === 0 ) {
+		$atts['posts_number'] = 0;
+	} else {
+		if ( empty($atts['posts_number']) || ($atts['posts_number'] !== -1)) {
+		  settype($atts['posts_number'], 'integer');
+		  $atts['posts_number'] = intval($atts['posts_number'], 10);
+		}
 
-    if ( empty($atts['posts_number']) || ($atts['posts_number'] < -1) ) {
-      $atts['posts_number'] = -1;
-    }
-    
+		if ( empty($atts['posts_number']) || ($atts['posts_number'] < -1) ) {
+		  $atts['posts_number'] = -1;
+		}
+	}
+
     $atts['featured_posts'] = validate_shortcode_sg_resources_filter_list_to_array( $atts['featured_posts'], true, 'sanitize_positive_number' );
     
     if ( !empty($atts['featured_links']) ) {
@@ -1332,7 +1336,10 @@ if ( !function_exists('shortcode_sg_resources_filter_results') ) {
           
           if ( 
             !empty($type) && !empty($type->term_id) && 
-            (empty($atts['exclude_types']) || !in_array($type->slug, $atts['exclude_types'])) 
+            ( 
+      			!isset($atts['exclude_types']) || empty($atts['exclude_types']) || !is_array($atts['exclude_types']) || 
+      			!in_array($type->slug, $atts['exclude_types']) 
+    		)
           ) {
             // Merges all term children into a single array of their IDs.
             $subtype_ids = get_term_children( $type->term_id, 'sg_type' );
@@ -1343,7 +1350,13 @@ if ( !function_exists('shortcode_sg_resources_filter_results') ) {
                 $subtype = get_term_by( 'id', $subtype_id, 'sg_type' );
                 
                 // check if this term is a direct child of the parent content type
-                if ( !empty($subtype) && ($subtype->parent == $type->term_id) ) {
+                if ( 
+          			!empty($subtype) && ($subtype->parent == $type->term_id) && 
+          			( 
+            			!isset($atts['exclude_types']) || empty($atts['exclude_types']) || !is_array($atts['exclude_types']) || 
+            			!in_array($subtype->slug, $atts['exclude_types']) 
+          			)
+        		) {
                   // if any topic is selected, add subtype only if it has posts with this topic
                   $add_subtype = true;
                   
@@ -1422,16 +1435,21 @@ if ( !function_exists('shortcode_sg_resources_filter_results') ) {
         }
         
         if ( !empty($sg_featured) ) {
-          $posts_number -= count($sg_featured);
+          if ( $posts_number > 0 ) {
+            $posts_number -= count($sg_featured);
+          }
         } else {
           $sg_featured = null;
         }
       }
       
-      if ( 
-        !empty($_POST_search) || !empty($_POST_topic) || (!empty($_POST_language) && ($_POST_language != $atts['default_language'])) || 
-        !empty($_GET_search) || !empty($_GET_topic) || (!empty($_GET_language) && ($_GET_language != $atts['default_language'])) || 
-        ( empty($atts['load_top_types']) && empty($atts['load_subtypes']) )
+      if (
+		($posts_number !== 0 && $posts_number !== '0') &&
+		(
+          !empty($_POST_search) || !empty($_POST_topic) || (!empty($_POST_language) && ($_POST_language != $atts['default_language'])) || 
+          !empty($_GET_search) || !empty($_GET_topic) || (!empty($_GET_language) && ($_GET_language != $atts['default_language'])) || 
+          ( empty($atts['load_top_types']) && empty($atts['load_subtypes']) )
+		)
       ) {
         // not default load or there is not top type request and no subtypes request
         // get usual posts
@@ -1489,8 +1507,12 @@ if ( !function_exists('shortcode_sg_resources_filter_results') ) {
         if ( !empty($sg_posts) ) {
           $posts_are_empty = false;
           
-          if ( $atts['posts_number'] < $sg_found_posts ) {
-            $sg_posts = array_splice( $sg_posts, 0, (($atts['posts_number'] > 0) ? $atts['posts_number'] : $sg_found_posts) );
+          if ( $posts_number < $sg_found_posts ) {
+			if ( $posts_number === 0 ) {
+				$sg_posts = array();
+			} else {
+				$sg_posts = array_splice( $sg_posts, 0, (($posts_number > 0) ? $posts_number : $sg_found_posts) );
+			}
           }
         }
       }

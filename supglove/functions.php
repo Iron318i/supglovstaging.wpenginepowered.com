@@ -2713,3 +2713,25 @@ function max_1_item_for_samples( $passed, $product_id, $quantity ) {
 
     return $passed;
 }
+function register_custom_sidebars() {
+    register_sidebar( array(
+        'name'          => __( 'No Sample Box Category', 'supglove' ),
+        'id'            => 'no-sample-box-category',
+        'description'   => __( 'Sidebar for the No Sample Box Products template.', 'supglove' ),
+        'before_widget' => '<div class="widget %2$s">',
+        'after_widget'  => '</div>',
+        'before_title'  => '<h3 class="widget-title">',
+        'after_title'   => '</h3>',
+    ) );
+}
+add_action( 'widgets_init', 'register_custom_sidebars' );
+function hide_top_bar_when_print() {
+    if (isset($_GET['action']) && $_GET['action'] === 'print') {
+        echo '<style>
+            div#wpfront-notification-bar {
+                display: none !important;
+            }
+        </style>';
+    }
+}
+add_action('wp_head', 'hide_top_bar_when_print');

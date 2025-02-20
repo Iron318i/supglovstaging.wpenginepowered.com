@@ -166,6 +166,7 @@ class Supro_WooCommerce {
 
 		//Add Glove Labels
 		add_action( 'woocommerce_single_product_summary', array( $this, 'product_glovelabels' ), 25 );
+		add_action( 'woocommerce_single_product_print_icons', array( $this, 'product_glovelabels' ), 10 );
     add_action( 'after_sg_fetured_product_gallery', array( $this, 'product_glovelabels' ), 25 );
 
 

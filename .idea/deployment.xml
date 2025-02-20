@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="supglovstaging" uploadOnCheckin="7e514baa-22ff-48e3-8b05-39ec8612d947" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false" autoUploadExternalChanges="true">
+    <option name="confirmBeforeUploading" value="false" />
     <serverData>
       <paths name="Penstock.capital">
         <serverdata>
@@ -55,5 +56,7 @@
         </serverdata>
       </paths>
     </serverData>
+    <option name="myUploadOnCheckinName" value="supglovstaging" />
+    <option name="myAutoUpload" value="ALWAYS" />
   </component>
 </project>

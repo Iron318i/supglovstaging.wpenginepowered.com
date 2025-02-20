@@ -17,7 +17,7 @@
 
 defined('ABSPATH') || exit;
 
-wp_enqueue_script('custom', get_stylesheet_directory_uri() . '/js/print-helper.js');
+//wp_enqueue_script('custom', get_stylesheet_directory_uri() . '/js/print-helper.js');
 
 global $product;
 
@@ -306,6 +306,7 @@ if ( $is_sample_box ) {
 		  display: flex;
 		  font-size: 16pt;
 		  font-weight: 700;
+		color: #000;
 		}
 
 		#primary-print .header .title .brand {
@@ -372,6 +373,7 @@ if ( $is_sample_box ) {
 		  font-weight: 700;
 		  line-height: 1.2;
 		  margin-bottom: 6px;
+			color: #000;
 		}
 
 		#primary-print .description .specs p {
@@ -535,7 +537,9 @@ if ( $is_sample_box ) {
         </div>
       </div>
 
-      <div class="icons"></div>
+      <div class="icons">
+		   <?php do_action('woocommerce_single_product_print_icons'); ?>
+		</div>
 
       <div class="description">
         <div class="col">

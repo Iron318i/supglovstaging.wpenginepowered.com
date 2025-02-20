@@ -78,6 +78,12 @@ if ( !empty($args['resources_section_link']) ) {
   $section_link = $args['resources_section_link'] . ( !empty($get_part) ? $get_part : '' );
 }
 
+$posts_per_load = -1;
+
+if ( isset($args['resources_per_load']) && $args['resources_per_load'] >= -1 ) {
+	$posts_per_load = $args['resources_per_load'];
+}
+
 $weglot_site_languages_list = null;
 $weglot_site_language = null;
 $weglot_site_language_external_code = null;

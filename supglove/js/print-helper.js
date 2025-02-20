@@ -1,3 +1,4 @@
+/*
 document.addEventListener('DOMContentLoaded', () => {
   const icons = document.querySelector('.glovelabels'),
         print = document.getElementById('primary-print')
@@ -9,3 +10,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
   console.log(icons)
 })
+*/
