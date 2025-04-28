@@ -110,6 +110,12 @@ if ( !empty($args['featured_product']) ) :
     $args['show_product_id'] = false;
     $sku = null;
   }
+  
+  if ( !empty($args['learn_more_link']) && ($args['learn_more_link'] === true || $args['learn_more_link'] === 1) ) {
+      $args['learn_more_link'] = true;
+  } else {
+      $args['learn_more_link'] = false;
+  }
 ?>
   <div class="sg-featured-product sg-featured-product--layout-<?php echo esc_attr( $args['layout'] ); ?>">
     <div class="sg-featured-product__inner-wrapper sg-featured-product__inner-wrapper--layout-<?php echo esc_attr( $args['layout'] ); ?>">
@@ -201,6 +207,12 @@ if ( !empty($args['featured_product']) ) :
               <?php echo wp_kses_post( $description ); ?>
             </div>
           <?php endif; ?>
+            
+            <?php if ( $args['learn_more_link'] ) : ?>
+            <p>
+                <a href="<?php the_permalink($product->get_id()); ?>" target="_blank" style="color: #fd8541;text-decoration: underline"><?php esc_html_e( 'Learn More', 'supro' ); ?></a>
+            </p>
+            <?php endif; ?>
           
           <?php if ( !empty($material_icon_urls) && ($args['layout'] == 'columns' || $args['layout'] == 'columns-2') ) : ?>
             <div class="sg-featured-product__icons sg-featured-product__icons--layout-<?php echo esc_attr( $args['layout'] ); ?>">

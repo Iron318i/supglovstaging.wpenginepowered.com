@@ -2051,6 +2051,7 @@ if ( !function_exists('shortcode_sg_featured_product') ) {
         'show_product_id' => false,
         'add_to_cart_link' => '',
         'add_to_cart_text' => '',
+        'learn_more_link' => false,
       ),
       $atts,
       'sg_featured_product'
@@ -2094,6 +2095,8 @@ if ( !function_exists('shortcode_sg_featured_product') ) {
     $atts['hide_add_to_cart'] = validate_shortcode_sg_resources_filter_bool( $atts['hide_add_to_cart'], false );
     
     $atts['show_product_id'] = validate_shortcode_sg_resources_filter_bool( $atts['show_product_id'], false );
+
+    $atts['learn_more_link'] = validate_shortcode_sg_resources_filter_bool( $atts['learn_more_link'], false );
     
     $product = wc_get_product( $atts['product_id'] );
     
@@ -2109,6 +2112,7 @@ if ( !function_exists('shortcode_sg_featured_product') ) {
         'show_product_id' => $atts['show_product_id'],
         'add_to_cart_link' => $atts['add_to_cart_link'],
         'add_to_cart_text' => $atts['add_to_cart_text'],
+        'learn_more_link' => $atts['learn_more_link'],
       ) );
       
       $html .= ob_get_contents();
