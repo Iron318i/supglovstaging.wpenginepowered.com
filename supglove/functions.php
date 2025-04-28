@@ -2735,3 +2735,326 @@ function hide_top_bar_when_print() {
     }
 }
 add_action('wp_head', 'hide_top_bar_when_print');
+
+add_action('woocommerce_checkout_process', 'validate_company_size');
+
+function validate_company_size() {
+    if (isset($_POST['company_size_safety_pro_value'])) { // Corrected field name
+        $company_size = sanitize_text_field($_POST['company_size_safety_pro_value']);
+
+        if (strpos($company_size, "0-100") !== false) { // Check if the value contains "0-100"
+            wc_add_notice(__('Your company must have at least 100 employees to proceed.', 'woocommerce'), 'error');
+        }
+    }
+}
+function checkout_employee_validation_script() {
+    if (is_checkout()) {
+        ?>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                console.log("✅ Validation Script Loaded Successfully");
+
+                function checkCompanySizeField() {
+                    let employeeField = jQuery("#company_size_safety_pro_value");
+                    
+                    if (!employeeField.length) {
+                        console.log("⚠️ Company size field is not found yet.");
+                        return false;
+                    }
+                    
+                    let selectedValue = employeeField.val();
+                    console.log("Company Size Selected:", selectedValue);
+                    
+                    if (selectedValue && selectedValue.includes("0-100")) {
+                        console.log("❌ Blocked Next Step: Employee count is below 100.");
+                        alert("Your company must have at least 100 employees to proceed.");
+                        return false;
+                    }
+
+                    console.log("✅ Allowed: Employee count is valid.");
+                    return true;
+                }
+
+                let nextButton = document.querySelector("#action-next");
+
+                if (nextButton) {
+                    nextButton.addEventListener("click", function (event) {
+                        if (!checkCompanySizeField()) {
+                            event.preventDefault();
+                        }
+                    });
+
+                    // Disable the button when an invalid option is selected
+                    jQuery(document).on("change", "#company_size_safety_pro_value", function () {
+                        if (!checkCompanySizeField()) {
+                            jQuery("#action-next").prop("disabled", true);
+                        } else {
+                            jQuery("#action-next").prop("disabled", false);
+                        }
+                    });
+                } else {
+                    console.log("❌ Next Button Not Found!");
+                }
+            });
+        </script>
+        <?php
+    }
+}
+add_action('wp_footer', 'checkout_employee_validation_script');
+
+function change_all_add_to_cart_buttons_dynamic() {
+    ?>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            function updateButtons() {
+                document.querySelectorAll(
+                    '.woocommerce div.product form.cart .button, .woocommerce .sample-box-cta-add-to-cart-form button.button.alt, .sg-featured-product__add-to-cart-button'
+                ).forEach(function(button) {
+                    if (!button.classList.contains("updated-text")) {
+                        button.innerHTML = "ADD TO SAMPLE BOX <span style='font-weight:bold;'>+</span>";
+                        button.classList.add("updated-text"); // Prevents duplicate updates
+                    }
+                });
+            }
+
+            // Run once on page load
+            updateButtons();
+
+            // Observe changes in the document for dynamically added buttons (AJAX support)
+            let observer = new MutationObserver(updateButtons);
+            observer.observe(document.body, { childList: true, subtree: true });
+        });
+    </script>
+    <?php
+}
+
+add_action('wp_footer', 'change_all_add_to_cart_buttons_dynamic');
+
+function shortcode_sample_box_products($atts) {
+  $atts = shortcode_atts([
+    'ids' => '', // comma-separated product IDs
+    'title' => "What's in the Box"
+  ], $atts);
+
+  $product_ids = array_filter(array_map('intval', explode(',', $atts['ids'])));
+  if (empty($product_ids)) return '';
+
+  ob_start();
+  ?>
+  <div class="product-box sample-box">
+    <div class="container">
+      <h2 class="sample-box__products-title"><?= esc_html($atts['title']) ?></h2>
+      <div class="sg-new-products sg-new-products--layout-columns-2 sg-new-products--columns-3 sg-new-products--sample-box">
+        <?php
+          foreach ($product_ids as $product_id) {
+            $product = wc_get_product($product_id);
+            if (!$product) continue;
+
+            get_template_part('inc/shortcodes/sg/sg-featured-product', null, [
+              'featured_product'     => $product,
+              'title'                => '',
+              'subtitle'             => '',
+              'layout'               => 'columns-2',
+              'hide_add_to_cart'     => false,
+              'show_product_id'      => true,
+              'add_to_cart_link'     => $product->get_permalink(),
+              'add_to_cart_text'     => false,
+              'add_to_cart_target'   => '_blank',
+            ]);
+          }
+        ?>
+      </div>
+    </div>
+  </div>
+  <?php
+  return ob_get_clean();
+}
+add_shortcode('sample_box_products', 'shortcode_sample_box_products');
+
+add_filter('woocommerce_add_to_cart_redirect', function($url) {
+    if (isset($_GET['redirect_to'])) {
+        $url = esc_url_raw($_GET['redirect_to']);
+    }
+    return $url;
+});
+add_action('template_redirect', function() {
+    if (is_checkout() && !is_user_logged_in()) {
+        wp_redirect(site_url('/my-account/'));
+        exit;
+    }
+});
+// 1. Add the custom link below the "Remember me" checkbox
+add_action('woocommerce_login_form', 'custom_registration_link_after_remember_me');
+function custom_registration_link_after_remember_me() {
+    echo '<p class="register-switch-link" style="margin-top:10px;">To register for a new account, <a href="#" id="open-register-tab">click here</a>.</p>';
+}
+// 2. JavaScript to click the actual "Register" tab link
+add_action('wp_footer', 'custom_switch_to_register_tab_script');
+function custom_switch_to_register_tab_script() {
+    if (is_account_page()) {
+        ?>
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const switchLink = document.getElementById('open-register-tab');
+            if (!switchLink) return;
+            switchLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                const tabLinks = document.querySelectorAll('.tabs-nav li a');
+                const registerLink = Array.from(tabLinks).find(link =>
+                    link.textContent.trim().toLowerCase() === 'register'
+                );
+                if (registerLink) {
+                    const mouseClickEvents = ['mouseover', 'mousedown', 'mouseup', 'click'];
+                    mouseClickEvents.forEach(type => {
+                        registerLink.dispatchEvent(new MouseEvent(type, {
+                            view: window,
+                            bubbles: true,
+                            cancelable: true
+                        }));
+                    });
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        });
+        </script>
+        <?php
+    }
+}
+function add_custom_user_roles() {
+    // Add Distributor role
+    add_role(
+        'distributor',
+        'Distributor',
+        [
+            'read' => true,
+            'edit_posts' => false,
+            'delete_posts' => false,
+        ]
+    );
+
+    // Add Safety Professional role
+    add_role(
+        'safety_professional',
+        'Safety Professional',
+        [
+            'read' => true,
+            'edit_posts' => false,
+            'delete_posts' => false,
+        ]
+    );
+
+    // Add Other role
+    add_role(
+        'other',
+        'Other',
+        [
+            'read' => true,
+            'edit_posts' => false,
+            'delete_posts' => false,
+        ]
+    );
+}
+
+add_action('init', 'add_custom_user_roles');
+add_action('wp_footer', 'add_placeholder_to_all_afreg_selects', 20);
+function add_placeholder_to_all_afreg_selects() {
+    if (!is_account_page()) return;
+    ?>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selects = document.querySelectorAll('select[name^="afreg_additional_"]');
+        selects.forEach(select => {
+            const hasPlaceholder = Array.from(select.options).some(opt => opt.value === "");
+            if (!hasPlaceholder) {
+                const placeholder = document.createElement('option');
+                placeholder.value = "";
+                placeholder.textContent = "Please Select";
+                placeholder.disabled = true;
+                placeholder.selected = true;
+                placeholder.hidden = false;
+                select.insertBefore(placeholder, select.firstChild);
+            }
+        });
+    });
+    </script>
+    <?php
+}
+add_action('add_meta_boxes', function() {
+    add_meta_box('restrict_roles_meta_box', 'Restrict Page by Role', 'restrict_roles_meta_box_callback', 'page', 'side');
+});
+
+function restrict_roles_meta_box_callback($post) {
+    $custom_roles = [
+        'distributor' => 'Distributor',
+        'safety_professional' => 'Safety Professional',
+    ];
+    $saved_roles = get_post_meta($post->ID, '_restricted_roles', true) ?: [];
+
+    foreach ($custom_roles as $role => $label) {
+        $checked = in_array($role, $saved_roles) ? 'checked' : '';
+        echo "<p><label><input type='checkbox' name='restricted_roles[]' value='$role' $checked> $label</label></p>";
+    }
+}
+add_action('save_post', function($post_id) {
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+
+    if (isset($_POST['restricted_roles'])) {
+        update_post_meta($post_id, '_restricted_roles', array_map('sanitize_text_field', $_POST['restricted_roles']));
+    } else {
+        delete_post_meta($post_id, '_restricted_roles');
+    }
+});
+add_action('template_redirect', function() {
+    if (is_page()) {
+        global $post;
+        $restricted_roles = get_post_meta($post->ID, '_restricted_roles', true);
+
+        if (!empty($restricted_roles)) {
+            // Always allow admins and editors
+            if (current_user_can('administrator') || current_user_can('editor')) {
+                return;
+            }
+
+            // Allow if the user's role matches any of the checked roles
+            foreach ($restricted_roles as $role) {
+                if (current_user_can($role)) {
+                    return;
+                }
+            }
+
+            // If no roles match, redirect
+            wp_redirect(home_url());
+            exit;
+        }
+    }
+});
+add_filter('wpcf7_form_elements', 'disable_cf7_form_for_guests');
+function disable_cf7_form_for_guests($form) {
+    if (!is_user_logged_in()) {
+        // Disable all input/textarea/select fields
+        $form = preg_replace_callback('/<(input|textarea|select)(.*?)>/i', function($matches) {
+            return '<' . $matches[1] . $matches[2] . ' disabled>';
+        }, $form);
+
+        // Replace the submit button with a message
+        $form = preg_replace('/<input[^>]+type=[\'"]submit[\'"][^>]*>/i', '<p style="color:#888; font-style:italic;">Please login to submit a form request.</p>', $form);
+    }
+
+    return $form;
+}
+
+add_filter('wp_nav_menu_objects', 'replace_login_menu_item', 10, 2);
+function replace_login_menu_item($items, $args) {
+    foreach ($items as &$item) {
+        if ($item->url == '#login') {
+            if (is_user_logged_in()) {
+                $item->title = 'Account';
+                $item->url = wc_get_page_permalink('myaccount');
+            } else {
+                $item->title = 'Login';
+                $item->url = wc_get_page_permalink('myaccount');
+            }
+        }
+    }
+    return $items;
+}

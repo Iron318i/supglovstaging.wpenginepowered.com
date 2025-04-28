@@ -22837,4 +22837,19 @@ li#menu-item-20949 {
     display: none !important;
 }
 
+.require-login-form input,
+.require-login-form textarea,
+.require-login-form select {
+  background-color: #f0f0f0;
+  pointer-events: none;
+  opacity: 0.6;
+}
 
+.woocommerce form .form-row label {
+    font-size: 15px;
+    font-weight: 400;
+    margin-bottom: 5px;
+    display: block;
+	color: black;
+    font-family: 'Helvetica Neue Bold Extended'!important;
+}

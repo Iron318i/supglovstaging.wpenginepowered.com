@@ -6,10 +6,8 @@
  *
  * @package Supglove
  */
-
 ?>
 	<?php
-
 	/*
 	 *  supro_site_content_close - 100
 	 */
@@ -32,11 +30,29 @@
 	<?php do_action( 'supro_after_footer' ) ?>
 </div><!-- #page -->
 <div id="hiddencartopen" class="hiddenclick"></div>
+
+<!-- 🛠 Bulletproof CSS language visibility fix -->
+<style>
+  .link-en, .link-es, .link-pt-br, .link-fr {
+    display: none !important;
+  }
+  html[lang="en-US"] body .link-en,
+  html[lang="es"] body .link-es,
+  html[lang="pt-BR"] body .link-pt-br,
+  html[lang="fr"] body .link-fr {
+    display: block !important;
+  }
+</style>
+
+<!-- 🔁 Shortcode compatibility patch for pt-BR -->
+<script>
+  if (document.documentElement.lang === "pt-BR") {
+    document.documentElement.lang = "pt-br";
+  }
+</script>
+
 <?php wp_footer(); ?>
-
-
-
-
-
 </body>
 </html>
+
+
