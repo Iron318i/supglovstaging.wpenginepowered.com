@@ -3058,3 +3058,84 @@ function replace_login_menu_item($items, $args) {
     }
     return $items;
 }
+
+add_filter('do_shortcode_tag', 'handle_all_cf7_shortcodes', 10, 4);
+function handle_all_cf7_shortcodes($output, $tag, $atts, $m) {
+    if ($tag !== 'contact-form-7' || is_user_logged_in()) {
+        return $output;
+    }
+
+    $login_url = wp_login_url(get_permalink());
+    $register_url = wp_registration_url();
+
+    $form_id = isset($atts['id']) ? $atts['id'] : 0;
+
+    $form_heading = get_post_meta($form_id, '_cf7_custom_heading', true);
+    $form_description = get_post_meta($form_id, '_cf7_custom_description', true);
+
+    $output_html = '';
+
+    if (!empty($form_heading) {
+        $output_html .= '<div class="form-sample-box">';
+        $output_html .= !empty($form_heading) ? '<h4>' . esc_html($form_heading) . '</h4>' : '';
+        $output_html .= !empty($form_description) ? '<p>' . esc_html($form_description) . '</p>' : '';
+        $output_html .= '</div>';
+    }
+
+    $output_html .= '
+    <div class="protected-form-message">
+        <h2 style="margin-bottom: 0;">CREATE A FREE ACCOUNT</h2>
+        <h3 style="margin: 0;">Sign up once—no more forms<br></h3>
+        <p>Your info is saved so you can get what you need fast</p>
+        <ul style="color: #1A1817!important;font-weight: 600;">
+            <li style="margin-bottom: 8px;">Free Samples</li>
+            <li style="margin-bottom: 8px;">Onsite services</li>
+            <li style="margin-bottom: 8px;">Expert advice</li>
+            <li style="margin-bottom: 8px;">Email updates</li>
+            <li style="margin-bottom: 8px;">And more!</li>
+        </ul>
+       <div style="margin: 30px 0;">
+            <a href="' . esc_url($register_url) . '" class="buttonogs btn_large btn_theme_color">SIGN UP</a>
+        </div>
+        
+        <p style="font-size: 14px;">Already have an account? <a href="' . esc_url($login_url) . '" style="color:#fd8541; text-decoration: underline;">Sign In</a></p>
+    </div>';
+
+    return $output_html;
+}
+
+add_action('wpcf7_admin_after_form', 'add_cf7_custom_fields_meta_box');
+function add_cf7_custom_fields_meta_box($form) {
+    $form_id = $form->id();
+    $heading = get_post_meta($form_id, '_cf7_custom_heading', true);
+    $description = get_post_meta($form_id, '_cf7_custom_description', true);
+
+    echo '<div class="metabox-holder" style="margin-top: 20px;">
+        <div class="postbox">
+            <h2 style="padding: 10px 15px;">Custom Form Header</h2>
+            <div class="inside" style="padding: 0 15px 15px;">
+                <div class="cf7-field-container">
+                    <p>
+                        <label for="cf7_custom_heading">Form Heading:</label><br>
+                        <input type="text" id="cf7_custom_heading" name="cf7_custom_heading" value="' . esc_attr($heading) . '" style="width: 100%;">
+                    </p>
+                    <p>
+                        <label for="cf7_custom_description">Form Description:</label><br>
+                        <textarea id="cf7_custom_description" name="cf7_custom_description" style="width: 100%; height: 80px;">' . esc_textarea($description) . '</textarea>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>';
+}
+
+add_action('wpcf7_save_contact_form', 'save_cf7_custom_fields');
+function save_cf7_custom_fields($form) {
+    if (isset($_POST['cf7_custom_heading'])) {
+        update_post_meta($form->id(), '_cf7_custom_heading', sanitize_text_field($_POST['cf7_custom_heading']));
+    }
+
+    if (isset($_POST['cf7_custom_description'])) {
+        update_post_meta($form->id(), '_cf7_custom_description', sanitize_textarea_field($_POST['cf7_custom_description']));
+    }
+}
