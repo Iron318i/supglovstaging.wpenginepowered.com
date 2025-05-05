@@ -22836,7 +22836,6 @@ body .wpcf7-form input[type="checkbox"]:checked:before {
 li#menu-item-20949 {
     display: none !important;
 }
-
 .require-login-form input,
 .require-login-form textarea,
 .require-login-form select {
@@ -22846,10 +22845,18 @@ li#menu-item-20949 {
 }
 
 .woocommerce form .form-row label {
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 400;
     margin-bottom: 5px;
     display: block;
 	color: black;
     font-family: 'Helvetica Neue Bold Extended'!important;
 }
+.col-lg-4.col-md-8.col-lg-offset-4.col-md-offset-2.col-sm-12.col-xs-12.col-login {
+    width: 100%!important;
+    max-width: 600px!important;
+    margin: 0 auto !important;
+    float: none !important;
+}
+
+
