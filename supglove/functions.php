@@ -2877,7 +2877,6 @@ add_filter('woocommerce_add_to_cart_redirect', function($url) {
     }
     return $url;
 });
-
 add_action('template_redirect', function() {
     if (is_checkout() && !is_user_logged_in()) {
         wp_redirect(site_url('/my-account/'));
@@ -2895,28 +2894,28 @@ function custom_switch_to_register_tab_script() {
     if (is_account_page()) {
         ?>
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const switchLink = document.getElementById('open-register-tab');
-                if (!switchLink) return;
-                switchLink.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const tabLinks = document.querySelectorAll('.tabs-nav li a');
-                    const registerLink = Array.from(tabLinks).find(link =>
-                        link.textContent.trim().toLowerCase() === 'register'
-                    );
-                    if (registerLink) {
-                        const mouseClickEvents = ['mouseover', 'mousedown', 'mouseup', 'click'];
-                        mouseClickEvents.forEach(type => {
-                            registerLink.dispatchEvent(new MouseEvent(type, {
-                                view: window,
-                                bubbles: true,
-                                cancelable: true
-                            }));
-                        });
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                });
+        document.addEventListener('DOMContentLoaded', function () {
+            const switchLink = document.getElementById('open-register-tab');
+            if (!switchLink) return;
+            switchLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                const tabLinks = document.querySelectorAll('.tabs-nav li a');
+                const registerLink = Array.from(tabLinks).find(link =>
+                    link.textContent.trim().toLowerCase() === 'register'
+                );
+                if (registerLink) {
+                    const mouseClickEvents = ['mouseover', 'mousedown', 'mouseup', 'click'];
+                    mouseClickEvents.forEach(type => {
+                        registerLink.dispatchEvent(new MouseEvent(type, {
+                            view: window,
+                            bubbles: true,
+                            cancelable: true
+                        }));
+                    });
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
             });
+        });
         </script>
         <?php
     }
@@ -2932,6 +2931,7 @@ function add_custom_user_roles() {
             'delete_posts' => false,
         ]
     );
+
     // Add Safety Professional role
     add_role(
         'safety_professional',
@@ -2942,6 +2942,7 @@ function add_custom_user_roles() {
             'delete_posts' => false,
         ]
     );
+
     // Add Other role
     add_role(
         'other',
@@ -2955,15 +2956,19 @@ function add_custom_user_roles() {
 }
 
 add_action('init', 'add_custom_user_roles');
+
+
 add_action('add_meta_boxes', function() {
     add_meta_box('restrict_roles_meta_box', 'Restrict Page by Role', 'restrict_roles_meta_box_callback', 'page', 'side');
 });
+
 function restrict_roles_meta_box_callback($post) {
     $custom_roles = [
         'distributor' => 'Distributor',
         'safety_professional' => 'Safety Professional',
     ];
     $saved_roles = get_post_meta($post->ID, '_restricted_roles', true) ?: [];
+
     foreach ($custom_roles as $role => $label) {
         $checked = in_array($role, $saved_roles) ? 'checked' : '';
         echo "<p><label><input type='checkbox' name='restricted_roles[]' value='$role' $checked> $label</label></p>";
@@ -2971,6 +2976,7 @@ function restrict_roles_meta_box_callback($post) {
 }
 add_action('save_post', function($post_id) {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+
     if (isset($_POST['restricted_roles'])) {
         update_post_meta($post_id, '_restricted_roles', array_map('sanitize_text_field', $_POST['restricted_roles']));
     } else {
@@ -2981,17 +2987,20 @@ add_action('template_redirect', function() {
     if (is_page()) {
         global $post;
         $restricted_roles = get_post_meta($post->ID, '_restricted_roles', true);
+
         if (!empty($restricted_roles)) {
             // Always allow admins and editors
             if (current_user_can('administrator') || current_user_can('editor')) {
                 return;
             }
+
             // Allow if the user's role matches any of the checked roles
             foreach ($restricted_roles as $role) {
                 if (current_user_can($role)) {
                     return;
                 }
             }
+
             // If no roles match, redirect
             wp_redirect(home_url());
             exit;
@@ -3005,11 +3014,14 @@ function disable_cf7_form_for_guests($form) {
         $form = preg_replace_callback('/<(input|textarea|select)(.*?)>/i', function($matches) {
             return '<' . $matches[1] . $matches[2] . ' disabled>';
         }, $form);
+
         // Replace the submit button with a message
         $form = preg_replace('/<input[^>]+type=[\'"]submit[\'"][^>]*>/i', '<p style="color:#888; font-style:italic;">Please login to submit a form request.</p>', $form);
     }
+
     return $form;
 }
+
 add_filter('wp_nav_menu_objects', 'replace_login_menu_item', 10, 2);
 function replace_login_menu_item($items, $args) {
     foreach ($items as &$item) {
@@ -3025,15 +3037,19 @@ function replace_login_menu_item($items, $args) {
     }
     return $items;
 }
+
 //Add Logged-Out State UI for All Contact Forms (Staging Only)
+
 add_filter('do_shortcode_tag', 'handle_all_cf7_shortcodes', 10, 4);
 function handle_all_cf7_shortcodes($output, $tag, $atts, $m)
 {
     if ($tag !== 'contact-form-7' || is_user_logged_in()) {
         return $output;
     }
+
     $login_url = wp_login_url(get_permalink());
     $register_url = wp_registration_url();
+
     return '
     <div class="protected-form-message">
         <h2 style="margin-bottom: 0;">CREATE A FREE ACCOUNT</h2>
@@ -3060,81 +3076,93 @@ function block_other_custom_user_role($username, $email, $validation_errors) {
         $validation_errors->add('registration-error', __('Sorry, you do not qualify for an account.', 'woocommerce'));
     }
 }
+
 // Frontend JS: block only if "other" is selected
 add_action('wp_footer', 'inline_js_block_other_role', 21);
 function inline_js_block_other_role() {
     if (!is_account_page()) return;
     ?>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const waitForElements = setInterval(() => {
-                const form = document.querySelector("form.register");
-                const roleDropdown = document.querySelector('#afreg_select_user_role');
-                const registerButton = form ? form.querySelector('button[type="submit"], input[type="submit"]') : null;
-                if (form && roleDropdown && registerButton) {
-                    clearInterval(waitForElements);
-                    // Hide button initially if nothing selected
-                    if (!roleDropdown.value || roleDropdown.value === "") {
+    document.addEventListener("DOMContentLoaded", function () {
+        const waitForElements = setInterval(() => {
+            const form = document.querySelector("form.register");
+            const roleDropdown = document.querySelector('#afreg_select_user_role');
+            const registerButton = form ? form.querySelector('button[type="submit"], input[type="submit"]') : null;
+
+            if (form && roleDropdown && registerButton) {
+                clearInterval(waitForElements);
+
+                // Hide button initially if nothing selected
+                if (!roleDropdown.value || roleDropdown.value === "") {
+                    registerButton.style.display = "none";
+                }
+
+                // Create error + help elements
+                const errorContainer = document.createElement("ul");
+                errorContainer.className = "woocommerce-error";
+                errorContainer.style.display = "none";
+                errorContainer.style.marginBottom = "15px";
+                roleDropdown.parentElement.insertAdjacentElement("afterend", errorContainer);
+
+                const helpMessage = document.createElement("p");
+                helpMessage.innerHTML = 'If you do not qualify, please <a href="/contact">contact us</a>.';
+                helpMessage.style.display = "none";
+                helpMessage.style.margin = "5px 0 15px";
+                roleDropdown.parentElement.insertAdjacentElement("afterend", helpMessage);
+
+                function checkRoleStatus() {
+                    const selected = roleDropdown.value.trim();
+
+                    if (!selected || selected === "") {
                         registerButton.style.display = "none";
+                        errorContainer.style.display = "none";
+                        helpMessage.style.display = "none";
+                        return;
                     }
-                    // Create error + help elements
-                    const errorContainer = document.createElement("ul");
-                    errorContainer.className = "woocommerce-error";
-                    errorContainer.style.display = "none";
-                    errorContainer.style.marginBottom = "15px";
-                    roleDropdown.parentElement.insertAdjacentElement("afterend", errorContainer);
-                    const helpMessage = document.createElement("p");
-                    helpMessage.innerHTML = 'If you do not qualify, please <a href="/contact">contact us</a>.';
-                    helpMessage.style.display = "none";
-                    helpMessage.style.margin = "5px 0 15px";
-                    roleDropdown.parentElement.insertAdjacentElement("afterend", helpMessage);
-                    function checkRoleStatus() {
-                        const selected = roleDropdown.value.trim();
-                        if (!selected || selected === "") {
-                            registerButton.style.display = "none";
-                            errorContainer.style.display = "none";
-                            helpMessage.style.display = "none";
-                            return;
-                        }
+
+                    if (selected === "other") {
+                        errorContainer.innerHTML = "<li>Sorry, you do not qualify for an account.</li>";
+                        errorContainer.style.display = "block";
+                        helpMessage.style.display = "block";
+                        registerButton.style.display = "none";
+                    } else {
+                        errorContainer.innerHTML = "";
+                        errorContainer.style.display = "none";
+                        helpMessage.style.display = "none";
+                        registerButton.style.display = "block";
+                    }
+                }
+
+                // Check on change
+                roleDropdown.addEventListener("change", checkRoleStatus);
+
+                // Check on submit
+                form.addEventListener("submit", function (e) {
+                    const selected = roleDropdown.value.trim();
+                    if (!selected || selected === "" || selected === "other") {
+                        e.preventDefault();
                         if (selected === "other") {
                             errorContainer.innerHTML = "<li>Sorry, you do not qualify for an account.</li>";
-                            errorContainer.style.display = "block";
                             helpMessage.style.display = "block";
-                            registerButton.style.display = "none";
                         } else {
-                            errorContainer.innerHTML = "";
-                            errorContainer.style.display = "none";
+                            errorContainer.innerHTML = "<li>Please select your professional affiliation before registering.</li>";
                             helpMessage.style.display = "none";
-                            registerButton.style.display = "block";
                         }
+                        errorContainer.style.display = "block";
+                        registerButton.style.display = "none";
+                        roleDropdown.focus();
                     }
-                    // Check on change
-                    roleDropdown.addEventListener("change", checkRoleStatus);
-                    // Check on submit
-                    form.addEventListener("submit", function (e) {
-                        const selected = roleDropdown.value.trim();
-                        if (!selected || selected === "" || selected === "other") {
-                            e.preventDefault();
-                            if (selected === "other") {
-                                errorContainer.innerHTML = "<li>Sorry, you do not qualify for an account.</li>";
-                                helpMessage.style.display = "block";
-                            } else {
-                                errorContainer.innerHTML = "<li>Please select your professional affiliation before registering.</li>";
-                                helpMessage.style.display = "none";
-                            }
-                            errorContainer.style.display = "block";
-                            registerButton.style.display = "none";
-                            roleDropdown.focus();
-                        }
-                    });
-                    // Final fallback check on load
-                    setTimeout(checkRoleStatus, 100);
-                }
-            }, 100);
-        });
+                });
+
+                // Final fallback check on load
+                setTimeout(checkRoleStatus, 100);
+            }
+        }, 100);
+    });
     </script>
     <?php
 }
+
 add_filter('afreg_custom_fields_args', 'reorder_afreg_field_message_above_input', 10, 1);
 function reorder_afreg_field_message_above_input($fields) {
     foreach ($fields as $key => &$field) {
@@ -3142,35 +3170,42 @@ function reorder_afreg_field_message_above_input($fields) {
         if (!empty($field['message'])) {
             // Store the message text
             $message = '<span class="afreg_field_message">' . esc_html($field['message']) . '</span>';
+
             // Append message to label, instead of below input
             if (!empty($field['label'])) {
                 $field['label'] .= $message;
             } else {
                 $field['label'] = $message;
             }
+
             // Remove it from the bottom
             $field['message'] = '';
         }
     }
+
     return $fields;
 }
 add_action('wp_footer', function () {
     if (!is_account_page()) return;
     ?>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const roleField = document.querySelector('select[name="afreg_select_user_role"]');
-            if (roleField) {
-                const label = roleField.closest("p").querySelector("label");
-                const helpMessage = document.createElement("p");
-                helpMessage.className = "afreg_field_message";
-                helpMessage.innerText = "Samples are only available to safety professionals who manage safety at their company and to current Superior Glove distributors. Professional titles are verified."
-                ;
-                if (label) {
-                    label.insertAdjacentElement("afterend", helpMessage);
-                }
+    document.addEventListener("DOMContentLoaded", function () {
+        const roleField = document.querySelector('select[name="afreg_select_user_role"]');
+
+        if (roleField) {
+            const label = roleField.closest("p").querySelector("label");
+            const helpMessage = document.createElement("p");
+
+            helpMessage.className = "afreg_field_message";
+            helpMessage.innerText = "Samples are only available to safety professionals who manage safety at their company and to current Superior Glove distributors. Professional titles are verified."
+
+;
+
+            if (label) {
+                label.insertAdjacentElement("afterend", helpMessage);
             }
-        });
+        }
+    });
     </script>
     <?php
 });
@@ -3178,26 +3213,30 @@ add_action('wp_footer', function () {
     if (!is_account_page()) return;
     ?>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const roleSelect = document.getElementById("afreg_select_user_role");
-            const registerForm = document.querySelector("form.register");
-            if (!roleSelect || !registerForm) return;
-            const registerButton = registerForm.querySelector('button[type="submit"], input[type="submit"]');
-            if (!registerButton) return;
-            // Hide the button initially
-            registerButton.style.display = "none";
-            // Toggle visibility
-            function toggleRegisterButton() {
-                const selected = roleSelect.options[roleSelect.selectedIndex].value;
-                if (selected && selected !== "" && selected.toLowerCase().includes("select") === false) {
-                    registerButton.style.display = "block";
-                } else {
-                    registerButton.style.display = "none";
-                }
+    document.addEventListener("DOMContentLoaded", function () {
+        const roleSelect = document.getElementById("afreg_select_user_role");
+        const registerForm = document.querySelector("form.register");
+        if (!roleSelect || !registerForm) return;
+
+        const registerButton = registerForm.querySelector('button[type="submit"], input[type="submit"]');
+        if (!registerButton) return;
+
+        // Hide the button initially
+        registerButton.style.display = "none";
+
+        // Toggle visibility
+        function toggleRegisterButton() {
+            const selected = roleSelect.options[roleSelect.selectedIndex].value;
+            if (selected && selected !== "" && selected.toLowerCase().includes("select") === false) {
+                registerButton.style.display = "block";
+            } else {
+                registerButton.style.display = "none";
             }
-            roleSelect.addEventListener("change", toggleRegisterButton);
-            toggleRegisterButton(); // Run once in case browser auto-fills
-        });
+        }
+
+        roleSelect.addEventListener("change", toggleRegisterButton);
+        toggleRegisterButton(); // Run once in case browser auto-fills
+    });
     </script>
     <?php
 });
@@ -3206,67 +3245,77 @@ function validate_custom_email_domain() {
     if (!is_account_page()) return;
     ?>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const waitForEmail = setInterval(() => {
-                const form = document.querySelector("form.register");
-                const emailField = document.querySelector('input[name="afreg_additional_46062"]');
-                const registerButton = form ? form.querySelector('button[type="submit"], input[type="submit"]') : null;
-                const fieldWrapper = emailField ? emailField.closest("p") : null;
-                const label = fieldWrapper ? fieldWrapper.querySelector("label") : null;
-                if (form && emailField && registerButton && label) {
-                    clearInterval(waitForEmail);
-                    // Error message
-                    const errorContainer = document.createElement("ul");
-                    errorContainer.className = "woocommerce-error";
-                    errorContainer.style.display = "none";
-                    errorContainer.style.margin = "8px 0";
-                    label.insertAdjacentElement("afterend", errorContainer);
-                    // Contact us helper
-                    const helpMessage = document.createElement("p");
-                    helpMessage.innerHTML = 'If you do not have a business email, please <a href="/contact">contact us</a>.';
-                    helpMessage.style.display = "none";
-                    helpMessage.style.margin = "0 0 15px";
-                    helpMessage.style.fontSize = "14px";
-                    helpMessage.style.color = "#555";
-                    label.insertAdjacentElement("afterend", helpMessage);
-                    const blockedDomains = [
-                        "gmail.com", "yahoo.com", "hotmail.com",
-                        "aol.com", "icloud.com", "outlook.com",
-                        "live.com", "msn.com"
-                    ];
-                    function validateEmail() {
-                        const email = emailField.value.trim().toLowerCase();
-                        const emailDomain = email.split("@")[1] || "";
-                        if (email && blockedDomains.includes(emailDomain)) {
-                            errorContainer.innerHTML = "<li>Please enter a valid business email address (no personal email domains).</li>";
-                            errorContainer.style.display = "block";
-                            helpMessage.style.display = "block";
-                            registerButton.style.display = "none";
-                        } else {
-                            errorContainer.innerHTML = "";
-                            errorContainer.style.display = "none";
-                            helpMessage.style.display = "none";
-                            registerButton.style.display = "";
-                        }
+    document.addEventListener("DOMContentLoaded", function () {
+        const waitForEmail = setInterval(() => {
+            const form = document.querySelector("form.register");
+            const emailField = document.querySelector('input[name="afreg_additional_46062"]');
+            const registerButton = form ? form.querySelector('button[type="submit"], input[type="submit"]') : null;
+            const fieldWrapper = emailField ? emailField.closest("p") : null;
+            const label = fieldWrapper ? fieldWrapper.querySelector("label") : null;
+
+            if (form && emailField && registerButton && label) {
+                clearInterval(waitForEmail);
+
+                // Error message
+                const errorContainer = document.createElement("ul");
+                errorContainer.className = "woocommerce-error";
+                errorContainer.style.display = "none";
+                errorContainer.style.margin = "8px 0";
+                label.insertAdjacentElement("afterend", errorContainer);
+
+                // Contact us helper
+                const helpMessage = document.createElement("p");
+                helpMessage.innerHTML = 'If you do not have a business email, please <a href="/contact">contact us</a>.';
+                helpMessage.style.display = "none";
+                helpMessage.style.margin = "0 0 15px";
+                helpMessage.style.fontSize = "14px";
+                helpMessage.style.color = "#555";
+                label.insertAdjacentElement("afterend", helpMessage);
+
+                const blockedDomains = [
+                    "gmail.com", "yahoo.com", "hotmail.com",
+                    "aol.com", "icloud.com", "outlook.com",
+                    "live.com", "msn.com"
+                ];
+
+                function validateEmail() {
+                    const email = emailField.value.trim().toLowerCase();
+                    const emailDomain = email.split("@")[1] || "";
+
+                    if (email && blockedDomains.includes(emailDomain)) {
+                        errorContainer.innerHTML = "<li>Please enter a valid business email address (no personal email domains).</li>";
+                        errorContainer.style.display = "block";
+                        helpMessage.style.display = "block";
+                        registerButton.style.display = "none";
+                    } else {
+                        errorContainer.innerHTML = "";
+                        errorContainer.style.display = "none";
+                        helpMessage.style.display = "none";
+                        registerButton.style.display = "";
                     }
-                    emailField.addEventListener("input", validateEmail);
-                    emailField.addEventListener("blur", validateEmail);
-                    form.addEventListener("submit", function (e) {
-                        const email = emailField.value.trim().toLowerCase();
-                        const emailDomain = email.split("@")[1] || "";
-                        if (email && blockedDomains.includes(emailDomain)) {
-                            e.preventDefault();
-                            errorContainer.innerHTML = "<li>Please enter a valid business email address (no personal email domains).</li>";
-                            errorContainer.style.display = "block";
-                            helpMessage.style.display = "block";
-                            registerButton.style.display = "none";
-                            emailField.focus();
-                        }
-                    });
-                    setTimeout(validateEmail, 500);
                 }
-            }, 200);
-        });
+
+                emailField.addEventListener("input", validateEmail);
+                emailField.addEventListener("blur", validateEmail);
+
+                form.addEventListener("submit", function (e) {
+                    const email = emailField.value.trim().toLowerCase();
+                    const emailDomain = email.split("@")[1] || "";
+
+                    if (email && blockedDomains.includes(emailDomain)) {
+                        e.preventDefault();
+                        errorContainer.innerHTML = "<li>Please enter a valid business email address (no personal email domains).</li>";
+                        errorContainer.style.display = "block";
+                        helpMessage.style.display = "block";
+                        registerButton.style.display = "none";
+                        emailField.focus();
+                    }
+                });
+
+                setTimeout(validateEmail, 500);
+            }
+        }, 200);
+    });
     </script>
     <?php
 }
