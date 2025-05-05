@@ -3087,6 +3087,7 @@ function inline_js_block_other_role() {
         const waitForElements = setInterval(() => {
             const form = document.querySelector("form.register");
             const roleDropdown = document.querySelector('#afreg_select_user_role');
+            const formInputs = document.querySelector('.form-inputs');
             const registerButton = form ? form.querySelector('button[type="submit"], input[type="submit"]') : null;
 
             if (form && roleDropdown && registerButton) {
@@ -3095,6 +3096,7 @@ function inline_js_block_other_role() {
                 // Hide button initially if nothing selected
                 if (!roleDropdown.value || roleDropdown.value === "") {
                     registerButton.style.display = "none";
+                    formInputs.style.display = "none";
                 }
 
                 // Create error + help elements
@@ -3117,6 +3119,7 @@ function inline_js_block_other_role() {
                         registerButton.style.display = "none";
                         errorContainer.style.display = "none";
                         helpMessage.style.display = "none";
+                        formInputs.style.display = "none";
                         return;
                     }
 
@@ -3125,11 +3128,13 @@ function inline_js_block_other_role() {
                         errorContainer.style.display = "block";
                         helpMessage.style.display = "block";
                         registerButton.style.display = "none";
+                        formInputs.style.display = "none";
                     } else {
                         errorContainer.innerHTML = "";
                         errorContainer.style.display = "none";
                         helpMessage.style.display = "none";
                         registerButton.style.display = "block";
+                        formInputs.style.display = "block";
                     }
                 }
 
@@ -3318,4 +3323,39 @@ function validate_custom_email_domain() {
     });
     </script>
     <?php
+}
+
+add_action('wp_footer', 'moving_the_email_field_script');
+function moving_the_email_field_script() {
+    if (is_account_page()) {
+        ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var formInputs = document.querySelector('.woocommerce-form-register .form-inputs');
+                var privacyPolicy = document.querySelector('.woocommerce-privacy-policy-text');
+                var businessEmailField = document.getElementById('afreg_additional_46362');
+                var mainEmailField = document.getElementById('reg_email');
+
+                if (formInputs && privacyPolicy) {
+                    privacyPolicy.parentNode.insertBefore(formInputs, privacyPolicy);
+                    formInputs.style.display = 'none'; // Скрываем блок
+                }
+
+                if (businessEmailField && mainEmailField) {
+                    businessEmailField.addEventListener('input', function() {
+                        mainEmailField.value = this.value;
+                    });
+
+                    if (businessEmailField.value) {
+                        mainEmailField.value = businessEmailField.value;
+                    }
+
+                    businessEmailField.addEventListener('focus', function() {
+                        if (formInputs) formInputs.style.display = 'block';
+                    });
+                }
+            });
+        </script>
+        <?php
+    }
 }

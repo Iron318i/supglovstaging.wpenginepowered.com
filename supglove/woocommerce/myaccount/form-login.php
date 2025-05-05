@@ -73,7 +73,7 @@ do_action( 'woocommerce_before_customer_login_form' ); ?>
 
 
 							<form method="post" class="woocommerce-form woocommerce-form-register register" <?php do_action( 'woocommerce_register_form_tag' ); ?>>
-
+                                <div class="form-inputs">
 								<?php do_action( 'woocommerce_register_form_start' ); ?>
 
 								<?php if ( 'no' === get_option( 'woocommerce_registration_generate_username' ) ) : ?>
@@ -100,10 +100,10 @@ do_action( 'woocommerce_before_customer_login_form' ); ?>
 									<p><?php esc_html_e( 'A password will be sent to your email address.', 'supro' ); ?></p>
 
 								<?php endif; ?>
-
+                                </div>
 								<?php do_action( 'woocommerce_register_form' ); ?>
 
-								<p class="woocommerce-form-row form-row">
+								<p class="woocommerce-form-row form-row row-submit">
 									<?php wp_nonce_field( 'woocommerce-register', 'woocommerce-register-nonce' ); ?>
 									<button type="submit" class="woocommerce-Button woocommerce-button button woocommerce-form-register__submit" name="register" value="<?php esc_attr_e( 'Register', 'supro' ); ?>"><?php esc_html_e( 'Register', 'supro' ); ?></button>
 								</p>
