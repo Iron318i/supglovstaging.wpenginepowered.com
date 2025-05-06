@@ -28,7 +28,7 @@ function supro_enqueue_scripts() {
 			'linearicons',
 			'photoswipe',
 		//	'filters'
-		), '20250506-3'
+		), '20250506-4'
 	);
 
 	wp_enqueue_style('responsive');

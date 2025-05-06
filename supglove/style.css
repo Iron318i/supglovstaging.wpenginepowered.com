@@ -22867,6 +22867,9 @@ li#menu-item-20949 {
 .woocommerce form .form-row input.input-radio{
     height: auto!important;
 }
+.woocommerce-account .customer-login .form-row #reg_email{
+    display: none!important;
+}
 .hidden{
     display: none!important;
 }

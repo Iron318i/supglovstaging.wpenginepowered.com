@@ -3352,6 +3352,15 @@ function custom_registration_form_behavior() {
                 }
             }
 
+            function disableEmptySelectOptions() {
+                document.querySelectorAll('.input-select option').forEach(option => {
+                    if (option.value === "") {
+                        option.disabled = true;
+                        option.selected = true;
+                    }
+                });
+            }
+
             const waitForElements = setInterval(() => {
                 const form = document.querySelector("form.register");
                 const roleDropdown = document.querySelector('#afreg_select_user_role');
@@ -3362,14 +3371,7 @@ function custom_registration_form_behavior() {
                 if (form && roleDropdown && registerButton && companySizeDropdown) {
                     clearInterval(waitForElements);
 
-                    if (companySizeDropdown.options.length > 0) {
-                        const placeholderOption = document.createElement('option');
-                        placeholderOption.value = "";
-                        placeholderOption.textContent = "Choose your Company Size";
-                        placeholderOption.selected = true;
-                        placeholderOption.disabled = true;
-                        companySizeDropdown.insertBefore(placeholderOption, companySizeDropdown.firstChild);
-                    }
+                    disableEmptySelectOptions();
 
                     const errorContainer = document.createElement("ul");
                     errorContainer.className = "woocommerce-error";
