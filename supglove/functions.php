@@ -3477,6 +3477,26 @@ function custom_registration_form_behavior() {
                     setTimeout(checkRegistrationStatus, 100);
                 }
             }, 100);
+
+            const preferredContactField = document.getElementById('afreg_additionalshowhide_46364');
+            const secondaryEmailField = document.getElementById('afreg_additionalshowhide_46363');
+            const businessEmailRadio = preferredContactField?.querySelector('input[value="Business Email"]');
+            const secondaryEmailRadio = preferredContactField?.querySelector('input[value="Secondary Email"]');
+
+            if (preferredContactField && secondaryEmailField && businessEmailRadio && secondaryEmailRadio) {
+                businessEmailRadio.checked = true;
+                secondaryEmailField.classList.add('hidden-email');
+
+                preferredContactField.addEventListener('change', function(e) {
+                    if (e.target.name === 'afreg_additional_46364') {
+                        if (e.target.value === 'Secondary Email') {
+                            secondaryEmailField.classList.remove('hidden-email');
+                        } else {
+                            secondaryEmailField.classList.add('hidden-email');
+                        }
+                    }
+                });
+            }
         });
     </script>
     <?php

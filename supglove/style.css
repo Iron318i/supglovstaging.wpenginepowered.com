@@ -22861,6 +22861,15 @@ li#menu-item-20949 {
 .woocommerce-account .tabs-content{
     padding-bottom: 15px!important;
 }
+.woocommerce .woocommerce-form-login .woocommerce-form-login__submit{
+    float: none!important;
+}
+.woocommerce form .form-row input.input-radio{
+    height: auto!important;
+}
 .hidden{
+    display: none!important;
+}
+.hidden-email{
     display: none!important;
 }
