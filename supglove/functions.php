@@ -3078,7 +3078,8 @@ function block_other_custom_user_role($username, $email, $validation_errors) {
 }
 
 // Frontend JS: block only if "other" is selected
-add_action('wp_footer', 'inline_js_block_other_role', 21);
+//add_action('wp_footer', 'inline_js_block_other_role', 21);
+/*
 function inline_js_block_other_role() {
     if (!is_account_page()) return;
     ?>
@@ -3167,7 +3168,7 @@ function inline_js_block_other_role() {
     </script>
     <?php
 }
-
+*/
 add_filter('afreg_custom_fields_args', 'reorder_afreg_field_message_above_input', 10, 1);
 function reorder_afreg_field_message_above_input($fields) {
     foreach ($fields as $key => &$field) {
@@ -3325,37 +3326,158 @@ function validate_custom_email_domain() {
     <?php
 }
 
-add_action('wp_footer', 'moving_the_email_field_script');
-function moving_the_email_field_script() {
-    if (is_account_page()) {
-        ?>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var formInputs = document.querySelector('.woocommerce-form-register .form-inputs');
-                var privacyPolicy = document.querySelector('.woocommerce-privacy-policy-text');
-                var businessEmailField = document.getElementById('afreg_additional_46362');
-                var mainEmailField = document.getElementById('reg_email');
+add_action('wp_footer', 'custom_registration_form_behavior');
+function custom_registration_form_behavior() {
+    if (!is_account_page()) return;
+    ?>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const formInputs = document.querySelector('.woocommerce-form-register .form-inputs');
+            const privacyPolicy = document.querySelector('.woocommerce-privacy-policy-text');
+            const businessEmailField = document.getElementById('afreg_additional_46362');
+            const mainEmailField = document.getElementById('reg_email');
 
-                if (formInputs && privacyPolicy) {
-                    privacyPolicy.parentNode.insertBefore(formInputs, privacyPolicy);
-                    formInputs.style.display = 'none'; // Скрываем блок
+            if (formInputs && privacyPolicy) {
+                privacyPolicy.parentNode.insertBefore(formInputs, privacyPolicy);
+                formInputs.style.display = 'none';
+            }
+
+            if (businessEmailField && mainEmailField) {
+                businessEmailField.addEventListener('input', function() {
+                    mainEmailField.value = this.value;
+                });
+
+                if (businessEmailField.value) {
+                    mainEmailField.value = businessEmailField.value;
                 }
+            }
 
-                if (businessEmailField && mainEmailField) {
-                    businessEmailField.addEventListener('input', function() {
-                        mainEmailField.value = this.value;
-                    });
+            const waitForElements = setInterval(() => {
+                const form = document.querySelector("form.register");
+                const roleDropdown = document.querySelector('#afreg_select_user_role');
+                const companySizeDropdown = document.querySelector('#afreg_additional_46359');
+                const registerButton = form ? form.querySelector('button[type="submit"], input[type="submit"]') : null;
+                const dependableFields = document.querySelectorAll('.af-dependable-field');
 
-                    if (businessEmailField.value) {
-                        mainEmailField.value = businessEmailField.value;
+                if (form && roleDropdown && registerButton && companySizeDropdown) {
+                    clearInterval(waitForElements);
+
+                    if (companySizeDropdown.options.length > 0) {
+                        const placeholderOption = document.createElement('option');
+                        placeholderOption.value = "";
+                        placeholderOption.textContent = "Choose your Company Size";
+                        placeholderOption.selected = true;
+                        placeholderOption.disabled = true;
+                        companySizeDropdown.insertBefore(placeholderOption, companySizeDropdown.firstChild);
                     }
 
-                    businessEmailField.addEventListener('focus', function() {
-                        if (formInputs) formInputs.style.display = 'block';
+                    const errorContainer = document.createElement("ul");
+                    errorContainer.className = "woocommerce-error";
+                    errorContainer.style.display = "none";
+                    errorContainer.style.marginBottom = "15px";
+                    roleDropdown.parentElement.insertAdjacentElement("afterend", errorContainer);
+
+                    const helpMessage = document.createElement("p");
+                    helpMessage.innerHTML = 'If you do not qualify, please <a href="/contact">contact us</a>.';
+                    helpMessage.style.display = "none";
+                    helpMessage.style.margin = "5px 0 15px";
+                    roleDropdown.parentElement.insertAdjacentElement("afterend", helpMessage);
+
+                    function checkRegistrationStatus() {
+                        const selectedRole = roleDropdown.value.trim();
+                        const selectedSize = companySizeDropdown ? companySizeDropdown.value.trim() : "";
+
+                        if (!selectedRole || selectedRole === "") {
+                            registerButton.style.display = "none";
+                            errorContainer.style.display = "none";
+                            helpMessage.style.display = "none";
+                            if (formInputs) formInputs.style.display = "none";
+                            return;
+                        }
+
+                        if (selectedRole === "other") {
+                            errorContainer.innerHTML = "<li>Sorry, you do not qualify for an account.</li>";
+                            errorContainer.style.display = "block";
+                            helpMessage.style.display = "block";
+                            registerButton.style.display = "none";
+                            if (formInputs) formInputs.style.display = "none";
+
+                            dependableFields.forEach(field => {
+                                field.classList.add('hidden');
+                            });
+                        }
+                        else if (selectedRole === "safety_professional" && selectedSize === "Less than 100 Employees") {
+                            errorContainer.innerHTML = "<li>Sorry, samples are only available for companies with 100+ employees.</li>";
+                            errorContainer.style.display = "block";
+                            helpMessage.style.display = "block";
+                            registerButton.style.display = "none";
+                            if (formInputs) formInputs.style.display = "none";
+
+                            dependableFields.forEach(field => {
+                                if (field.id !== 'afreg_additionalshowhide_46359') {
+                                    field.classList.add('hidden');
+                                } else {
+                                    field.classList.remove('hidden');
+                                }
+                            });
+                        }
+                        else {
+                            errorContainer.innerHTML = "";
+                            errorContainer.style.display = "none";
+                            helpMessage.style.display = "none";
+                            registerButton.style.display = "block";
+                            if (formInputs) formInputs.style.display = "block";
+
+                            dependableFields.forEach(field => {
+                                const rules = field.querySelector('.afreg-dependable-on-rules');
+                                if (rules) {
+                                    const allowedRoles = rules.value.split(',');
+                                    if (allowedRoles.includes(selectedRole)) {
+                                        field.classList.remove('hidden');
+                                    } else {
+                                        field.classList.add('hidden');
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                    roleDropdown.addEventListener("change", checkRegistrationStatus);
+                    if (companySizeDropdown) {
+                        companySizeDropdown.addEventListener("change", checkRegistrationStatus);
+                    }
+
+                    form.addEventListener("submit", function(e) {
+                        const selectedRole = roleDropdown.value.trim();
+                        const selectedSize = companySizeDropdown ? companySizeDropdown.value.trim() : "";
+
+                        if (!selectedRole || selectedRole === "" || selectedRole === "other" ||
+                            (selectedRole === "safety_professional" && selectedSize === "Less than 100 Employees")) {
+                            e.preventDefault();
+
+                            if (selectedRole === "other") {
+                                errorContainer.innerHTML = "<li>Sorry, you do not qualify for an account.</li>";
+                                helpMessage.style.display = "block";
+                            }
+                            else if (selectedRole === "safety_professional" && selectedSize === "Less than 100 Employees") {
+                                errorContainer.innerHTML = "<li>Sorry, samples are only available for companies with 100+ employees.</li>";
+                                helpMessage.style.display = "block";
+                            }
+                            else {
+                                errorContainer.innerHTML = "<li>Please select your professional affiliation before registering.</li>";
+                                helpMessage.style.display = "none";
+                            }
+
+                            errorContainer.style.display = "block";
+                            registerButton.style.display = "none";
+                            roleDropdown.focus();
+                        }
                     });
+
+                    setTimeout(checkRegistrationStatus, 100);
                 }
-            });
-        </script>
-        <?php
-    }
+            }, 100);
+        });
+    </script>
+    <?php
 }
