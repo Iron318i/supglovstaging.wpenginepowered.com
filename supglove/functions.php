@@ -3499,6 +3499,95 @@ function custom_registration_form_behavior() {
                     }
                 });
             }
+
+            function validateRequiredFields() {
+                const role = document.querySelector('#afreg_select_user_role').value;
+                const submitButton = document.querySelector('.woocommerce-form-register__submit');
+                const distributorCompanySize = document.querySelector('#afreg_additional_46361');
+                const companySize = document.querySelector('#afreg_additional_46359');
+                const companyLocation = document.querySelector('#afreg_additional_46360');
+                const businessEmail = document.querySelector('#afreg_additional_46362');
+                let isValid = true;
+
+                document.querySelectorAll('.required-field-error').forEach(el => {
+                    el.classList.remove('required-field-error');
+                });
+
+                if (role === 'distributor') {
+                    if (!distributorCompanySize.value) {
+                        distributorCompanySize.classList.add('required-field-error');
+                        isValid = false;
+                    }
+                    if (!companyLocation.value) {
+                        companyLocation.classList.add('required-field-error');
+                        isValid = false;
+                    }
+                    if (!businessEmail.value || !/^\S+@\S+\.\S+$/.test(businessEmail.value)) {
+                        businessEmail.classList.add('required-field-error');
+                        isValid = false;
+                    }
+                }
+                else if (role === 'safety_professional') {
+                    if (!companySize.value) {
+                        companySize.classList.add('required-field-error');
+                        isValid = false;
+                    }
+                    if (!companyLocation.value) {
+                        companyLocation.classList.add('required-field-error');
+                        isValid = false;
+                    }
+                    if (!businessEmail.value || !/^\S+@\S+\.\S+$/.test(businessEmail.value)) {
+                        businessEmail.classList.add('required-field-error');
+                        isValid = false;
+                    }
+                }
+
+                if (submitButton) {
+                    submitButton.disabled = !isValid;
+                }
+
+                return isValid;
+            }
+
+            const submitButton = document.querySelector('.woocommerce-form-register__submit');
+            if (submitButton) {
+                submitButton.disabled = true;
+
+                submitButton.addEventListener('mouseover', function() {
+                    if (this.disabled) {
+                        validateRequiredFields();
+                        document.querySelectorAll('.required-field-error').forEach(el => {
+                            el.classList.add('show-required-fields');
+                            setTimeout(() => {
+                                el.classList.remove('show-required-fields');
+                            }, 1000);
+                        });
+                    }
+                });
+
+                submitButton.addEventListener('click', function(e) {
+                    if (!validateRequiredFields()) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            const formFields = [
+                '#afreg_additional_46359',
+                '#afreg_additional_46360',
+                '#afreg_additional_46361',
+                '#afreg_additional_46362'
+            ];
+
+            formFields.forEach(selector => {
+                const field = document.querySelector(selector);
+                if (field) {
+                    field.addEventListener('change', validateRequiredFields);
+                    field.addEventListener('input', validateRequiredFields);
+                }
+            });
+
+
         });
     </script>
     <?php
