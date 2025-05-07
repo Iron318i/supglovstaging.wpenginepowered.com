@@ -55,6 +55,14 @@ if ( $product->is_in_stock() ) : ?>
                 <?php echo esc_html( $product->single_add_to_cart_text() ); ?> <i class="t-icon icon-ion-android-add"></i>
             </button>
 	    <?php else : ?>
+            <button
+                    type="submit"
+                    name="add-to-cart"
+                    data-link="<?= $product->get_permalink() ?>"
+                    value="<?php echo esc_attr( $product->get_id() ); ?>"
+                    class="single_add_to_cart_button button alt updated-text"
+            ><?php _e( 'REQUEST SAMPLE', 'supro' ) ?> <span style='font-weight:bold;'>+</span</button>
+        <?php /* ?>
 	      <button
           type="button"
           data-id="<?= $product->get_sku() ?>"
@@ -65,6 +73,7 @@ if ( $product->is_in_stock() ) : ?>
 	        <span>Contact Us</span>
 	        <span class="icon-enquire inside-button"></span>
 	      </button>
+        <?php */ ?>
 	    <?php endif ?>
 
 		<?php do_action( 'woocommerce_after_add_to_cart_button' ); ?>

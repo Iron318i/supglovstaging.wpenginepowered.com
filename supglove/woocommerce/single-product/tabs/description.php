@@ -21,6 +21,7 @@ defined('ABSPATH') || exit;
 global $post, $product;
 
 $is_sample_box = get_post_meta( $product->get_id(), 'sg_sample_box_marker', true );
+$enquired_product = get_post_meta($product->get_id(), '_enquired_product', true) == 'yes';
 
 if ( !$is_sample_box ) {
   $heading = apply_filters('woocommerce_product_description_heading', __('Description', 'woocommerce'));
@@ -80,6 +81,15 @@ if ( !$is_sample_box ) {
             echo '<img src="' . $icon_path . '" alt="P65 Warning" width="30">';
             echo '<p>' . get_option( 'p65_warning' ) . '</p>';
           echo '</div>';
+        }
+
+        if ( $enquired_product ) {
+            $icon_path = get_template_directory_uri() . '/img/products_messages/attention-sign.svg';
+
+            echo '<div class="warning-message">';
+            echo '<img src="' . $icon_path . '" alt="Warning" width="35">';
+            echo '<p>' . __( 'We will need a bit more information in order to push through this sample request', 'supro' ) . '</p>';
+            echo '</div>';
         }
 
       echo '</div>';
