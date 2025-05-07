@@ -13811,8 +13811,7 @@ h3.ordergot {
 }
 
 .woocommerce-account .woocommerce .form-row .input-text {
-    background-color: transparent;
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    border: 1px solid #000;
     color: #000;
     font-weight: 400;
     padding: 10px 20px;
@@ -14269,6 +14268,7 @@ h3.ordergot {
     text-transform: uppercase;
     height: 52px;
     line-height: 52px;
+    background-color: #f46b25;
 }
 
 .woocommerce-account .customer-login .form-row-password {
@@ -14297,7 +14297,6 @@ h3.ordergot {
 
 .woocommerce-account .customer-login .inline .label {
     display: inline-block;
-    color: #999999;
     text-transform: inherit;
     position: relative;
     line-height: 1;
@@ -22877,7 +22876,7 @@ li#menu-item-20949 {
     display: none!important;
 }
 .required-field-error {
-    border: 1px solid #ff0000 !important;
+    border: 1px solid #f46b25 !important;
 }
 .show-required-fields {
     animation: pulse 0.5s ease-in-out;
@@ -22888,4 +22887,67 @@ li#menu-item-20949 {
     50% { transform: translateX(5px); }
     75% { transform: translateX(-5px); }
     100% { transform: translateX(0); }
+}
+.woocommerce-form-login, .woocommerce-form-register{
+    font-size: 18px;
+    line-height: 1.6;
+    color: #000;
+}
+.woocommerce-form-register .afreg_field_message,
+.woocommerce-form-register .afreg_field_message_radio{
+    margin-bottom: 15px;
+    display: inline-block;
+}
+
+.afreg-is-radio-dependable {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.afreg-is-radio-dependable + .afreg_radio {
+    position: relative;
+    padding-left: 28px;
+    cursor: pointer;
+    display: inline-block;
+    margin-right: 15px;
+    line-height: 1.5;
+    transition: color 0.3s;
+}
+.afreg-is-radio-dependable + .afreg_radio:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 4px;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    background: #fff;
+    transition: all 0.3s;
+}
+.afreg-is-radio-dependable:checked + .afreg_radio:before {
+    border-color: #f46b25;
+}
+.afreg-is-radio-dependable + .afreg_radio:after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 8px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #f46b25;
+    opacity: 0;
+    transition: all 0.3s;
+}
+.afreg-is-radio-dependable:checked + .afreg_radio:after {
+    opacity: 1;
+}
+.afreg-is-radio-dependable:focus + .afreg_radio:before {
+    box-shadow: 0 0 0 3px rgba(244, 107, 37, 0.2);
+}
+.afreg-is-radio-dependable:not(:checked) + .afreg_radio:hover:before {
+    border-color: #f46b25;
+    opacity: 0.7;
 }
