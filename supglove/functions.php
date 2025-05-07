@@ -3041,16 +3041,19 @@ function replace_login_menu_item($items, $args) {
 //Add Logged-Out State UI for All Contact Forms (Staging Only)
 
 add_filter('do_shortcode_tag', 'handle_all_cf7_shortcodes', 10, 4);
-function handle_all_cf7_shortcodes($output, $tag, $atts, $m)
-{
-    if ($tag !== 'contact-form-7' || is_user_logged_in()) {
+function handle_all_cf7_shortcodes($output, $tag, $atts, $m) {
+    $force_show = isset($atts['force_show']) && $atts['force_show'] === 'true';
+
+    if ($tag !== 'contact-form-7' || (is_user_logged_in() || $force_show)) {
         return $output;
     }
 
     $login_url = wp_login_url(get_permalink());
     $register_url = wp_registration_url();
 
-    return '
+    $html = '
+<div class="protected-form-wrp">
+    <div class="protected-form">'. $output.'</div>
     <div class="protected-form-message">
         <h2 style="margin-bottom: 0;">CREATE A FREE ACCOUNT</h2>
         <h3 style="margin: 0;">Sign up once—no more forms<br></h3>
@@ -3062,12 +3065,69 @@ function handle_all_cf7_shortcodes($output, $tag, $atts, $m)
             <li style="margin-bottom: 8px;">Email updates</li>
             <li style="margin-bottom: 8px;">And more!</li>
         </ul>
-       <div style="margin: 30px 0;">
+        <div style="margin: 30px 0;">
             <a href="/my-account/" class="buttonogs btn_large btn_theme_color">SIGN UP</a>
         </div>
-        
         <p style="font-size: 14px;">Already have an account? <a href="/my-account/" style="color:#fd8541; text-decoration: underline;">Sign In</a></p>
-    </div>';
+    </div>
+</div>';
+
+    $html .= '
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        function adjustFormHeight() {
+            const form = document.querySelector(".protected-form");
+            const message = document.querySelector(".protected-form-message");
+            
+            if (form && message) {
+                const messageHeight = message.offsetHeight;
+                const formHeight = form.offsetHeight;
+                
+                if (formHeight < messageHeight) {
+                    form.style.minHeight = messageHeight + "px";
+                } else {
+                    form.style.minHeight = "";
+                }
+            }
+        }
+        
+        adjustFormHeight();
+        window.addEventListener("resize", adjustFormHeight);
+        
+    });
+    </script>';
+
+    $html .= '
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const formWrapper = document.querySelector(".protected-form-wrp");
+        if (formWrapper) {
+            const forms = formWrapper.querySelectorAll("form");
+            
+            forms.forEach(form => {
+                form.addEventListener("submit", function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.href = "/my-account/";
+                    return false;
+                });
+                
+                const inputs = form.querySelectorAll("input, textarea, select, button");
+                inputs.forEach(input => {
+                    input.style.pointerEvents = "none";
+                    input.style.opacity = "1";
+                    input.style.filter = "none";
+                    input.readOnly = true;
+                    if (input.tagName === "BUTTON" || input.type === "submit") {
+                        input.disabled = true;
+                    }
+                });
+            });
+        }
+    });
+    </script>';
+    return $html;
+
 }
 // Backend validation for "other" only
 add_action('woocommerce_register_post', 'block_other_custom_user_role', 10, 3);
