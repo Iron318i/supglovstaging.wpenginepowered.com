@@ -3306,6 +3306,8 @@ add_action('wp_footer', function () {
     </script>
     <?php
 });
+/*
+ *
 add_action('wp_footer', 'validate_custom_email_domain', 21);
 function validate_custom_email_domain() {
     if (!is_account_page()) return;
@@ -3385,6 +3387,7 @@ function validate_custom_email_domain() {
     </script>
     <?php
 }
+*/
 
 add_action('wp_footer', 'custom_registration_form_behavior');
 function custom_registration_form_behavior() {
@@ -3394,6 +3397,11 @@ function custom_registration_form_behavior() {
         document.addEventListener("DOMContentLoaded", function() {
             const businessEmailField = document.getElementById('afreg_additional_46362');
             const mainEmailField = document.getElementById('reg_email');
+            const blockedDomains = [
+                "gmail.com", "yahoo.com", "hotmail.com",
+                "aol.com", "icloud.com", "outlook.com",
+                "live.com", "msn.com"
+            ];
 
             if (businessEmailField && mainEmailField) {
                 businessEmailField.addEventListener('input', function() {
@@ -3405,6 +3413,43 @@ function custom_registration_form_behavior() {
                 }
             }
 
+            function validateEmailDomain() {
+                const email = businessEmailField.value.trim().toLowerCase();
+                const emailDomain = email.split("@")[1] || "";
+                const fieldWrapper = businessEmailField.closest("p");
+                const label = fieldWrapper ? fieldWrapper.querySelector("label") : null;
+
+                if (!label) return;
+
+                let errorContainer = label.nextElementSibling?.classList.contains('woocommerce-error')
+                    ? label.nextElementSibling
+                    : null;
+
+                if (!errorContainer) {
+                    errorContainer = document.createElement("ul");
+                    errorContainer.className = "woocommerce-error email-domain-error";
+                    errorContainer.style.display = "none";
+                    errorContainer.style.margin = "8px 0";
+                    label.insertAdjacentElement("afterend", errorContainer);
+                }
+
+                if (email && blockedDomains.includes(emailDomain)) {
+                    errorContainer.innerHTML = "<li>Please enter a valid business email address (no personal email domains).</li>";
+                    errorContainer.style.display = "block";
+                    return false;
+                } else {
+                    errorContainer.innerHTML = "";
+                    errorContainer.style.display = "none";
+                    return true;
+                }
+            }
+
+            if (businessEmailField) {
+                businessEmailField.addEventListener("input", validateEmailDomain);
+                businessEmailField.addEventListener("blur", validateEmailDomain);
+            }
+
+            // Основная логика формы
             function disableEmptySelectOptions() {
                 document.querySelectorAll('.input-select option').forEach(option => {
                     if (option.value === "") {
@@ -3507,10 +3552,16 @@ function custom_registration_form_behavior() {
                     form.addEventListener("submit", function(e) {
                         const selectedRole = roleDropdown.value.trim();
                         const selectedSize = companySizeDropdown ? companySizeDropdown.value.trim() : "";
+                        const emailValid = validateEmailDomain();
 
                         if (!selectedRole || selectedRole === "" || selectedRole === "other" ||
-                            (selectedRole === "safety_professional" && selectedSize === "Less than 100 Employees")) {
+                            (selectedRole === "safety_professional" && selectedSize === "Less than 100 Employees") || !emailValid) {
                             e.preventDefault();
+
+                            if (!emailValid) {
+                                businessEmailField.focus();
+                                return;
+                            }
 
                             if (selectedRole === "other") {
                                 errorContainer.innerHTML = "<li>Sorry, you do not qualify for an account.</li>";
@@ -3620,7 +3671,7 @@ function custom_registration_form_behavior() {
                 });
 
                 submitButton.addEventListener('click', function(e) {
-                    if (!validateRequiredFields()) {
+                    if (!validateRequiredFields() || !validateEmailDomain()) {
                         e.preventDefault();
                     }
                 });
