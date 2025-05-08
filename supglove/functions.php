@@ -3392,15 +3392,8 @@ function custom_registration_form_behavior() {
     ?>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const formInputs = document.querySelector('.woocommerce-form-register .form-inputs');
-            const privacyPolicy = document.querySelector('.woocommerce-privacy-policy-text');
             const businessEmailField = document.getElementById('afreg_additional_46362');
             const mainEmailField = document.getElementById('reg_email');
-
-            if (formInputs && privacyPolicy) {
-                privacyPolicy.parentNode.insertBefore(formInputs, privacyPolicy);
-                formInputs.style.display = 'none';
-            }
 
             if (businessEmailField && mainEmailField) {
                 businessEmailField.addEventListener('input', function() {
@@ -3462,7 +3455,6 @@ function custom_registration_form_behavior() {
 
                         if (!selectedRole || selectedRole === "") {
                             registerButton.style.display = "none";
-                            if (formInputs) formInputs.style.display = "none";
                             return;
                         }
 
@@ -3471,7 +3463,6 @@ function custom_registration_form_behavior() {
                             errorContainer.style.display = "block";
                             helpMessage.style.display = "block";
                             registerButton.style.display = "none";
-                            if (formInputs) formInputs.style.display = "none";
 
                             dependableFields.forEach(field => {
                                 field.classList.add('hidden');
@@ -3482,7 +3473,6 @@ function custom_registration_form_behavior() {
                             sizeErrorContainer.style.display = "block";
                             helpMessage.style.display = "block";
                             registerButton.style.display = "none";
-                            if (formInputs) formInputs.style.display = "none";
 
                             dependableFields.forEach(field => {
                                 if (field.id !== 'afreg_additionalshowhide_46359') {
@@ -3494,7 +3484,6 @@ function custom_registration_form_behavior() {
                         }
                         else {
                             registerButton.style.display = "block";
-                            if (formInputs) formInputs.style.display = "block";
 
                             dependableFields.forEach(field => {
                                 const rules = field.querySelector('.afreg-dependable-on-rules');
