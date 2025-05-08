@@ -3387,12 +3387,11 @@ function validate_custom_email_domain() {
 }
 
 add_action('wp_footer', 'custom_registration_form_behavior');
-function custom_registration_form_behavior()
-{
+function custom_registration_form_behavior() {
     if (!is_account_page()) return;
     ?>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const formInputs = document.querySelector('.woocommerce-form-register .form-inputs');
             const privacyPolicy = document.querySelector('.woocommerce-privacy-policy-text');
             const businessEmailField = document.getElementById('afreg_additional_46362');
@@ -3404,7 +3403,7 @@ function custom_registration_form_behavior()
             }
 
             if (businessEmailField && mainEmailField) {
-                businessEmailField.addEventListener('input', function () {
+                businessEmailField.addEventListener('input', function() {
                     mainEmailField.value = this.value;
                 });
 
@@ -3440,6 +3439,13 @@ function custom_registration_form_behavior()
                     errorContainer.style.marginBottom = "15px";
                     roleDropdown.parentElement.insertAdjacentElement("afterend", errorContainer);
 
+                    const sizeErrorContainer = document.createElement("ul");
+                    sizeErrorContainer.id = "company-size-error-container";
+                    sizeErrorContainer.className = "woocommerce-error";
+                    sizeErrorContainer.style.display = "none";
+                    sizeErrorContainer.style.marginBottom = "15px";
+                    companySizeDropdown.parentNode.insertBefore(sizeErrorContainer, companySizeDropdown.nextSibling);
+
                     const helpMessage = document.createElement("p");
                     helpMessage.innerHTML = 'If you do not qualify, please <a href="/contact">contact us</a>.';
                     helpMessage.style.display = "none";
@@ -3450,10 +3456,12 @@ function custom_registration_form_behavior()
                         const selectedRole = roleDropdown.value.trim();
                         const selectedSize = companySizeDropdown ? companySizeDropdown.value.trim() : "";
 
+                        errorContainer.style.display = "none";
+                        sizeErrorContainer.style.display = "none";
+                        helpMessage.style.display = "none";
+
                         if (!selectedRole || selectedRole === "") {
                             registerButton.style.display = "none";
-                            errorContainer.style.display = "none";
-                            helpMessage.style.display = "none";
                             if (formInputs) formInputs.style.display = "none";
                             return;
                         }
@@ -3468,9 +3476,10 @@ function custom_registration_form_behavior()
                             dependableFields.forEach(field => {
                                 field.classList.add('hidden');
                             });
-                        } else if (selectedRole === "safety_professional" && selectedSize === "Less than 100 Employees") {
-                            errorContainer.innerHTML = "<li>Sorry, samples are only available for companies with 100+ employees.</li>";
-                            errorContainer.style.display = "block";
+                        }
+                        else if (selectedRole === "safety_professional" && selectedSize === "Less than 100 Employees") {
+                            sizeErrorContainer.innerHTML = "<li>Sorry, samples are only available for companies with 100+ employees.</li>";
+                            sizeErrorContainer.style.display = "block";
                             helpMessage.style.display = "block";
                             registerButton.style.display = "none";
                             if (formInputs) formInputs.style.display = "none";
@@ -3482,10 +3491,8 @@ function custom_registration_form_behavior()
                                     field.classList.remove('hidden');
                                 }
                             });
-                        } else {
-                            errorContainer.innerHTML = "";
-                            errorContainer.style.display = "none";
-                            helpMessage.style.display = "none";
+                        }
+                        else {
                             registerButton.style.display = "block";
                             if (formInputs) formInputs.style.display = "block";
 
@@ -3508,7 +3515,7 @@ function custom_registration_form_behavior()
                         companySizeDropdown.addEventListener("change", checkRegistrationStatus);
                     }
 
-                    form.addEventListener("submit", function (e) {
+                    form.addEventListener("submit", function(e) {
                         const selectedRole = roleDropdown.value.trim();
                         const selectedSize = companySizeDropdown ? companySizeDropdown.value.trim() : "";
 
@@ -3519,12 +3526,13 @@ function custom_registration_form_behavior()
                             if (selectedRole === "other") {
                                 errorContainer.innerHTML = "<li>Sorry, you do not qualify for an account.</li>";
                                 helpMessage.style.display = "block";
-                            } else if (selectedRole === "safety_professional" && selectedSize === "Less than 100 Employees") {
-                                errorContainer.innerHTML = "<li>Sorry, samples are only available for companies with 100+ employees.</li>";
+                            }
+                            else if (selectedRole === "safety_professional" && selectedSize === "Less than 100 Employees") {
+                                sizeErrorContainer.innerHTML = "<li>Sorry, samples are only available for companies with 100+ employees.</li>";
                                 helpMessage.style.display = "block";
-                            } else {
+                            }
+                            else {
                                 errorContainer.innerHTML = "<li>Please select your professional affiliation before registering.</li>";
-                                helpMessage.style.display = "none";
                             }
 
                             errorContainer.style.display = "block";
@@ -3546,7 +3554,7 @@ function custom_registration_form_behavior()
                 businessEmailRadio.checked = true;
                 secondaryEmailField.classList.add('hidden-email');
 
-                preferredContactField.addEventListener('change', function (e) {
+                preferredContactField.addEventListener('change', function(e) {
                     if (e.target.name === 'afreg_additional_46364') {
                         if (e.target.value === 'Secondary Email') {
                             secondaryEmailField.classList.remove('hidden-email');
@@ -3583,7 +3591,8 @@ function custom_registration_form_behavior()
                         businessEmail.classList.add('required-field-error');
                         isValid = false;
                     }
-                } else if (role === 'safety_professional') {
+                }
+                else if (role === 'safety_professional') {
                     if (!companySize.value) {
                         companySize.classList.add('required-field-error');
                         isValid = false;
@@ -3609,7 +3618,7 @@ function custom_registration_form_behavior()
             if (submitButton) {
                 submitButton.disabled = true;
 
-                submitButton.addEventListener('mouseover', function () {
+                submitButton.addEventListener('mouseover', function() {
                     if (this.disabled) {
                         validateRequiredFields();
                         document.querySelectorAll('.required-field-error').forEach(el => {
@@ -3621,7 +3630,7 @@ function custom_registration_form_behavior()
                     }
                 });
 
-                submitButton.addEventListener('click', function (e) {
+                submitButton.addEventListener('click', function(e) {
                     if (!validateRequiredFields()) {
                         e.preventDefault();
                     }
@@ -3650,16 +3659,14 @@ function custom_registration_form_behavior()
                     const input = field.querySelector('input:not([type="hidden"]), select, textarea');
 
                     if (label && message && input) {
-                        if (message.previousElementSibling === label) {
-                            return;
+                        if (message.previousElementSibling !== label) {
+                            label.insertAdjacentElement('afterend', message);
                         }
-                        label.insertAdjacentElement('afterend', message);
                     }
                 });
             }
 
             moveFieldMessages();
-
 
             function radioLabelsFix() {
                 document.querySelectorAll('.afreg_radio').forEach(radioLabel => {
@@ -3668,19 +3675,15 @@ function custom_registration_form_behavior()
                     if (radioInput && radioInput.type === 'radio') {
                         radioLabel.addEventListener('click', () => {
                             radioInput.checked = true;
-
                             const event = new Event('change', { bubbles: true });
                             radioInput.dispatchEvent(event);
                         });
-
                         radioLabel.style.cursor = 'pointer';
                     }
                 });
             }
 
             radioLabelsFix();
-
-
         });
     </script>
     <?php
