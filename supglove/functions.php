@@ -3395,6 +3395,11 @@ function custom_registration_form_behavior() {
     ?>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            const roleDropdown = document.querySelector('#afreg_select_user_role');
+            if (roleDropdown && roleDropdown.options.length > 0) {
+                roleDropdown.options[0].text = "Choose Professional Affiliation";
+            }
+
             const businessEmailField = document.getElementById('afreg_additional_46362');
             const mainEmailField = document.getElementById('reg_email');
             const blockedDomains = [
