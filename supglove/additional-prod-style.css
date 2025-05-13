@@ -4690,7 +4690,7 @@ body .wpcf7-form .address_checkbox input[type="checkbox"] {
 .woocommerce .woocommerce-form-login .woocommerce-form-login__submit{
   float: none!important;
 }
-.woocommerce form .form-row input.input-radio{
+.woocommerce-account form .form-row input.input-radio{
   height: auto!important;
 }
 .hidden{
@@ -4829,4 +4829,27 @@ select + .woocommerce-error{
   left: 50%;
   transform: translate(-50%, -50%);
   width: 83%;
+}
+/*checkout*/
+.woocommerce-checkout #thwmsc-tab-panels{
+  overflow: hidden;
+}
+.woocommerce-checkout ul#thwmsc-tabs{
+  display: none!important;
+}
+.woocommerce-checkout .thwmsc-tab-panel .half_width{
+    width: calc(50% - 30px) !important;
+    margin-right: 15px !important;
+    margin-left: 15px !important;
+}
+@media(max-width: 600px){
+  .woocommerce-checkout .thwmsc-tab-panel .half_width{
+    width: calc(100% - 30px) !important;
+  }
+}
+.woocommerce-checkout .thwmsc-tab-panel .select2-container .select2-selection--single .select2-selection__arrow {
+  top: 0!important;
+}
+.woocommerce-checkout .thwmsc-tab-panel .woocommerce-input-wrapper .input-radio{
+  margin-bottom: 12px;
 }

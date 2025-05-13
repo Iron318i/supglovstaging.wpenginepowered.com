@@ -48,7 +48,7 @@ function woocommerce_checkout_info_contact() {
         echo '<p id="your_info_heading"  class="checkoutheader">'. esc_html__( 'Your Info', 'supro' ) .'</p>';
     }
 }
-add_action('woocommerce_checkout_info_contact', 'woocommerce_checkout_size_contact');
+//add_action('woocommerce_checkout_info_contact', 'woocommerce_checkout_size_contact');
 
 function woocommerce_checkout_size_info() {
   // Check if it's the checkout page
@@ -56,16 +56,14 @@ function woocommerce_checkout_size_info() {
     echo '<p id="your_info_heading"  class="checkoutheader">'. esc_html__( 'Your Info', 'supro' ) .'</p>';
   }
 }
-add_action('woocommerce_checkout_info_contact', 'woocommerce_checkout_size_info'
-);
+add_action('woocommerce_checkout_info_contact', 'woocommerce_checkout_size_info');
 function woocommerce_checkout_size_contact() {
   // Check if it's the checkout page
   if (is_checkout()) {
     do_action( 'woocommerce_checkout_order_review' );  
   }
 }
-add_action('woocommerce_checkout_info_contact', 'woocommerce_checkout_size_contact'
-);
+//add_action('woocommerce_checkout_info_contact', 'woocommerce_checkout_size_contact');
 
 // Custom Email validation
 
