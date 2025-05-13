@@ -3740,3 +3740,26 @@ function custom_registration_form_behavior() {
     </script>
     <?php
 }
+
+// Hook into CF7 form tag processing to dynamically fill email fields for logged-in users
+add_filter('wpcf7_form_tag', 'auto_fill_email_input_for_logged_user', 10, 2);
+
+function auto_fill_email_input_for_logged_user($tag, $unused) {
+    // Exit if the user is not logged in
+    if (!is_user_logged_in()) {
+        return $tag;
+    }
+
+    $current_user = wp_get_current_user();
+
+    // Apply only to email-type fields
+    if ($tag['type'] === 'email' || $tag['basetype'] === 'email') {
+        // Only set value if no default values are already provided
+        if (empty($tag['values'])) {
+            $tag['values'][] = $current_user->user_email;
+            $tag['raw_values'][] = $current_user->user_email;
+        }
+    }
+
+    return $tag;
+}
