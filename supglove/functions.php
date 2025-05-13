@@ -3032,7 +3032,7 @@ function disable_cf7_form_for_guests($form) {
 add_filter('wp_nav_menu_objects', 'replace_login_menu_item', 10, 2);
 function replace_login_menu_item($items, $args) {
     foreach ($items as &$item) {
-        if ($item->url == '#login') {
+        if ($item->url == '/my-account') {
             if (is_user_logged_in()) {
                 $item->title = 'Account';
                 $item->url = wc_get_page_permalink('myaccount');
