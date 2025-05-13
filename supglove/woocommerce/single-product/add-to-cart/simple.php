@@ -61,7 +61,7 @@ if ( $product->is_in_stock() ) : ?>
                     data-link="<?= $product->get_permalink() ?>"
                     value="<?php echo esc_attr( $product->get_id() ); ?>"
                     class="single_add_to_cart_button button alt updated-text"
-            ><?php _e( 'REQUEST SAMPLE', 'supro' ) ?> <span style='font-weight:bold;'>+</span</button>
+            >REQUEST SAMPLE <span style='font-weight:bold;'>+</span</button>
         <?php /* ?>
 	      <button
           type="button"
