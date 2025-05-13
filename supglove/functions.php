@@ -373,9 +373,16 @@ add_action( 'wp_enqueue_scripts', 'fixing_styles' );
 
 // Enqueue additional production styles
 function additional_prod_styles() {
-  wp_enqueue_style( 'additional-prod-styles', get_stylesheet_directory_uri() . '/additional-prod-style.css', array(), '1.5.2.1' );
+    $file_path = get_stylesheet_directory() . '/additional-prod-style.css';
+    $file_url = get_stylesheet_directory_uri() . '/additional-prod-style.css';
+
+    // Проверка существования файла
+    $version = file_exists($file_path) ? filemtime($file_path) : false;
+
+    wp_enqueue_style( 'additional-prod-styles', $file_url, array(), $version );
 }
 add_action( 'wp_enqueue_scripts', 'additional_prod_styles' );
+
 
 
 // Enqueue additional production scripts

@@ -13815,9 +13815,9 @@ h3.ordergot {
     color: #000;
     font-weight: 400;
     padding: 10px 20px;
-    font-size: 16px;
-    height: 48px;
-    line-height: 48px;
+    font-size: 18px;
+    height: 40px;
+    line-height: 40px;
     text-align: left;
 }
 
@@ -13826,22 +13826,22 @@ h3.ordergot {
 }
 
 .woocommerce-account .woocommerce .form-row ::-webkit-input-placeholder {
-    color: #999;
+    color: #000;
     font-weight: 400;
 }
 
 .woocommerce-account .woocommerce .form-row :-moz-placeholder {
-    color: #999;
+    color: #000;
     font-weight: 400;
 }
 
 .woocommerce-account .woocommerce .form-row ::-moz-placeholder {
-    color: #999;
+    color: #000;
     font-weight: 400;
 }
 
 .woocommerce-account .woocommerce .form-row :-ms-input-placeholder {
-    color: #999;
+    color: #000;
     font-weight: 400;
 }
 
@@ -22834,154 +22834,4 @@ body .wpcf7-form input[type="checkbox"]:checked:before {
 
 li#menu-item-20949 {
     display: none !important;
-}
-.require-login-form input,
-.require-login-form textarea,
-.require-login-form select {
-  background-color: #f0f0f0;
-  pointer-events: none;
-  opacity: 0.6;
-}
-
-.woocommerce form .form-row label {
-    font-size: 18px;
-    font-weight: 400;
-    margin-bottom: 10px !important;
-    line-height: 1.5;
-    display: block;
-    color: black;
-    font-family: 'Helvetica Neue Bold Extended' !important;
-}
-.col-lg-4.col-md-8.col-lg-offset-4.col-md-offset-2.col-sm-12.col-xs-12.col-login {
-    width: 100%!important;
-    max-width: 620px!important;
-    margin: 0 auto !important;
-    float: none !important;
-}
-.woocommerce-account .tabs-content{
-    padding-bottom: 15px!important;
-}
-.woocommerce .woocommerce-form-login .woocommerce-form-login__submit{
-    float: none!important;
-}
-.woocommerce form .form-row input.input-radio{
-    height: auto!important;
-}
-.hidden{
-    display: none!important;
-}
-.hidden-email{
-    display: none!important;
-}
-.required-field-error {
-    border: 1px solid #f46b25 !important;
-}
-.show-required-fields {
-    animation: pulse 0.5s ease-in-out;
-}
-@keyframes pulse {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    50% { transform: translateX(5px); }
-    75% { transform: translateX(-5px); }
-    100% { transform: translateX(0); }
-}
-.woocommerce-form-login, .woocommerce-form-register{
-    font-size: 18px;
-    line-height: 1.6;
-    color: #000;
-}
-.woocommerce-account .woocommerce-form-register .form-inputs{
-    display: none!important;
-}
-.woocommerce-form-register .afreg_field_message,
-.woocommerce-form-register .afreg_field_message_radio{
-    margin-top: 0;
-    margin-bottom: 15px;
-    display: inline-block;
-    font-size: 18px;
-}
-
-.afreg-is-radio-dependable {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-.afreg-is-radio-dependable + .afreg_radio {
-    position: relative;
-    padding-left: 28px;
-    cursor: pointer;
-    display: inline-block;
-    margin-right: 15px;
-    line-height: 1.5;
-    transition: color 0.3s;
-}
-.afreg-is-radio-dependable + .afreg_radio:before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 4px;
-    width: 18px;
-    height: 18px;
-    border: 2px solid #ddd;
-    border-radius: 50%;
-    background: #fff;
-    transition: all 0.3s;
-}
-.afreg-is-radio-dependable:checked + .afreg_radio:before {
-    border-color: #f46b25;
-}
-.afreg-is-radio-dependable + .afreg_radio:after {
-    content: "";
-    position: absolute;
-    left: 4px;
-    top: 8px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #f46b25;
-    opacity: 0;
-    transition: all 0.3s;
-}
-.afreg-is-radio-dependable:checked + .afreg_radio:after {
-    opacity: 1;
-}
-.afreg-is-radio-dependable:focus + .afreg_radio:before {
-    box-shadow: 0 0 0 3px rgba(244, 107, 37, 0.2);
-}
-.afreg-is-radio-dependable:not(:checked) + .afreg_radio:hover:before {
-    border-color: #f46b25;
-    opacity: 0.7;
-}
-select + .woocommerce-error{
-    margin-top: 15px;
-}
-/**/
-.protected-form-wrp{
-    position: relative;
-}
-.protected-form{
-    position: relative;
-}
-.protected-form > * {
-    opacity: .1;
-}
-.protected-form:after{
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #e88f48;
-    opacity: .06;
-}
-.protected-form-message{
-    color: #000;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 83%;
 }
