@@ -576,7 +576,7 @@ class Supro_WooCommerce {
 		global $product;
 
 		echo '<div class="footer-button footer-button-shop-list">';
-
+/*
 		$product_enquired = get_post_meta( $product->get_id(), '_enquired_product', true ) == 'yes';
 
 		if ( !$product_enquired && function_exists( 'woocommerce_template_loop_add_to_cart' ) ) {
@@ -593,7 +593,10 @@ class Supro_WooCommerce {
         '<span class="icon-enquire"></span>'
       );
     }
-
+*/
+        if ( function_exists( 'woocommerce_template_loop_add_to_cart' ) ) {
+            woocommerce_template_loop_add_to_cart();
+        }
 		echo '<div class="actions-button">';
 
 		if ( shortcode_exists( 'yith_wcwl_add_to_wishlist' ) ) {

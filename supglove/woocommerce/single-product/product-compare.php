@@ -367,13 +367,14 @@ foreach ( $products_to_compare as $thecompareproduct ) {
                     <div class="un-product-thumbnail">
                       <a href="<?php echo esc_url( get_permalink( $someproduct->get_id() ) ); ?>" ><img src="<?php echo $someproduct_image; ?>" data-id="<?php echo esc_attr( $someproduct->get_id() ); ?>"></a>
                       <div class="footer-button2">
-                        <?php if (!$enquired_product) : ?>
                           <a
                             href="?add-to-cart=<?php echo $someproduct->get_id(); ?>" data-quantity="1" data-title="<?php echo $someproduct->get_name(); ?>"
                             data-product_id="<?php echo $someproduct->get_id(); ?>" data-product_sku="<?php echo $someproduct->get_sku(); ?>"
                             class="button product_type_simple add_to_cart_button ajax_add_to_cart buttonogs btn_small btn_theme_color" rel="nofollow" tabindex="0"><span
                               class="hidebuttxt"><?php _e( 'Add to Box', 'supro' ); ?> <i class="t-icon icon-ion-android-add"></i></span><i class="showmobile t-icon icon-cartboxadd"></i>
                           </a>
+
+                        <?php /* if (!$enquired_product) : ?>
                         <?php else : ?>
                           <button
                             type="button"
@@ -385,7 +386,7 @@ foreach ( $products_to_compare as $thecompareproduct ) {
                             <span>Contact Us</span>
                             <span class="icon-enquire inside-button"></span>
                           </button>
-                        <?php endif ?>
+                        <?php endif */?>
                       </div>
                       <div class="quicky2"><a
                         href="<?php echo $someproduct->get_permalink(); ?>" data-id="<?php echo esc_attr( $someproduct->get_id() ); ?>" class="buttonogs btn_small btn_dark2"><span
