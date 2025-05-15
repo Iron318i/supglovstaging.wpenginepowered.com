@@ -14210,13 +14210,16 @@ h3.ordergot {
 
 .woocommerce-account.woocommerce-lost-password form.lost_reset_password {
     text-align: center;
-}
-
-.woocommerce-account.woocommerce-lost-password form.lost_reset_password .form-row {
-    max-width: 630px;
+    max-width: 550px;
     margin: 0 auto;
+    padding-top: 5px;
+    background-color: #F8F6F1;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 2px;
+    overflow: hidden;
+    color: #000;
 }
-
 .woocommerce-account.woocommerce-lost-password form.lost_reset_password .form-row label {
     color: #000;
 }
@@ -14260,7 +14263,8 @@ h3.ordergot {
     text-align: left;
 }
 
-.woocommerce-account .customer-login .form-row .button {
+.woocommerce-account .customer-login .form-row .button,
+.woocommerce-account .lost_reset_password .button {
     width: 100%;
     font-size: 18px;
     margin-top: 30px;

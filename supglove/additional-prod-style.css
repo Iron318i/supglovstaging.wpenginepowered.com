@@ -4746,6 +4746,11 @@ body .wpcf7-form .address_checkbox input[type="checkbox"] {
   display: inline-block;
   font-size: 18px;
 }
+@media(max-width: 600px){
+  .woocommerce-form-register .half_width{
+    width: 100% !important;
+  }
+}
 
 .afreg-is-radio-dependable {
   position: absolute;
@@ -4852,4 +4857,62 @@ select + .woocommerce-error{
 }
 .woocommerce-checkout .thwmsc-tab-panel .woocommerce-input-wrapper .input-radio{
   margin-bottom: 12px;
+}
+.woocommerce-checkout .woocommerce-input-wrapper .input-radio {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  width: 18px;
+  height: 18px !important;
+  min-width: 18px;
+  margin-right: 10px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  background: #fff;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.woocommerce-checkout .woocommerce-input-wrapper .input-radio:checked {
+  border-color: #f46b25;
+  background-color: #fff !important;
+}
+.woocommerce-checkout .woocommerce-input-wrapper .input-radio:checked::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f46b25;
+}
+.woocommerce-checkout .woocommerce-input-wrapper label.radio {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  margin-right: 15px;
+  line-height: 1.5;
+  vertical-align: middle;
+  font-family: 'Helvetica Neue', Arial, sans-serif !important;
+}
+.woocommerce-checkout .woocommerce-input-wrapper .input-radio:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(244, 107, 37, 0.2);
+}
+.woocommerce-checkout .woocommerce-input-wrapper .input-radio:hover {
+  border-color: #f46b25;
+}
+.woocommerce-checkout .woocommerce-input-wrapper label.radio.required_field {
+  display: inline-block !important;
+}
+.woocommerce-checkout .woocommerce form .form-row input.input-radio {
+  line-height: normal;
+  display: inline-block;
+  vertical-align: middle;
+}
+/*Lost your password*/
+.woocommerce-account.woocommerce-lost-password form.lost_reset_password .form-row{
+  float: none;
+  width: 100%;
 }
