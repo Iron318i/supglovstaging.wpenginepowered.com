@@ -4916,3 +4916,13 @@ select + .woocommerce-error{
   float: none;
   width: 100%;
 }
+/* Header Fix */
+@media (min-width: 1571px) and (max-width: 1699px){
+  .site-header .primary-nav #menu-left-menu {
+    column-gap: .6vw;
+  }
+}
+
+.hidden-state{
+  display: none!important;
+}

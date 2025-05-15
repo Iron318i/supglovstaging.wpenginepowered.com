@@ -3734,6 +3734,111 @@ function custom_registration_form_behavior() {
             }
 
             radioLabelsFix();
+
+            // Utility to wait until an element is present in the DOM
+            const waitForElement = (selector, callback) => {
+                const el = document.querySelector(selector);
+                if (el) return callback(el);
+                const observer = new MutationObserver(() => {
+                    const el = document.querySelector(selector);
+                    if (el) {
+                        observer.disconnect();
+                        callback(el);
+                    }
+                });
+                observer.observe(document.body, { childList: true, subtree: true });
+            };
+
+            // Main logic once elements are ready
+            waitForElement('#afreg_additional_46360', () => {
+
+                const companyLocation = document.getElementById('afreg_additional_46360');
+                const country = document.getElementById('afreg_additional_46397');
+
+                const stateField = document.getElementById('afreg_additionalshowhide_46395');
+                const provinceField = document.getElementById('afreg_additionalshowhide_46423');
+                const mexicanField = document.getElementById('afreg_additionalshowhide_46424');
+
+                const stateSelect = document.getElementById('afreg_additional_46395');
+                const provinceSelect = document.getElementById('afreg_additional_46423');
+                const mexicanSelect = document.getElementById('afreg_additional_46424');
+
+                const mexicanLabel = mexicanField.querySelector('label');
+
+                // Show or hide an element by toggling the 'hidden' class
+                function setVisibility(el, visible) {
+                    if (!el) return;
+                    if (visible) {
+                        el.classList.remove('hidden-state');
+                    } else {
+                        el.classList.add('hidden-state');
+                    }
+                }
+
+                // Make a field required or not
+                function toggleRequired(el, required) {
+                    if (el) {
+                        if (required) {
+                            el.setAttribute('required', 'required');
+                        } else {
+                            el.removeAttribute('required');
+                        }
+                    }
+                }
+
+                // Synchronize values of both select fields
+                function syncSelects(value) {
+                    companyLocation.value = value;
+                    country.value = value;
+                }
+
+                // Update visibility and required state based on selected country
+                function updateFields(value) {
+                    setVisibility(stateField, false);
+                    setVisibility(provinceField, false);
+                    setVisibility(mexicanField, false);
+
+                    toggleRequired(stateSelect, false);
+                    toggleRequired(provinceSelect, false);
+                    toggleRequired(mexicanSelect, false);
+
+                    if (value === 'United States') {
+                        setVisibility(stateField, true);
+                        toggleRequired(stateSelect, true);
+                    } else if (value === 'Canada') {
+                        setVisibility(provinceField, true);
+                        toggleRequired(provinceSelect, true);
+                    } else if (value === 'Mexico') {
+                        setVisibility(mexicanField, true);
+                        toggleRequired(mexicanSelect, true);
+                        if (mexicanLabel) {
+                            mexicanLabel.textContent = 'States';
+                        }
+                    }
+                }
+
+                // Event handler when either country selector changes
+                function handleChange(e) {
+                    const value = e.target.value;
+                    syncSelects(value);
+                    updateFields(value);
+                }
+
+                companyLocation.addEventListener('change', handleChange);
+                country.addEventListener('change', handleChange);
+
+                    [stateField, provinceField, mexicanField].forEach(el => {
+                        if (el) el.classList.add('hidden-state');
+                    });
+
+                    // Initial sync and update if value exists
+                    const initialValue = companyLocation.value || country.value;
+                    if (initialValue) {
+                        syncSelects(initialValue);
+                        updateFields(initialValue);
+                    }
+            });
+
         });
     </script>
     <?php
