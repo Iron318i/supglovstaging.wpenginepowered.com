@@ -11573,12 +11573,15 @@ a.orangebut:hover,
     border: 1px solid #464646;
     padding: 8px 20px;
     height: 46px;
-    border-radius: 0;
+    border-radius: 5px;
     outline: 0;
 }
 
 .woocommerce form .form-row .select2-container .select2-selection--single .select2-selection__rendered {
     padding-left: 0;
+}
+.select2-container .select2-selection--single .select2-selection__rendered {
+    padding: .3em!important;
 }
 
 .woocommerce form .form-row .select2-container .select2-selection--single .select2-selection__arrow {
