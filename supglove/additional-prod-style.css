@@ -4835,6 +4835,15 @@ select + .woocommerce-error{
   transform: translate(-50%, -50%);
   width: 83%;
 }
+@media(max-width: 599px){
+  .protected-form-wrp h2{
+      font-size: 32px;
+  }
+  .protected-form-wrp h3{
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+  }
+}
 /*checkout*/
 .woocommerce-checkout #thwmsc-tab-panels{
   overflow: hidden;

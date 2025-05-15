@@ -3061,8 +3061,8 @@ function handle_all_cf7_shortcodes($output, $tag, $atts, $m) {
     <div class="protected-form">'. $output.'</div>
     <div class="protected-form-message">
         <h2 style="margin-bottom: 0;">CREATE A FREE ACCOUNT</h2>
-        <h3 style="margin: 0;">Sign up once—no more forms<br></h3>
-        <p>Your info is saved so you can get what you need fast</p>
+        <h3 style="margin: 0;text-transform: none">Sign up once—no more forms</h3>
+        <p><span style="font-size: 1.2em;">Your info is saved so you can get what you need fast</span></p>
         <ul style="color: #1A1817!important;font-weight: 600;">
             <li style="margin-bottom: 8px;">Free Samples</li>
             <li style="margin-bottom: 8px;">Onsite services</li>
