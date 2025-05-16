@@ -12,8 +12,10 @@
  *
  * @see     https://woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates
- * @version 9.0.0
+ * @version 9.7.0
  */
+
+use Automattic\WooCommerce\Enums\ProductType;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -59,7 +61,7 @@ $wrapper_classes   = apply_filters(
 			$html .= '</div>';
 		}
 
-		echo apply_filters( 'woocommerce_single_product_image_thumbnail_html', $html, $post_thumbnail_id );
+		echo apply_filters( 'woocommerce_single_product_image_thumbnail_html', $html, $post_thumbnail_id ); // phpcs:disable WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 		do_action( 'woocommerce_product_thumbnails' );
 		?>
