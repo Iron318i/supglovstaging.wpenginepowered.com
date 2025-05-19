@@ -63,7 +63,7 @@ function woocommerce_checkout_size_contact() {
     do_action( 'woocommerce_checkout_order_review' );  
   }
 }
-//add_action('woocommerce_checkout_info_contact', 'woocommerce_checkout_size_contact');
+add_action('woocommerce_checkout_info_contact', 'woocommerce_checkout_size_contact');
 
 // Custom Email validation
 
@@ -3865,4 +3865,35 @@ function auto_fill_email_input_for_logged_user($tag, $unused) {
     }
 
     return $tag;
+}
+
+/**
+ * Check cart items on the cart/checkout pages.
+ * If the cart has more than 3 items, keep only the first 3 and remove the rest.
+ */
+add_action('template_redirect', 'check_cart_items_on_cart_page');
+
+function check_cart_items_on_cart_page() {
+    // Only run on cart or checkout pages
+    if (is_cart() || is_checkout()) {
+        $cart_items = WC()->cart->get_cart();
+        $cart_items_count = count($cart_items);
+
+        // If cart has more than 3 items, remove extras
+        if ($cart_items_count > 3) {
+            $items_kept = 0; // Counter for kept items
+
+            foreach ($cart_items as $cart_item_key => $cart_item) {
+                $items_kept++;
+
+                // Remove items after the first 3
+                if ($items_kept > 3) {
+                    WC()->cart->remove_cart_item($cart_item_key);
+                }
+            }
+
+            // Show a notice to the user
+            wc_add_notice(__('Maximum 3 items allowed in cart. Extra items were removed.', 'supglove'), 'notice');
+        }
+    }
 }
