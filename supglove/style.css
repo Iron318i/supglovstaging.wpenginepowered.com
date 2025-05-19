@@ -22842,3 +22842,6 @@ body .wpcf7-form input[type="checkbox"]:checked:before {
 li#menu-item-20949 {
     display: none !important;
 }
+a#open-register-tab {
+  text-decoration: underline;
+}
