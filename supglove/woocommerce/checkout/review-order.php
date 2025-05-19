@@ -16,6 +16,19 @@
  */
 
 defined( 'ABSPATH' ) || exit;
+
+// Initialize flag to check if any product requires enquiry
+$has_enquired_product = false;
+
+// Check each product in cart for the _enquired_product meta
+foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+    $_product = $cart_item['data'];
+    if ( get_post_meta( $_product->get_id(), '_enquired_product', true ) === 'yes' ) {
+        $has_enquired_product = true;
+        break; // No need to check further if we found one
+    }
+}
+
 ?>
 <table class="shop_table woocommerce-checkout-review-order-table">
 	<thead>
@@ -28,6 +41,11 @@ defined( 'ABSPATH' ) || exit;
 		</tr>
 	</thead>
 	<tbody>
+    <?php if ( $has_enquired_product ) : ?>
+    <tr class="enquired_product_info" style="display: none">
+        <td colspan="2"><small>*An item in your cart requires additional qualification and approval before a sample can be sent. Our sales team will contact you to discuss whether you meet qualification criteria to sample this product.</small></td>
+    </tr>
+    <?php endif; ?>
 		<?php
 		do_action( 'woocommerce_review_order_before_cart_contents' );
 

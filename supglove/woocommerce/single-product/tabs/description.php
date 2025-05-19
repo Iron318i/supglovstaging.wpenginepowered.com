@@ -83,15 +83,6 @@ if ( !$is_sample_box ) {
           echo '</div>';
         }
 
-        if ( $enquired_product ) {
-            $icon_path = get_template_directory_uri() . '/img/products_messages/attention-sign.svg';
-
-            echo '<div class="warning-message">';
-            echo '<img src="' . $icon_path . '" alt="Warning" width="35">';
-            echo '<p>' . __( 'We will need a bit more information in order to push through this sample request', 'supro' ) . '</p>';
-            echo '</div>';
-        }
-
       echo '</div>';
       echo '<div class="col col-sm-12 col-md-6 prodetailsright prodetailsblock">';
       

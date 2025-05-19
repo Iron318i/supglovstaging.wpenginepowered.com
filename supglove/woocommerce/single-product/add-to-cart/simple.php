@@ -29,8 +29,13 @@ if ( $product->is_in_stock() ) : ?>
 
 	<?php do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 
+    <?php if($enquired_product) : ?>
+        <div class="additional-btn-info"><small><?php  _e( '*Additional qualification criteria apply to receive a sample.', 'supro' ) ?></small></div>
+    <?php endif; ?>
+
 	<form class="cart" action="<?php echo esc_url( apply_filters( 'woocommerce_add_to_cart_form_action', $product->get_permalink() ) ); ?>" method="post" enctype='multipart/form-data'>
 		<?php do_action( 'woocommerce_before_add_to_cart_button' ); ?>
+
 
 		<?php
 		do_action( 'woocommerce_before_add_to_cart_quantity' );
@@ -61,7 +66,8 @@ if ( $product->is_in_stock() ) : ?>
                     data-link="<?= $product->get_permalink() ?>"
                     value="<?php echo esc_attr( $product->get_id() ); ?>"
                     class="single_add_to_cart_button button alt updated-text"
-            >REQUEST SAMPLE <span style='font-weight:bold;'>+</span</button>
+            ><?php  _e( 'REQUEST SAMPLE *', 'supro' ) ?>
+            </button>
         <?php /* ?>
 	      <button
           type="button"
@@ -78,7 +84,7 @@ if ( $product->is_in_stock() ) : ?>
 
 		<?php do_action( 'woocommerce_after_add_to_cart_button' ); ?>
 
-    <?php if ( !$is_sample_box ) : ?>
+        <?php if ( !$is_sample_box ) : ?>
       <div class="print_page"><a href="javascript:print();">Download or Print Page here</a></div>
     <?php endif; ?>
 

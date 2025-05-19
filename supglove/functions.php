@@ -1143,7 +1143,12 @@ function lionplugins_woocommerce_checkout_remove_item( $product_name, $cart_item
 	if ( is_checkout() && !is_wc_endpoint_url('order-received') ) {
 		$_product = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
 		$product_id = apply_filters( 'woocommerce_cart_item_product_id', $cart_item['product_id'], $cart_item, $cart_item_key );
-    
+        $enquired_product = get_post_meta($_product->get_id(), '_enquired_product', true) == 'yes';
+        $mark = '';
+        if($enquired_product){
+            $mark = ' *';
+        }
+
 		$thumbnail = $_product->get_image();
     $is_visible = $_product && $_product->is_visible();
     
@@ -1163,9 +1168,9 @@ function lionplugins_woocommerce_checkout_remove_item( $product_name, $cart_item
 		return 
       $image 
     . '<div class="cartitmedet">' 
-      . '<div class="cartitmedetinner">' 
-        . $product_name . '<br/>' 
-        . '<h6 class="sku">' . __( 'PRODUCT ID: ', 'SuperiorGlove' ) . $_product->get_sku() . '</h6>' 
+      . '<div class="cartitmedetinner">'
+        . $product_name . '<br/>'
+        . '<h6 class="sku">' . __( 'PRODUCT ID: ', 'SuperiorGlove' ) . $_product->get_sku() .	$mark .'</h6>'
         . $quickdetails 
       . '</div>' 
     . '</div>';
