@@ -3058,11 +3058,19 @@ function handle_all_cf7_shortcodes($output, $tag, $atts, $m) {
         return $output;
     }
 
-    $login_url = wp_login_url(get_permalink());
-    $register_url = wp_registration_url();
+    // Get current page URL with #form anchor for redirect
+    $current_url = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+    $redirect_url = $current_url . '#form';
+
+    // Используем /my-account/ для обоих случаев
+    $login_url = add_query_arg('redirect_to', urlencode($redirect_url), '/my-account/');
+    $register_url = add_query_arg(array(
+        'redirect_to' => urlencode($redirect_url),
+        'action' => 'register'
+    ), '/my-account/');
 
     $html = '
-<div class="protected-form-wrp">
+<div class="protected-form-wrp" id="form">
     <div class="protected-form">'. $output.'</div>
     <div class="protected-form-message">
         <h2 style="margin-bottom: 0;">CREATE A FREE ACCOUNT</h2>
@@ -3076,9 +3084,9 @@ function handle_all_cf7_shortcodes($output, $tag, $atts, $m) {
             <li style="margin-bottom: 8px;">And more!</li>
         </ul>
         <div style="margin: 30px 0;">
-            <a href="/my-account/" class="buttonogs btn_large btn_theme_color">SIGN UP</a>
+            <a href="'.esc_url($register_url).'" class="buttonogs btn_large btn_theme_color">SIGN UP</a>
         </div>
-        <p style="font-size: 14px;">Already have an account? <a href="/my-account/" style="color:#fd8541; text-decoration: underline;">Sign In</a></p>
+        <p style="font-size: 14px;">Already have an account? <a href="'.esc_url($login_url).'" style="color:#fd8541; text-decoration: underline;">Sign In</a></p>
     </div>
 </div>';
 
@@ -3103,7 +3111,6 @@ function handle_all_cf7_shortcodes($output, $tag, $atts, $m) {
         
         adjustFormHeight();
         window.addEventListener("resize", adjustFormHeight);
-        
     });
     </script>';
 
@@ -3118,7 +3125,7 @@ function handle_all_cf7_shortcodes($output, $tag, $atts, $m) {
                 form.addEventListener("submit", function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    window.location.href = "/my-account/";
+                    window.location.href = "'.esc_url($login_url).'";
                     return false;
                 });
                 
@@ -3137,8 +3144,8 @@ function handle_all_cf7_shortcodes($output, $tag, $atts, $m) {
     });
     </script>';
     return $html;
-
 }
+
 // Backend validation for "other" only
 add_action('woocommerce_register_post', 'block_other_custom_user_role', 10, 3);
 function block_other_custom_user_role($username, $email, $validation_errors) {
