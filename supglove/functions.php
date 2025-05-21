@@ -3062,11 +3062,10 @@ function handle_all_cf7_shortcodes($output, $tag, $atts, $m) {
     $current_url = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
     $redirect_url = $current_url . '#form';
 
-    // Используем /my-account/ для обоих случаев
     $login_url = add_query_arg('redirect_to', urlencode($redirect_url), '/my-account/');
     $register_url = add_query_arg(array(
         'redirect_to' => urlencode($redirect_url),
-        'action' => 'register'
+        'supro_tab' => 'register'
     ), '/my-account/');
 
     $html = '
@@ -3144,6 +3143,40 @@ function handle_all_cf7_shortcodes($output, $tag, $atts, $m) {
     });
     </script>';
     return $html;
+}
+
+add_action('wp_footer', 'supro_handle_account_tab_switch');
+function supro_handle_account_tab_switch() {
+    if (is_account_page()) {
+        ?>
+        <script>
+            jQuery(document).ready(function($) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const activeTab = urlParams.get('supro_tab');
+
+                if (activeTab === 'register') {
+                    const $tabs = $('.supro-tabs');
+                    const $registerTab = $('.tabs-nav a[href="#register"]');
+                    const $loginTab = $('.tabs-nav a[href="#login"]');
+                    const $panels = $('.tabs-panel');
+
+                    if ($registerTab.length) {
+                        setTimeout(function() {
+                            $loginTab.removeClass('active').parent().removeClass('active');
+                            $registerTab.addClass('active').parent().addClass('active');
+                            $panels.removeClass('active');
+                            $panels.eq(1).addClass('active');
+                            $registerTab.trigger('click');
+                        }, 100);
+                    }
+                }
+                if (typeof supro.loginTab === 'function') {
+                    supro.loginTab();
+                }
+            });
+        </script>
+        <?php
+    }
 }
 
 // Backend validation for "other" only

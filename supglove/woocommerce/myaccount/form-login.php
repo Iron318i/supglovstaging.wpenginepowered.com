@@ -28,9 +28,9 @@ do_action( 'woocommerce_before_customer_login_form' ); ?>
 		<div class="col-lg-4 col-md-8 col-lg-offset-4 col-md-offset-2 col-sm-12 col-xs-12 col-login">
 			<div class="supro-tabs">
 				<ul class="tabs-nav">
-					<li class="active"><a href="#" class="active"><?php esc_html_e( 'Login', 'supro' ); ?></a></li>
+					<li class="active"><a href="#login" class="active"><?php esc_html_e( 'Login', 'supro' ); ?></a></li>
 					<?php if ( 'yes' === get_option( 'woocommerce_enable_myaccount_registration' ) ) : ?>
-						<li><a href="#"><?php esc_html_e( 'Register', 'supro' ); ?></a></li>
+						<li><a href="#register"><?php esc_html_e( 'Register', 'supro' ); ?></a></li>
 					<?php endif; ?>
 				</ul>
 				<div class="tabs-content">
