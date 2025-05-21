@@ -3496,6 +3496,7 @@ function custom_registration_form_behavior() {
             function validateEmailDomain() {
                 const email = businessEmailField.value.trim().toLowerCase();
                 const emailDomain = email.split("@")[1] || "";
+                const selectedRole = roleDropdown?.value.trim();
                 const fieldWrapper = businessEmailField.closest("p");
                 const label = fieldWrapper ? fieldWrapper.querySelector("label") : null;
 
@@ -3515,20 +3516,43 @@ function custom_registration_form_behavior() {
 
                 const isWhitelisted = whitelistedEmails.includes(email);
 
-                if (!isWhitelisted && blockedDomains.includes(emailDomain)) {
-                    errorContainer.innerHTML = "<li>Please enter a valid business email address (no personal email domains).</li>";
-                    errorContainer.style.display = "block";
-                    return false;
-                } else {
-                    errorContainer.innerHTML = "";
-                    errorContainer.style.display = "none";
-                    return true;
+                // Reset any previous error
+                errorContainer.innerHTML = "";
+                errorContainer.style.display = "none";
+
+                if (selectedRole === "distributor") {
+                    if (!isWhitelisted) {
+                        errorContainer.innerHTML = "<li>We cannot locate your email address in our distributor database. If this is an error, or if you would like to become a Superior Glove distributor, please call 800-265-7617 or 519-853-1920.</li>";
+                        errorContainer.style.display = "block";
+                        return false;
+                    }
+                } else if (selectedRole === "safety_professional") {
+                    if (blockedDomains.includes(emailDomain)) {
+                        errorContainer.innerHTML = "<li>Please enter a valid business email address (no personal email domains).</li>";
+                        errorContainer.style.display = "block";
+                        return false;
+                    }
                 }
+
+                return true;
             }
 
+
             if (businessEmailField) {
-                businessEmailField.addEventListener("input", validateEmailDomain);
-                businessEmailField.addEventListener("blur", validateEmailDomain);
+                let emailInputTimeout;
+
+                businessEmailField.addEventListener("input", function () {
+                    clearTimeout(emailInputTimeout);
+
+                    emailInputTimeout = setTimeout(function () {
+                        validateEmailDomain();
+                    }, 500);
+                });
+
+                businessEmailField.addEventListener("blur", function () {
+                    clearTimeout(emailInputTimeout);
+                    validateEmailDomain();
+                });
             }
 
             function disableEmptySelectOptions() {
