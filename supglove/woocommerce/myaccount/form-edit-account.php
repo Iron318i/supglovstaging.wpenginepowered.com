@@ -2,6 +2,8 @@
 /**
  * Edit account form
  *
+ * This template can be overridden by copying it to yourtheme/woocommerce/myaccount/form-edit-account.php.
+ *
  * @package WooCommerce\Templates
  * @version 9.7.0
  */
@@ -19,77 +21,59 @@ $user    = wp_get_current_user();
 	<?php do_action( 'woocommerce_edit_account_form_start' ); ?>
 
 	<p class="woocommerce-form-row woocommerce-form-row--first form-row form-row-first">
-		<input type="text" class="woocommerce-Input" placeholder="<?php esc_attr_e( 'First name', 'supro' ); ?>" name="account_first_name" id="account_first_name" autocomplete="given-name" value="<?php echo esc_attr( $user->first_name ); ?>" />
+		<input type="text" class="woocommerce-Input woocommerce-Input--text input-text"
+		       placeholder="<?php esc_attr_e( 'First name', 'supro' ); ?>"
+		       name="account_first_name" id="account_first_name"
+		       autocomplete="given-name"
+		       value="<?php echo esc_attr( $user->first_name ); ?>" />
 	</p>
 
 	<p class="woocommerce-form-row woocommerce-form-row--last form-row form-row-last">
-		<input type="text" class="woocommerce-Input" placeholder="<?php esc_attr_e( 'Last name', 'supro' ); ?>" name="account_last_name" id="account_last_name" autocomplete="family-name" value="<?php echo esc_attr( $user->last_name ); ?>" />
+		<input type="text" class="woocommerce-Input woocommerce-Input--text input-text"
+		       placeholder="<?php esc_attr_e( 'Last name', 'supro' ); ?>"
+		       name="account_last_name" id="account_last_name"
+		       autocomplete="family-name"
+		       value="<?php echo esc_attr( $user->last_name ); ?>" />
 	</p>
 
 	<div class="clear"></div>
 
-	<p class="woocommerce-form-row form-row-wide">
-		<input type="text" class="woocommerce-Input" placeholder="<?php esc_attr_e( 'Display Name', 'supro' ); ?>" name="account_display_name" id="account_display_name" value="<?php echo esc_attr( $user->display_name ); ?>" />
-		<span><em><?php esc_html_e( 'This will be how your name will be displayed in the account section and in reviews.', 'supro' ); ?></em></span>
+	<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+		<input type="text" class="woocommerce-Input woocommerce-Input--text input-text"
+		       placeholder="<?php esc_attr_e( 'Display Name', 'supro' ); ?>"
+		       name="account_display_name" id="account_display_name"
+		       value="<?php echo esc_attr( $user->display_name ); ?>" />
+		<span><em><?php esc_html_e( 'This will be how your name will be displayed in the account section and in reviews', 'supro' ); ?></em></span>
 	</p>
 
-	<p class="woocommerce-form-row form-row-wide">
-		<input type="email" class="woocommerce-Input" placeholder="<?php esc_attr_e( 'Email address', 'supro' ); ?>" name="account_email" id="account_email" autocomplete="email" value="<?php echo esc_attr( $user->user_email ); ?>" />
+	<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+		<input type="email" class="woocommerce-Input woocommerce-Input--email input-text"
+		       placeholder="<?php esc_attr_e( 'Email address', 'supro' ); ?>"
+		       name="account_email" id="account_email"
+		       autocomplete="email"
+		       value="<?php echo esc_attr( $user->user_email ); ?>" />
 	</p>
-
-	<?php $value = esc_attr( get_user_meta( $user_id, 'afreg_select_user_role', true ) ); ?>
-	<p class="woocommerce-form-row form-row-wide">
-	<label for="afreg_select_user_role">Professional Affiliation</label>
-	<select name="afreg_select_user_role" id="afreg_select_user_role">
-		<option value="Choose Professional Affiliation" <?php selected( $value, 'Choose Professional Affiliation' ); ?>>Choose Professional Affiliation</option>
-		<option value="distributor" <?php selected( $value, 'distributor' ); ?>>Distributor</option>
-		<option value="safety_professional" <?php selected( $value, 'safety_professional' ); ?>>Safety Professional</option>
-	</select>
-</p>
 
 	<?php
-	$afreg_fields = [
-		'afreg_additional_46359' => 'Company Size (Safety Professional)',
-		'afreg_additional_46360' => 'Company Location',
-		'afreg_additional_46364' => 'Preferred Contact Method',
-		'afreg_additional_46362' => 'Business Email',
-		'afreg_additional_46363' => 'Secondary Email',
-		'afreg_additional_46385' => 'First Name',
-		'afreg_additional_46387' => 'Last Name',
-		'afreg_additional_46388' => 'Job Title',
-		'afreg_additional_46389' => 'Phone Number',
-		'afreg_additional_46390' => 'Email',
-		'afreg_additional_46391' => 'Company Name',
-		'afreg_additional_46392' => 'Street Address',
-		'afreg_additional_46393' => 'Additional Address',
-		'afreg_additional_46394' => 'City',
-		'afreg_additional_46395' => 'State',
-		'afreg_additional_46423' => 'Province',
-		'afreg_additional_46424' => 'Mexican States',
-		'afreg_additional_46396' => 'Post Code / Zip Code',
-		'afreg_additional_46397' => 'Country',
-		'afreg_additional_46426' => 'Preferred Language',
-		'afreg_additional_46383' => 'Weekly Email Opt-in',
-	];
-
-	foreach ( $afreg_fields as $meta_key => $label ) :
-		$value = esc_attr( get_user_meta( $user_id, $meta_key, true ) );
-		?>
-		<p class="woocommerce-form-row form-row-wide">
-			<label for="<?php echo esc_attr( $meta_key ); ?>"><?php echo esc_html( $label ); ?></label>
-			<input type="text" class="woocommerce-Input" name="<?php echo esc_attr( $meta_key ); ?>" id="<?php echo esc_attr( $meta_key ); ?>" value="<?php echo $value; ?>" />
-		</p>
-	<?php endforeach; ?>
+		// This hook injects plugin-managed fields (AFREG, etc.)
+		do_action( 'woocommerce_edit_account_form_fields' );
+	?>
 
 	<fieldset>
-		<p class="woocommerce-form-row form-row-wide">
-			<input type="password" class="woocommerce-Input" placeholder="<?php esc_attr_e( 'Current Password', 'supro' ); ?>" name="password_current" id="password_current" autocomplete="off" />
+		<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+			<input type="password" class="woocommerce-Input woocommerce-Input--password input-text"
+			       placeholder="<?php esc_attr_e( 'Current Password', 'supro' ); ?>"
+			       name="password_current" id="password_current" autocomplete="off" />
 		</p>
-		<p class="woocommerce-form-row form-row-wide">
-			<input type="password" class="woocommerce-Input" placeholder="<?php esc_attr_e( 'New Password', 'supro' ); ?>" name="password_1" id="password_1" autocomplete="off" />
+		<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+			<input type="password" class="woocommerce-Input woocommerce-Input--password input-text"
+			       placeholder="<?php esc_attr_e( 'New Password', 'supro' ); ?>"
+			       name="password_1" id="password_1" autocomplete="off" />
 		</p>
-		<p class="woocommerce-form-row form-row-wide">
-			<input type="password" class="woocommerce-Input" placeholder="<?php esc_attr_e( 'Confirm New Password', 'supro' ); ?>" name="password_2" id="password_2" autocomplete="off" />
+		<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+			<input type="password" class="woocommerce-Input woocommerce-Input--password input-text"
+			       placeholder="<?php esc_attr_e( 'Confirm New Password', 'supro' ); ?>"
+			       name="password_2" id="password_2" autocomplete="off" />
 		</p>
 	</fieldset>
 
@@ -99,7 +83,9 @@ $user    = wp_get_current_user();
 
 	<p class="edit-btn">
 		<?php wp_nonce_field( 'save_account_details', 'save-account-details-nonce' ); ?>
-		<button type="submit" class="woocommerce-Button button" name="save_account_details" value="<?php esc_attr_e( 'Save changes', 'woocommerce' ); ?>">
+		<button type="submit" class="woocommerce-Button button<?php echo esc_attr( wc_wp_theme_get_element_class_name( 'button' ) ? ' ' . wc_wp_theme_get_element_class_name( 'button' ) : '' ); ?>"
+		        name="save_account_details"
+		        value="<?php esc_attr_e( 'Save changes', 'woocommerce' ); ?>">
 			<?php esc_html_e( 'Save changes', 'woocommerce' ); ?>
 		</button>
 		<input type="hidden" name="action" value="save_account_details" />
@@ -109,4 +95,5 @@ $user    = wp_get_current_user();
 </form>
 
 <?php do_action( 'woocommerce_after_edit_account_form' ); ?>
+
 

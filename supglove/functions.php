@@ -3909,3 +3909,110 @@ function check_cart_items_on_cart_page() {
         }
     }
 }
+add_action( 'user_register', function( $user_id ) {
+	if ( isset( $_POST['afreg_select_user_role'] ) ) {
+		$role = sanitize_text_field( $_POST['afreg_select_user_role'] );
+
+		if ( in_array( $role, [ 'distributor', 'safety_professional', 'other' ], true ) ) {
+			$user = new WP_User( $user_id );
+			$user->set_role( $role );
+		}
+	}
+}, 100 );
+
+add_filter( 'afreg_override_user_role', function( $role ) {
+	if ( is_account_page() && is_user_logged_in() ) {
+		$custom = get_user_meta( get_current_user_id(), 'afreg_select_user_role', true );
+		if ( in_array( $custom, [ 'distributor', 'safety_professional', 'other' ], true ) ) {
+			return $custom;
+		}
+	}
+	return $role;
+});
+add_action( 'init', function () {
+	if ( is_user_logged_in() ) {
+		$user = wp_get_current_user();
+		$afreg_meta = get_user_meta( $user->ID, 'afreg_select_user_role', true );
+
+		if ( empty( $afreg_meta ) && in_array( $user->roles[0], [ 'distributor', 'safety_professional', 'other' ], true ) ) {
+			update_user_meta( $user->ID, 'afreg_select_user_role', $user->roles[0] );
+		}
+	}
+} );
+add_action( 'template_redirect', function () {
+	if ( is_account_page() && is_user_logged_in() ) {
+		$user     = wp_get_current_user();
+		$meta_val = get_user_meta( $user->ID, 'afreg_select_user_role', true );
+
+		// If meta is empty but user has a valid role, backfill it
+		if ( empty( $meta_val ) && in_array( $user->roles[0], [ 'distributor', 'safety_professional', 'other' ], true ) ) {
+			update_user_meta( $user->ID, 'afreg_select_user_role', $user->roles[0] );
+		}
+	}
+} );
+add_action( 'woocommerce_before_account_navigation', function() {
+	if ( is_user_logged_in() && is_account_page() ) {
+		echo '<div class="woocommerce-account-title" style="text-align:center; margin: 30px 0 15px;">';
+		echo '<h1>Your Account</h1>';
+		echo '</div>';
+	}
+});
+add_action('wp_footer', 'custom_registration_form_behavior_with_job_title');
+function custom_registration_form_behavior_with_job_title() {
+	if (!is_account_page()) return;
+	?>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			const jobTitleField = document.getElementById('afreg_additional_46435');
+			const allowedTerms = [
+				'safety', 'health', 'health & safety', 'hse', 'risk', 'compliance', 'occupational', 'environmental',
+				'hseq', 'ohs', 'ehs', 'hso', 'hsm', 'hsc', 'hsa', 'ohso', 'ohsms', 'chso', 'csp', 'crsp',
+				'chsmsa', 'cso', 'sheq', 'psm', 'cih', 'asp', 'ehsr', 'ert', 'hmt', 'hazwoper', 'eh&s', 'oh&s', 's&e'
+			];
+			const blockedTerm = 'consult';
+
+			let debounceTimer;
+			function validateJobTitleField() {
+				const jobTitle = jobTitleField.value.trim().toLowerCase();
+				const isBlocked = jobTitle.includes(blockedTerm);
+				const hasAllowed = allowedTerms.some(term => jobTitle.includes(term));
+
+				const fieldWrapper = jobTitleField.closest("p");
+				const label = fieldWrapper ? fieldWrapper.querySelector("label") : null;
+
+				if (!label) return;
+
+				let errorContainer = label.nextElementSibling?.classList.contains('woocommerce-error')
+					? label.nextElementSibling
+					: null;
+
+				if (!errorContainer) {
+					errorContainer = document.createElement("ul");
+					errorContainer.className = "woocommerce-error job-title-error";
+					errorContainer.style.display = "none";
+					errorContainer.style.margin = "8px 0";
+					label.insertAdjacentElement("afterend", errorContainer);
+				}
+
+				if (!hasAllowed || isBlocked) {
+					errorContainer.innerHTML = "<li>Sorry, based on your job title, you do not qualify for an account.</li>";
+					errorContainer.style.display = "block";
+				} else {
+					errorContainer.innerHTML = "";
+					errorContainer.style.display = "none";
+				}
+			}
+
+			function debounceValidate() {
+				clearTimeout(debounceTimer);
+				debounceTimer = setTimeout(validateJobTitleField, 400);
+			}
+
+			if (jobTitleField) {
+				jobTitleField.addEventListener("input", debounceValidate);
+				jobTitleField.addEventListener("blur", validateJobTitleField);
+			}
+		});
+	</script>
+	<?php
+}
