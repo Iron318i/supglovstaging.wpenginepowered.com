@@ -4994,6 +4994,9 @@ select + .woocommerce-error{
 }
 #wpfront-notification-bar.hidden{
   display: block!important;
+  .home &{
+    display: none!important;
+  }
 }
 
 @media(min-width: 1200px){
