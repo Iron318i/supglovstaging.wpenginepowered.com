@@ -3439,9 +3439,32 @@ function validate_custom_email_domain() {
 }
 */
 
+function get_email_whitelist_from_sheet() {
+    $sheet_url = 'https://docs.google.com/spreadsheets/d/1OKHwQq3j7jVOm-aFV6Ebe6243YSE1Nhp/export?format=csv'; // Replace with your real sheet ID
+
+    $response = wp_remote_get($sheet_url);
+    if (is_wp_error($response)) return [];
+
+    $csv = wp_remote_retrieve_body($response);
+    $lines = explode(PHP_EOL, $csv);
+    $emails = [];
+
+    foreach ($lines as $line) {
+        $email = trim(str_getcsv($line)[3]);
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $emails[] = strtolower($email);
+        }
+    }
+
+    return $emails;
+}
+
 add_action('wp_footer', 'custom_registration_form_behavior');
 function custom_registration_form_behavior() {
     if (!is_account_page()) return;
+
+    $whitelisted_emails = get_email_whitelist_from_sheet();
+    $whitelist_json = json_encode($whitelisted_emails);
     ?>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -3449,7 +3472,7 @@ function custom_registration_form_behavior() {
             if (roleDropdown && roleDropdown.options.length > 0) {
                 roleDropdown.options[0].text = "Choose Professional Affiliation";
             }
-            
+
             const businessEmailField = document.getElementById('afreg_additional_46362');
             const mainEmailField = document.getElementById('reg_email');
             const blockedDomains = [
@@ -3457,6 +3480,8 @@ function custom_registration_form_behavior() {
                 "aol.com", "icloud.com", "outlook.com",
                 "live.com", "msn.com"
             ];
+
+            const whitelistedEmails = <?php echo $whitelist_json; ?>;
 
             if (businessEmailField && mainEmailField) {
                 businessEmailField.addEventListener('input', function() {
@@ -3488,7 +3513,9 @@ function custom_registration_form_behavior() {
                     label.insertAdjacentElement("afterend", errorContainer);
                 }
 
-                if (email && blockedDomains.includes(emailDomain)) {
+                const isWhitelisted = whitelistedEmails.includes(email);
+
+                if (!isWhitelisted && blockedDomains.includes(emailDomain)) {
                     errorContainer.innerHTML = "<li>Please enter a valid business email address (no personal email domains).</li>";
                     errorContainer.style.display = "block";
                     return false;
@@ -3504,7 +3531,6 @@ function custom_registration_form_behavior() {
                 businessEmailField.addEventListener("blur", validateEmailDomain);
             }
 
-            // Основная логика формы
             function disableEmptySelectOptions() {
                 document.querySelectorAll('.input-select option').forEach(option => {
                     if (option.value === "") {
@@ -3513,6 +3539,8 @@ function custom_registration_form_behavior() {
                     }
                 });
             }
+
+            disableEmptySelectOptions();
 
             const waitForElements = setInterval(() => {
                 const form = document.querySelector("form.register");
