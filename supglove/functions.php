@@ -2746,71 +2746,7 @@ function hide_top_bar_when_print() {
 }
 add_action('wp_head', 'hide_top_bar_when_print');
 
-add_action('woocommerce_checkout_process', 'validate_company_size');
 
-function validate_company_size() {
-    if (isset($_POST['company_size_safety_pro_value'])) { // Corrected field name
-        $company_size = sanitize_text_field($_POST['company_size_safety_pro_value']);
-
-        if (strpos($company_size, "0-100") !== false) { // Check if the value contains "0-100"
-            wc_add_notice(__('Your company must have at least 100 employees to proceed.', 'woocommerce'), 'error');
-        }
-    }
-}
-function checkout_employee_validation_script() {
-    if (is_checkout()) {
-        ?>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                console.log("✅ Validation Script Loaded Successfully");
-
-                function checkCompanySizeField() {
-                    let employeeField = jQuery("#company_size_safety_pro_value");
-                    
-                    if (!employeeField.length) {
-                        console.log("⚠️ Company size field is not found yet.");
-                        return false;
-                    }
-                    
-                    let selectedValue = employeeField.val();
-                    console.log("Company Size Selected:", selectedValue);
-                    
-                    if (selectedValue && selectedValue.includes("0-100")) {
-                        console.log("❌ Blocked Next Step: Employee count is below 100.");
-                        alert("Your company must have at least 100 employees to proceed.");
-                        return false;
-                    }
-
-                    console.log("✅ Allowed: Employee count is valid.");
-                    return true;
-                }
-
-                let nextButton = document.querySelector("#action-next");
-
-                if (nextButton) {
-                    nextButton.addEventListener("click", function (event) {
-                        if (!checkCompanySizeField()) {
-                            event.preventDefault();
-                        }
-                    });
-
-                    // Disable the button when an invalid option is selected
-                    jQuery(document).on("change", "#company_size_safety_pro_value", function () {
-                        if (!checkCompanySizeField()) {
-                            jQuery("#action-next").prop("disabled", true);
-                        } else {
-                            jQuery("#action-next").prop("disabled", false);
-                        }
-                    });
-                } else {
-                    console.log("❌ Next Button Not Found!");
-                }
-            });
-        </script>
-        <?php
-    }
-}
-add_action('wp_footer', 'checkout_employee_validation_script');
 
 function change_all_add_to_cart_buttons_dynamic() {
     ?>
@@ -3550,7 +3486,7 @@ function custom_registration_form_behavior() {
                 });
 
                 businessEmailField.addEventListener("blur", function () {
-                    clearTimeout(emailInputTimeout);
+                    clearTimeout(emailInputTimeout); 
                     validateEmailDomain();
                 });
             }
@@ -4101,3 +4037,91 @@ function custom_registration_form_behavior_with_job_title() {
 	</script>
 	<?php
 }
+add_filter( 'woocommerce_checkout_fields', function( $fields ) {
+    foreach ( [ 'billing', 'shipping', 'order' ] as $fieldset ) {
+        if ( isset( $fields[ $fieldset ] ) ) {
+            foreach ( $fields[ $fieldset ] as $key => $field ) {
+                $fields[ $fieldset ][ $key ]['required'] = false;
+                $fields[ $fieldset ][ $key ]['validate'] = []; // Remove all validation rules
+            }
+        }
+    }
+    return $fields;
+});
+
+
+// Autofill checkout fields from AFREG user meta
+add_action('wp_enqueue_scripts', function () {
+	if (!is_checkout() || !is_user_logged_in()) return;
+
+	$current_user = wp_get_current_user();
+	$user_meta = [
+		'billing_first_name'  => get_user_meta($current_user->ID, 'afreg_additional_46385', true),
+		'billing_last_name'   => get_user_meta($current_user->ID, 'afreg_additional_46387', true),
+		'billing_company'     => get_user_meta($current_user->ID, 'afreg_additional_46391', true),
+		'billing_address_1'   => get_user_meta($current_user->ID, 'afreg_additional_46392', true),
+		'billing_address_2'   => get_user_meta($current_user->ID, 'afreg_additional_46393', true),
+		'billing_city'        => get_user_meta($current_user->ID, 'afreg_additional_46394', true),
+		'billing_state'       => get_user_meta($current_user->ID, 'afreg_additional_46395', true),
+		'billing_postcode'    => get_user_meta($current_user->ID, 'afreg_additional_46396', true),
+		'billing_country'     => get_user_meta($current_user->ID, 'afreg_additional_46397', true),
+		'billing_phone'       => get_user_meta($current_user->ID, 'afreg_additional_46389', true),
+		'billing_email'       => get_user_meta($current_user->ID, 'afreg_additional_46390', true),
+		'billing_job_title'   => get_user_meta($current_user->ID, 'afreg_additional_46388', true),
+	];
+
+	$js_data = wp_json_encode($user_meta);
+
+	wp_add_inline_script('jquery', "
+		document.addEventListener('DOMContentLoaded', function () {
+			try {
+				const userData = $js_data;
+				Object.entries(userData).forEach(([key, val]) => {
+					if (!val) return;
+					const el = document.querySelector(`[name='\${key}']`);
+					if (el && el.value === '') {
+						el.value = val;
+						el.dispatchEvent(new Event('input', { bubbles: true }));
+						el.dispatchEvent(new Event('change', { bubbles: true }));
+					}
+				});
+			} catch (e) {
+				console.error('Autofill error:', e);
+			}
+		});
+	");
+});
+
+// Save AFREG data as WooCommerce billing address
+add_action('woocommerce_checkout_create_order', function($order, $data) {
+	$afreg_map = [
+		'billing_first_name'  => 'afreg_additional_46385',
+		'billing_last_name'   => 'afreg_additional_46387',
+		'billing_company'     => 'afreg_additional_46391',
+		'billing_address_1'   => 'afreg_additional_46392',
+		'billing_address_2'   => 'afreg_additional_46393',
+		'billing_city'        => 'afreg_additional_46394',
+		'billing_state'       => 'afreg_additional_46395',
+		'billing_postcode'    => 'afreg_additional_46396',
+		'billing_country'     => 'afreg_additional_46397',
+		'billing_phone'       => 'afreg_additional_46389',
+		'billing_email'       => 'afreg_additional_46390',
+		'billing_job_title'   => 'afreg_additional_46388',
+	];
+
+	$billing_data = [];
+
+	foreach ($afreg_map as $wc_key => $afreg_key) {
+		if (!empty($_POST[$afreg_key])) {
+			$value = sanitize_text_field($_POST[$afreg_key]);
+			$billing_data[$wc_key] = $value;
+			update_user_meta(get_current_user_id(), $wc_key, $value);
+		}
+	}
+
+	if (!empty($billing_data)) {
+		$order->set_address($billing_data, 'billing');
+	}
+}, 20, 2);
+
+

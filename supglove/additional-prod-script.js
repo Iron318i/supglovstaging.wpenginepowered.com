@@ -1098,64 +1098,7 @@
     });
   }
   
-  
-  $(document).ready(function () {
-    $('#action-next').on('click', function () {
-      var location_distributor_value = $('#location_distributor_value').val();
-      var location_safety_pro_value = $('#location_distributor_value').val();
-      var valBillingC = $('#billing_country').val();
-      
-      if (location_distributor_value.length || location_safety_pro_value.length) {
-        $("#billing_country").val(location_safety_pro_value || location_safety_pro_value);
-      }
-
-      if (valBillingC === 'United States' || valBillingC ==='Mexico' || valBillingC ==='Canada'){
-        $("#other_states_field").hide();
-      }
-    });
-
-    $('#billing_country').on('change', function () {
-      var valueChanged = $(this).val();
-      
-      $("#location_distributor_value").val(valueChanged);
-      $("#location_safety_pro_value").val(valueChanged);
-
-      if (this.value === 'Canada') {
-        $("#canada_province_field").show();
-        $("#other_states_field").hide();
-      } else if (this.value === 'Mexico') {
-        $("#mexican_states").show()
-        $("#other_states_field").hide();
-      } else if (this.value === 'United States') {
-        $("#states_usa_field").show();
-        $("#other_states_field").hide();
-      } else if (this.value !== 'United States' && this.value !== 'Mexico' && this.value !== 'Canada'){
-        $("#mexican_states, #canada_province_field, #states_usa_field").hide();
-        $("#other_states_field").show();
-      }
-    });
-
-
-    let actionNextR = $('#cf7mls-next-btn-cf7mls_step-1');
-    
-    actionNextR.click(function(){
-      let provinceValueQ = $('input[name="qualification-province"]:checked');
-      
-      if (provinceValueQ.length){
-        var provinceValue = $('input[name="rd-your-province"]');
-        var provinceValueN = provinceValue.val(provinceValueQ.val());
-      }
-    });
-
-
-    hideNextbutton();
-    initResourcesFilter();
-    initNewProductHeightsEqualizier();
-    hideEmptySizeInputsInCheckout();
-    handleMultistepCF7();
-    handleCF7FieldsForSalesforce();
-    //handleBackToResources();
-  });
+ 
   
   
   $(window).on("load", function () {

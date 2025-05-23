@@ -1,52 +1,50 @@
 <?php
 /**
- * Edit address form
- *
- * This template can be overridden by copying it to yourtheme/woocommerce/myaccount/form-edit-address.php.
- *
- * HOWEVER, on occasion WooCommerce will need to update template files and you
- * (the theme developer) will need to copy the new files to your theme to
- * maintain compatibility. We try to do this as little as possible, but it does
- * happen. When this occurs the version of the template file will be bumped and
- * the readme will list any important changes.
- *
- * @see https://woocommerce.com/document/template-structure/
- * @package WooCommerce\Templates
- * @version 9.3.0
+ * Edit address form (Custom AFREG fields with Country-Based Logic)
  */
 
 defined( 'ABSPATH' ) || exit;
 
 $page_title = ( 'billing' === $load_address ) ? esc_html__( 'Billing address', 'woocommerce' ) : esc_html__( 'Shipping address', 'woocommerce' );
 
-do_action( 'woocommerce_before_edit_account_address_form' ); ?>
+$customer_id = get_current_user_id();
+
+$custom_fields = [
+	'afreg_additional_46385' => 'First Name',
+	'afreg_additional_46387' => 'Last Name',
+	'afreg_additional_46391' => 'Company Name',
+	'afreg_additional_46392' => 'Street Address',
+	'afreg_additional_46393' => 'Additional Address',
+	'afreg_additional_46394' => 'City',
+	'afreg_additional_46395' => 'State',
+	'afreg_additional_46423' => 'Province',
+	'afreg_additional_46424' => 'Mexican States',
+	'afreg_additional_46396' => 'Post Code',
+	'afreg_additional_46397' => 'Country',
+	'afreg_additional_46389' => 'Phone',
+	'afreg_additional_46390' => 'Email',
+];
+
+$current_country = get_user_meta( $customer_id, 'afreg_additional_46397', true );
+
+?>
 
 <?php if ( ! $load_address ) : ?>
 	<?php wc_get_template( 'myaccount/my-address.php' ); ?>
 <?php else : ?>
-
-	<form method="post" novalidate>
-
-   <?php
-   /*
-		<h3><?php echo apply_filters( 'woocommerce_my_account_edit_address_title', $page_title, $load_address ); ?></h3><?php // @codingStandardsIgnoreLine ?>
-*/
-?>
-
+	<form method="post">
+		<h3><?php echo esc_html( $page_title ); ?></h3>
 		<div class="woocommerce-address-fields">
-			<?php do_action( "woocommerce_before_edit_address_form_{$load_address}" ); ?>
-
 			<div class="woocommerce-address-fields__field-wrapper">
-
-				<?php
-
-				foreach ( $addrress as $key => $field ) {
-					woocommerce_form_field( $key, $field, wc_get_post_data_by_key( $key, $field['value'] ) );
-				}
-				?>
+				<?php foreach ( $custom_fields as $key => $label ) : ?>
+					<?php if ($key === 'afreg_additional_46423' && $current_country !== 'Canada') continue; ?>
+					<?php if ($key === 'afreg_additional_46424' && $current_country !== 'Mexico') continue; ?>
+					<p class="form-row form-row-wide">
+						<label for="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $label ); ?></label>
+						<input type="text" class="input-text" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( get_user_meta( $customer_id, $key, true ) ); ?>">
+					</p>
+				<?php endforeach; ?>
 			</div>
-
-			<?php do_action( "woocommerce_after_edit_address_form_{$load_address}" ); ?>
 
 			<p>
 				<button type="submit" class="button" name="save_address" value="<?php esc_attr_e( 'Save address', 'woocommerce' ); ?>"><?php esc_html_e( 'Save address', 'woocommerce' ); ?></button>
@@ -54,9 +52,7 @@ do_action( 'woocommerce_before_edit_account_address_form' ); ?>
 				<input type="hidden" name="action" value="edit_address" />
 			</p>
 		</div>
-
 	</form>
-
 <?php endif; ?>
 
 <?php do_action( 'woocommerce_after_edit_account_address_form' ); ?>

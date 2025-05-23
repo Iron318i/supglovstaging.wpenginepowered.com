@@ -78,6 +78,11 @@ $meta_sections = [
 				<tbody>
 					<?php foreach ( $section['fields'] as $key => $label ) :
 						$val = get_user_meta( get_current_user_id(), $key, true );
+						$country = get_user_meta( get_current_user_id(), 'afreg_additional_46397', true );
+
+						if ( $key === 'afreg_additional_46423' && $country !== 'Canada' ) continue;
+						if ( $key === 'afreg_additional_46424' && $country !== 'Mexico' ) continue;
+
 						if ( ! empty( $val ) ) : ?>
 							<tr>
 								<th style="width: 300px;"><?php echo esc_html( $label ); ?></th>
