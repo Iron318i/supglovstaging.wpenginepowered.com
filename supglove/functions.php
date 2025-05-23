@@ -3377,30 +3377,50 @@ function validate_custom_email_domain() {
 
 function get_email_whitelist_from_sheet() {
     $sheet_url = 'https://docs.google.com/spreadsheets/d/1OKHwQq3j7jVOm-aFV6Ebe6243YSE1Nhp/export?format=csv'; // Replace with your real sheet ID
+    $exception_sheet_url = 'https://docs.google.com/spreadsheets/d/1LjZVixRaJFlPAZRmJW9ZsRgOFm3iWG22/export?format=csv';
 
+    // Get main whitelist
     $response = wp_remote_get($sheet_url);
-    if (is_wp_error($response)) return [];
-
-    $csv = wp_remote_retrieve_body($response);
-    $lines = explode(PHP_EOL, $csv);
     $emails = [];
-
-    foreach ($lines as $line) {
-        $email = trim(str_getcsv($line)[3]);
-        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $emails[] = strtolower($email);
+    if (!is_wp_error($response)) {
+        $csv = wp_remote_retrieve_body($response);
+        $lines = explode(PHP_EOL, $csv);
+        foreach ($lines as $line) {
+            $email = trim(str_getcsv($line)[3]);
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $emails[] = strtolower($email);
+            }
         }
     }
 
-    return $emails;
+    // Get exception whitelist
+    $exception_response = wp_remote_get($exception_sheet_url);
+    $exception_emails = [];
+    if (!is_wp_error($exception_response)) {
+        $exception_csv = wp_remote_retrieve_body($exception_response);
+        $exception_lines = explode(PHP_EOL, $exception_csv);
+        foreach ($exception_lines as $line) {
+            $email = trim(str_getcsv($line)[0]); // Assuming emails are in first column
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $exception_emails[] = strtolower($email);
+            }
+        }
+    }
+
+    return [
+        'whitelist' => $emails,
+        'exceptions' => $exception_emails
+    ];
 }
+
 
 add_action('wp_footer', 'custom_registration_form_behavior');
 function custom_registration_form_behavior() {
     if (!is_account_page()) return;
 
-    $whitelisted_emails = get_email_whitelist_from_sheet();
-    $whitelist_json = json_encode($whitelisted_emails);
+    $email_lists = get_email_whitelist_from_sheet();
+    $whitelist_json = json_encode($email_lists['whitelist']);
+    $exceptions_json = json_encode($email_lists['exceptions']);
     ?>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -3418,6 +3438,7 @@ function custom_registration_form_behavior() {
             ];
 
             const whitelistedEmails = <?php echo $whitelist_json; ?>;
+            const exceptionEmails = <?php echo $exceptions_json; ?>;
 
             if (businessEmailField && mainEmailField) {
                 businessEmailField.addEventListener('input', function() {
@@ -3436,7 +3457,7 @@ function custom_registration_form_behavior() {
                 const fieldWrapper = businessEmailField.closest("p");
                 const label = fieldWrapper ? fieldWrapper.querySelector("label") : null;
 
-                if (!label) return;
+                if (!label) return false;
 
                 let errorContainer = label.nextElementSibling?.classList.contains('woocommerce-error')
                     ? label.nextElementSibling
@@ -3451,10 +3472,16 @@ function custom_registration_form_behavior() {
                 }
 
                 const isWhitelisted = whitelistedEmails.includes(email);
+                const isException = exceptionEmails.includes(email);
 
                 // Reset any previous error
                 errorContainer.innerHTML = "";
                 errorContainer.style.display = "none";
+
+                // If email is in exceptions list, always allow
+                if (isException) {
+                    return true;
+                }
 
                 if (selectedRole === "distributor") {
                     if (!isWhitelisted) {
@@ -3473,7 +3500,6 @@ function custom_registration_form_behavior() {
                 return true;
             }
 
-
             if (businessEmailField) {
                 let emailInputTimeout;
 
@@ -3488,6 +3514,34 @@ function custom_registration_form_behavior() {
                 businessEmailField.addEventListener("blur", function () {
                     clearTimeout(emailInputTimeout); 
                     validateEmailDomain();
+                });
+            }
+
+            // Update the submit button state based on email validation
+            function updateSubmitButtonState() {
+                const submitButton = document.querySelector('.woocommerce-form-register__submit');
+                if (!submitButton) return;
+
+                const emailValid = validateEmailDomain();
+                submitButton.disabled = !emailValid;
+            }
+
+            if (businessEmailField) {
+                let emailInputTimeout;
+
+                businessEmailField.addEventListener("input", function () {
+                    clearTimeout(emailInputTimeout);
+
+                    emailInputTimeout = setTimeout(function () {
+                        validateEmailDomain();
+                        updateSubmitButtonState();
+                    }, 500);
+                });
+
+                businessEmailField.addEventListener("blur", function () {
+                    clearTimeout(emailInputTimeout);
+                    validateEmailDomain();
+                    updateSubmitButtonState();
                 });
             }
 
@@ -3660,6 +3714,12 @@ function custom_registration_form_behavior() {
                 document.querySelectorAll('.required-field-error').forEach(el => {
                     el.classList.remove('required-field-error');
                 });
+
+                // First validate email
+                const emailValid = validateEmailDomain();
+                if (!emailValid) {
+                    isValid = false;
+                }
 
                 if (role === 'distributor') {
                     if (!distributorCompanySize.value) {
