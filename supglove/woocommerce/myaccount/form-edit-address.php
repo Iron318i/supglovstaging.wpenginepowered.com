@@ -32,6 +32,10 @@ $current_country = get_user_meta( $customer_id, 'afreg_additional_46397', true )
 <?php if ( ! $load_address ) : ?>
 	<?php wc_get_template( 'myaccount/my-address.php' ); ?>
 <?php else : ?>
+	<?php
+		$current_user = wp_get_current_user();
+		echo '<p class="woocommerce-username">' . esc_html( $current_user->display_name ) . '</p>';
+	?>
 	<form method="post">
 		<h3><?php echo esc_html( $page_title ); ?></h3>
 		<div class="woocommerce-address-fields">
@@ -56,3 +60,4 @@ $current_country = get_user_meta( $customer_id, 'afreg_additional_46397', true )
 <?php endif; ?>
 
 <?php do_action( 'woocommerce_after_edit_account_address_form' ); ?>
+

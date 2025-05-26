@@ -3008,7 +3008,7 @@ function handle_all_cf7_shortcodes($output, $tag, $atts, $m) {
 <div class="protected-form-wrp" id="form">
     <div class="protected-form">'. $output.'</div>
     <div class="protected-form-message">
-        <h2 style="margin-bottom: 0;">CREATE A FREE ACCOUNT</h2>
+        <h2 style="margin-bottom: 0; font-size: 42px;">CREATE A FREE ACCOUNT</h2>
         <h3 style="margin: 0;text-transform: none">Sign up once—no more forms</h3>
         <p><span style="font-size: 1.3em;">Your info is saved so you can get what you need fast</span></p>
         <ul style="color: #1A1817!important;font-weight: 600;">
@@ -4038,65 +4038,16 @@ add_action( 'woocommerce_before_account_navigation', function() {
 		echo '</div>';
 	}
 });
-add_action('wp_footer', 'custom_registration_form_behavior_with_job_title');
-function custom_registration_form_behavior_with_job_title() {
-	if (!is_account_page()) return;
-	?>
-	<script>
-		document.addEventListener("DOMContentLoaded", function() {
-			const jobTitleField = document.getElementById('afreg_additional_46435');
-			const allowedTerms = [
-				'safety', 'health', 'health & safety', 'hse', 'risk', 'compliance', 'occupational', 'environmental',
-				'hseq', 'ohs', 'ehs', 'hso', 'hsm', 'hsc', 'hsa', 'ohso', 'ohsms', 'chso', 'csp', 'crsp',
-				'chsmsa', 'cso', 'sheq', 'psm', 'cih', 'asp', 'ehsr', 'ert', 'hmt', 'hazwoper', 'eh&s', 'oh&s', 's&e'
-			];
-			const blockedTerm = 'consult';
 
-			let debounceTimer;
-			function validateJobTitleField() {
-				const jobTitle = jobTitleField.value.trim().toLowerCase();
-				const isBlocked = jobTitle.includes(blockedTerm);
-				const hasAllowed = allowedTerms.some(term => jobTitle.includes(term));
 
-				const fieldWrapper = jobTitleField.closest("p");
-				const label = fieldWrapper ? fieldWrapper.querySelector("label") : null;
 
-				if (!label) return;
 
-				let errorContainer = label.nextElementSibling?.classList.contains('woocommerce-error')
-					? label.nextElementSibling
-					: null;
 
-				if (!errorContainer) {
-					errorContainer = document.createElement("ul");
-					errorContainer.className = "woocommerce-error job-title-error";
-					errorContainer.style.display = "none";
-					errorContainer.style.margin = "8px 0";
-					label.insertAdjacentElement("afterend", errorContainer);
-				}
 
-				if (!hasAllowed || isBlocked) {
-					errorContainer.innerHTML = "<li>Sorry, based on your job title, you do not qualify for an account.</li>";
-					errorContainer.style.display = "block";
-				} else {
-					errorContainer.innerHTML = "";
-					errorContainer.style.display = "none";
-				}
-			}
 
-			function debounceValidate() {
-				clearTimeout(debounceTimer);
-				debounceTimer = setTimeout(validateJobTitleField, 400);
-			}
 
-			if (jobTitleField) {
-				jobTitleField.addEventListener("input", debounceValidate);
-				jobTitleField.addEventListener("blur", validateJobTitleField);
-			}
-		});
-	</script>
-	<?php
-}
+
+
 add_filter( 'woocommerce_checkout_fields', function( $fields ) {
     foreach ( [ 'billing', 'shipping', 'order' ] as $fieldset ) {
         if ( isset( $fields[ $fieldset ] ) ) {
@@ -4110,11 +4061,11 @@ add_filter( 'woocommerce_checkout_fields', function( $fields ) {
 });
 
 
-// Autofill checkout fields from AFREG user meta
 add_action('wp_enqueue_scripts', function () {
 	if (!is_checkout() || !is_user_logged_in()) return;
 
 	$current_user = wp_get_current_user();
+
 	$user_meta = [
 		'billing_first_name'  => get_user_meta($current_user->ID, 'afreg_additional_46385', true),
 		'billing_last_name'   => get_user_meta($current_user->ID, 'afreg_additional_46387', true),
@@ -4122,35 +4073,104 @@ add_action('wp_enqueue_scripts', function () {
 		'billing_address_1'   => get_user_meta($current_user->ID, 'afreg_additional_46392', true),
 		'billing_address_2'   => get_user_meta($current_user->ID, 'afreg_additional_46393', true),
 		'billing_city'        => get_user_meta($current_user->ID, 'afreg_additional_46394', true),
-		'billing_state'       => get_user_meta($current_user->ID, 'afreg_additional_46395', true),
 		'billing_postcode'    => get_user_meta($current_user->ID, 'afreg_additional_46396', true),
 		'billing_country'     => get_user_meta($current_user->ID, 'afreg_additional_46397', true),
 		'billing_phone'       => get_user_meta($current_user->ID, 'afreg_additional_46389', true),
 		'billing_email'       => get_user_meta($current_user->ID, 'afreg_additional_46390', true),
 		'billing_job_title'   => get_user_meta($current_user->ID, 'afreg_additional_46388', true),
+		'us_state'            => get_user_meta($current_user->ID, 'afreg_additional_46395', true),
 	];
 
 	$js_data = wp_json_encode($user_meta);
 
-	wp_add_inline_script('jquery', "
-		document.addEventListener('DOMContentLoaded', function () {
-			try {
-				const userData = $js_data;
-				Object.entries(userData).forEach(([key, val]) => {
-					if (!val) return;
-					const el = document.querySelector(`[name='\${key}']`);
-					if (el && el.value === '') {
-						el.value = val;
-						el.dispatchEvent(new Event('input', { bubbles: true }));
-						el.dispatchEvent(new Event('change', { bubbles: true }));
-					}
-				});
-			} catch (e) {
-				console.error('Autofill error:', e);
+	wp_add_inline_script('jquery', <<<JS
+document.addEventListener("DOMContentLoaded", function () {
+	const userData = $js_data;
+
+	// Step 1: Fill other fields
+	setTimeout(() => {
+		Object.entries(userData).forEach(([key, val]) => {
+			if (!val || key === 'us_state') return;
+			const el = document.querySelector(`[name="\${key}"]`);
+			if (el && el.value === "") {
+				el.value = val;
+				el.dispatchEvent(new Event("input", { bubbles: true }));
+				el.dispatchEvent(new Event("change", { bubbles: true }));
 			}
 		});
-	");
+	}, 300);
+
+	// Step 2: Set billing_country
+	setTimeout(() => {
+		const countryVal = userData.billing_country;
+		if (!countryVal || countryVal.toUpperCase() !== 'US') return;
+
+		const selectEl = document.querySelector("select[name='billing_country']");
+		const select2Container = document.querySelector("#select2-billing_country-container");
+		if (selectEl && select2Container) {
+			selectEl.value = 'US';
+			jQuery(selectEl).trigger("change").trigger("change.select2");
+		}
+	}, 500);
+
+	// Step 3: Brute-force states_usa match
+	setTimeout(() => {
+		const saved = userData.us_state;
+		if (!saved) return;
+
+		const stateLabelToCode = {
+			"michigan": "MI", "california": "CA", "new york": "NY", "texas": "TX"
+		};
+		let target = saved.trim().toLowerCase();
+		if (stateLabelToCode[target]) {
+			target = stateLabelToCode[target];
+		}
+
+		const interval = setInterval(() => {
+			const el = document.querySelector("[name='states_usa']");
+			if (!el || !el.options.length) return;
+
+			const options = Array.from(el.options);
+			const match = options.find(opt =>
+				opt.value.toLowerCase() === target || opt.textContent.trim().toLowerCase() === target
+			);
+
+			if (match) {
+				clearInterval(interval);
+
+				// Force value change by resetting first
+				el.value = '';
+				el.dispatchEvent(new Event("change", { bubbles: true }));
+				el.value = match.value;
+
+				// Fire everything to simulate user interaction
+				el.dispatchEvent(new Event("input", { bubbles: true }));
+				el.dispatchEvent(new Event("change", { bubbles: true }));
+				el.dispatchEvent(new Event("blur", { bubbles: true }));
+				el.dispatchEvent(new Event("click", { bubbles: true }));
+				if (window.jQuery) {
+					jQuery(el).val(match.value).trigger("change").trigger("change.select2");
+				}
+
+				console.log("FORCE-applied states_usa →", match.value);
+			}
+		}, 300);
+	}, 1200);
 });
+JS
+	);
+});
+
+
+
+
+
+
+
+
+
+
+
 
 // Save AFREG data as WooCommerce billing address
 add_action('woocommerce_checkout_create_order', function($order, $data) {
@@ -4170,12 +4190,34 @@ add_action('woocommerce_checkout_create_order', function($order, $data) {
 	];
 
 	$billing_data = [];
+	$user_id = get_current_user_id();
 
 	foreach ($afreg_map as $wc_key => $afreg_key) {
+		$value = '';
+
+		// Use posted value if available, otherwise fallback to user meta
 		if (!empty($_POST[$afreg_key])) {
 			$value = sanitize_text_field($_POST[$afreg_key]);
+		} elseif ($user_id) {
+			$value = get_user_meta($user_id, $afreg_key, true);
+		}
+
+		// Normalize specific fields
+		if ($wc_key === 'billing_country' && $value) {
+			$value = strtoupper($value);
+			// fallback to US if invalid
+			if (!array_key_exists($value, WC()->countries->get_countries())) {
+				$value = 'US';
+			}
+		}
+
+		if ($wc_key === 'billing_phone' && $value) {
+			$value = preg_replace('/[^0-9+]/', '', $value);
+		}
+
+		if (!empty($value)) {
 			$billing_data[$wc_key] = $value;
-			update_user_meta(get_current_user_id(), $wc_key, $value);
+			update_user_meta($user_id, $wc_key, $value);
 		}
 	}
 
@@ -4184,4 +4226,75 @@ add_action('woocommerce_checkout_create_order', function($order, $data) {
 	}
 }, 20, 2);
 
+add_action('woocommerce_checkout_process', function () {
+	$user_id = get_current_user_id();
 
+	// Fallback to AFREG if billing_phone is missing
+	if (empty($_POST['billing_phone'])) {
+		$phone = sanitize_text_field($_POST['afreg_additional_46389'] ?? get_user_meta($user_id, 'afreg_additional_46389', true));
+		if (!empty($phone)) {
+			$_POST['billing_phone'] = preg_replace('/[^0-9+]/', '', $phone);
+		}
+	}
+
+	// Fallback to AFREG if billing_country is missing or invalid
+	if (empty($_POST['billing_country'])) {
+		$country = strtoupper(sanitize_text_field($_POST['afreg_additional_46397'] ?? get_user_meta($user_id, 'afreg_additional_46397', true)));
+		if (array_key_exists($country, WC()->countries->get_countries())) {
+			$_POST['billing_country'] = $country;
+		} else {
+			$_POST['billing_country'] = 'US'; // fallback
+		}
+	}
+
+	// Fallback to AFREG if billing_state is missing
+	if (empty($_POST['billing_state'])) {
+		$state = sanitize_text_field($_POST['afreg_additional_46395'] ?? get_user_meta($user_id, 'afreg_additional_46395', true));
+		if (!empty($state)) {
+			$_POST['billing_state'] = strtoupper($state);
+		}
+	}
+});
+
+
+
+
+
+// 1. Rename the endpoint from 'orders' to 'samples'
+add_filter( 'woocommerce_get_query_vars', 'rename_orders_endpoint' );
+function rename_orders_endpoint( $vars ) {
+    $vars['samples'] = $vars['orders']; // Reassign endpoint
+    unset( $vars['orders'] ); // Remove old
+    return $vars;
+}
+
+// 2. Rename menu label to "Samples" AND preserve menu order
+add_filter( 'woocommerce_account_menu_items', 'rename_orders_menu_item_with_position', 99 );
+function rename_orders_menu_item_with_position( $items ) {
+    $logout = $items['customer-logout'];
+    unset( $items['customer-logout'] ); // Temporarily remove logout
+
+    if ( isset( $items['orders'] ) ) {
+        $new_items = [];
+        foreach ( $items as $key => $value ) {
+            if ( $key === 'orders' ) {
+                $new_items['samples'] = __( 'Samples', 'woocommerce' );
+            } else {
+                $new_items[$key] = $value;
+            }
+        }
+        $items = $new_items;
+    }
+
+    $items['customer-logout'] = $logout; // Add logout back to the end
+    return $items;
+}
+
+// 3. Hook the same content to the new endpoint
+add_action( 'woocommerce_account_samples_endpoint', 'woocommerce_account_orders' );
+
+
+add_filter('woocommerce_registration_redirect', 'custom_redirect_after_registration');
+function custom_redirect_after_registration( $redirect ) {
+    return site_url('/thank-you/'); // <-- Change to your actual page slug or URL
+}

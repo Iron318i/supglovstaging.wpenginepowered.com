@@ -5002,7 +5002,8 @@ select + .woocommerce-error{
 @media(min-width: 1200px){
   .additional-btn-info{
     display: block;
-    margin-bottom: -20px;
+    margin-bottom: -1px;
+	margin-top: 10px;
   }
 }
 @media (max-width: 1199px) {

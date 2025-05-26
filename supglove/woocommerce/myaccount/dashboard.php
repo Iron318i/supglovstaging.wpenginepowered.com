@@ -56,11 +56,11 @@ $meta_sections = [
 		<?php if ( $user ): ?>
 			<ul>
 				<li><?php echo get_avatar(get_current_user_id(), 125); ?></li>
-				<li><span class="m-title"><?php esc_html_e('Hello!', 'supro'); ?> <?php echo esc_html($user->display_name); ?></span></li>
-				<li><span><?php esc_html_e('Email', 'supro'); ?>:</span><?php echo esc_html(get_user_meta(get_current_user_id(), 'afreg_additional_46390', true)); ?></li>
-				<li><span><?php esc_html_e('Phone', 'supro'); ?>:</span><?php echo esc_html(get_user_meta(get_current_user_id(), 'afreg_additional_46389', true)); ?></li>
-				<li><span><?php esc_html_e('Job Title', 'supro'); ?>:</span><?php echo esc_html(get_user_meta(get_current_user_id(), 'afreg_additional_46388', true)); ?></li>
-				<li>
+<li><span class="m-title"><?php echo esc_html($user->display_name); ?></span></li>
+<li><span><?php esc_html_e('Email', 'supro'); ?>:</span><?php echo esc_html(get_user_meta(get_current_user_id(), 'afreg_additional_46390', true)); ?></li>
+<li><span><?php esc_html_e('Phone', 'supro'); ?>:</span><?php echo esc_html(get_user_meta(get_current_user_id(), 'afreg_additional_46389', true)); ?></li>
+<li><span><?php esc_html_e('Job Title', 'supro'); ?>:</span><?php echo esc_html(get_user_meta(get_current_user_id(), 'afreg_additional_46388', true)); ?></li>
+<li>
 					<a href="<?php echo esc_url(wc_get_endpoint_url('edit-account')); ?>" class="m-button">
 						<?php esc_html_e('Edit Profile', 'supro'); ?>
 					</a>
