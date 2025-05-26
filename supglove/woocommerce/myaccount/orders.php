@@ -21,24 +21,24 @@ do_action( 'woocommerce_before_account_orders', $has_orders ); ?>
 			<tr>
 				<?php
 				$custom_columns = wc_get_account_orders_columns();
-
 				// Remove unwanted columns
-				unset( $custom_columns['order-total'], $custom_columns['order-coupon'] );
+				unset( $custom_columns['order-total'], $custom_columns['order-coupon'], $custom_columns['wtypc_coupon'] );
 
 				// Rename column headers
-				foreach ( $custom_columns as $column_id => &$column_name ) {
-					if ( $column_id === 'order-number' ) {
-						$column_name = 'Sample';
-					}
-					if ( $column_id === 'order-date' ) {
-						$column_name = 'Requested';
-					}
-					if ( $column_id === 'order-status' ) {
-						$column_name = 'Sample Status';
-					}
-				}
-
-				foreach ( $custom_columns as $column_id => $column_name ) : ?>
+				foreach ( $custom_columns as $column_id => $column_name ) :
+                    if ( $column_id === 'order-number' ) {
+                        $column_name = 'Sample';
+                    }
+                    if ( $column_id === 'order-date' ) {
+                        $column_name = 'Requested';
+                    }
+                    if ( $column_id === 'order-status' ) {
+                        $column_name = 'Sample Status';
+                    }
+                    if ( $column_id === 'order-actions' ) {
+                        $column_name = 'Actions';
+                    }
+                    ?>
 					<th scope="col" class="woocommerce-orders-table__header woocommerce-orders-table__header-<?php echo esc_attr( $column_id ); ?>">
 						<span class="nobr"><?php echo esc_html( $column_name ); ?></span>
 					</th>

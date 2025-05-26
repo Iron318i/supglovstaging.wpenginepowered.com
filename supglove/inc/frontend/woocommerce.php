@@ -398,7 +398,7 @@ class Supro_WooCommerce {
 	 */
 	function orders_title( $has_orders ) {
 		if ( $has_orders ) {
-			printf( '<h2 class="orders-title">%s</h2>', esc_html__( 'Order History', 'supro' ) );
+			printf( '<h2 class="orders-title">%s</h2>', esc_html__( 'Sample History', 'supro' ) );
 		}
 	}
 
@@ -1457,8 +1457,8 @@ class Supro_WooCommerce {
 		$user = get_user_by( 'ID', get_current_user_id() );
 
 		if ( $user ) {
-			printf( '<h3 class="m-title">%s %s</h3>', esc_html__( 'Hello!', 'supro' ), $user->display_name );
-		}
+            printf( '<h3 class="m-title">%s</h3>', esc_html( $user->display_name ) );
+        }
 	}
 
 
