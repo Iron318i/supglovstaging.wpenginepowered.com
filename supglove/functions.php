@@ -4298,3 +4298,10 @@ add_filter('woocommerce_registration_redirect', 'custom_redirect_after_registrat
 function custom_redirect_after_registration( $redirect ) {
     return site_url('/thank-you/'); // <-- Change to your actual page slug or URL
 }
+
+
+add_filter( 'woocommerce_order_again_button_text', 'custom_order_again_button_text' );
+
+function custom_order_again_button_text( $text ) {
+    return 'Request Again';
+}

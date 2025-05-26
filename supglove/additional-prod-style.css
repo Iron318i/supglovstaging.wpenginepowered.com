@@ -5035,3 +5035,8 @@ select + .woocommerce-error{
   text-align: left;
   line-height: 1.1;
 }
+.woocommerce-thank-you-page-order_details__header-value,
+.woocommerce-thank-you-page-order_details__product-value,
+.woocommerce-thank-you-page-order_details__order_item_total{
+  display: none!important;
+}
