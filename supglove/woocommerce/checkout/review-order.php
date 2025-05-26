@@ -41,11 +41,6 @@ foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
 		</tr>
 	</thead>
 	<tbody>
-    <?php if ( $has_enquired_product ) : ?>
-    <tr class="enquired_product_info" style="display: none">
-        <td colspan="2"><small>*An item in your cart requires additional qualification and approval before a sample can be sent. Our sales team will contact you to discuss whether you meet qualification criteria to sample this product.</small></td>
-    </tr>
-    <?php endif; ?>
 		<?php
 		do_action( 'woocommerce_review_order_before_cart_contents' );
 

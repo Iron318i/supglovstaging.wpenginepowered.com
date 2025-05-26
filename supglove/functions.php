@@ -65,6 +65,26 @@ function woocommerce_checkout_size_contact() {
 }
 add_action('woocommerce_checkout_info_contact', 'woocommerce_checkout_size_contact');
 
+function woocommerce_checkout_enquired_info() {
+    $has_enquired_product = false;
+
+    // Check each product in cart for the _enquired_product meta
+    foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+        $_product = $cart_item['data'];
+        if ( get_post_meta( $_product->get_id(), '_enquired_product', true ) === 'yes' ) {
+            $has_enquired_product = true;
+            break; // No need to check further if we found one
+        }
+    }
+    if ( $has_enquired_product ) {
+        echo '<div class="enquired_product_info ml-15" style="display: none">';
+        echo '<small>*An item in your cart requires additional qualification and approval before a sample can be sent. Our sales team will contact you to discuss whether you meet qualification criteria to sample this product.</small>';
+        echo '</div>';
+    }
+}
+
+add_action('woocommerce_checkout_info_contact', 'woocommerce_checkout_enquired_info');
+
 // Custom Email validation
 
 add_action( 'woocommerce_after_checkout_validation', 'custom_validate_email', 10, 2 );
@@ -1144,9 +1164,11 @@ function lionplugins_woocommerce_checkout_remove_item( $product_name, $cart_item
 		$_product = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
 		$product_id = apply_filters( 'woocommerce_cart_item_product_id', $cart_item['product_id'], $cart_item, $cart_item_key );
         $enquired_product = get_post_meta($_product->get_id(), '_enquired_product', true) == 'yes';
-        $mark = '';
+        $enquired_start = '';
+        $enquired_end = '';
         if($enquired_product){
-            $mark = ' *';
+            $enquired_start = ' <span style="color: red">';
+            $enquired_end = ' *<span>';
         }
 
 		$thumbnail = $_product->get_image();
@@ -1170,7 +1192,7 @@ function lionplugins_woocommerce_checkout_remove_item( $product_name, $cart_item
     . '<div class="cartitmedet">' 
       . '<div class="cartitmedetinner">'
         . $product_name . '<br/>'
-        . '<h6 class="sku">' . __( 'PRODUCT ID: ', 'SuperiorGlove' ) . $_product->get_sku() .	$mark .'</h6>'
+        . '<h6 class="sku">' . __( 'PRODUCT ID: ', 'SuperiorGlove' ).$enquired_start . $_product->get_sku() .	$enquired_end .'</h6>'
         . $quickdetails 
       . '</div>' 
     . '</div>';
