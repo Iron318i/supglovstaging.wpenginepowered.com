@@ -3453,6 +3453,8 @@ function custom_registration_form_behavior() {
 
             const businessEmailField = document.getElementById('afreg_additional_46362');
             const mainEmailField = document.getElementById('reg_email');
+            const additionalEmailField = document.getElementById('afreg_additional_46390');
+
             const blockedDomains = [
                 "gmail.com", "yahoo.com", "hotmail.com",
                 "aol.com", "icloud.com", "outlook.com",
@@ -3462,14 +3464,32 @@ function custom_registration_form_behavior() {
             const whitelistedEmails = <?php echo $whitelist_json; ?>;
             const exceptionEmails = <?php echo $exceptions_json; ?>;
 
-            if (businessEmailField && mainEmailField) {
-                businessEmailField.addEventListener('input', function() {
+            let isSyncing = false;
+
+            if (businessEmailField && mainEmailField && additionalEmailField) {
+                if (businessEmailField.value) {
+                    isSyncing = true;
+                    mainEmailField.value = businessEmailField.value;
+                    additionalEmailField.value = businessEmailField.value;
+                    isSyncing = false;
+                }
+
+                businessEmailField.addEventListener('input', function () {
+                    if (isSyncing) return;
+                    isSyncing = true;
                     mainEmailField.value = this.value;
+                    additionalEmailField.value = this.value;
+                    isSyncing = false;
                 });
 
-                if (businessEmailField.value) {
-                    mainEmailField.value = businessEmailField.value;
-                }
+                additionalEmailField.addEventListener('input', function () {
+                    if (isSyncing) return;
+                    isSyncing = true;
+                    mainEmailField.value = this.value;
+                    businessEmailField.value = this.value;
+                    isSyncing = false;
+
+                });
             }
 
             function validateEmailDomain() {
@@ -3536,10 +3556,12 @@ function custom_registration_form_behavior() {
                 return true;
             }
 
-            if (businessEmailField) {
-                let emailInputTimeout;
+            let emailInputTimeout;
 
-                businessEmailField.addEventListener("input", function () {
+            function setupEmailValidationListener(emailField) {
+                if (!emailField) return;
+
+                emailField.addEventListener("input", function () {
                     clearTimeout(emailInputTimeout);
 
                     emailInputTimeout = setTimeout(function () {
@@ -3547,11 +3569,14 @@ function custom_registration_form_behavior() {
                     }, 500);
                 });
 
-                businessEmailField.addEventListener("blur", function () {
-                    clearTimeout(emailInputTimeout); 
+                emailField.addEventListener("blur", function () {
+                    clearTimeout(emailInputTimeout);
                     validateEmailDomain();
                 });
             }
+
+            setupEmailValidationListener(businessEmailField);
+            setupEmailValidationListener(additionalEmailField);
 
             // Update the submit button state based on email validation
             function updateSubmitButtonState() {
@@ -3966,6 +3991,7 @@ function custom_registration_form_behavior() {
                         syncSelects(initialValue);
                         updateFields(initialValue);
                     }
+
             });
 
         });
