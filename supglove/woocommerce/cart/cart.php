@@ -327,9 +327,18 @@ do_action( 'woocommerce_before_cart' ); ?>
         </td>
         
         <td class="actions">
-          <a href="<?php echo esc_url( wc_get_checkout_url() ); ?>" class="checkout-button wc-forward  buttonogs btn_small btn_theme_color">
-            <?php esc_html_e( 'Request My Samples', 'woocommerce' ); ?>
-          </a>
+            <?php
+            if ( is_user_logged_in() ) {
+                $checkout_url = wc_get_checkout_url();
+            } else {
+                $redirect_to = urlencode( wc_get_checkout_url() );
+                $checkout_url = wc_get_page_permalink( 'myaccount' ) . '?redirect_to=' . $redirect_to;
+            }
+            ?>
+
+            <a href="<?php echo esc_url( $checkout_url ); ?>" class="checkout-button wc-forward buttonogs btn_small btn_theme_color">
+                <?php esc_html_e( 'Request My Samples', 'woocommerce' ); ?>
+            </a>
         </div>
       </tr>
 
