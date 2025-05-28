@@ -3922,9 +3922,13 @@ function custom_registration_form_behavior() {
                 const provinceSelect = document.getElementById('afreg_additional_46423');
                 const mexicanSelect = document.getElementById('afreg_additional_46424');
 
-                const mexicanLabel = mexicanField.querySelector('label');
+                const mexicanLabel = mexicanField?.querySelector('label');
 
-                // Show or hide an element by toggling the 'hidden' class
+                // New generic State* field
+                const otherStateField = document.getElementById('afreg_additionalshowhide_46525');
+                const otherStateInput = document.getElementById('afreg_additional_46525');
+
+                // Show or hide an element by toggling the 'hidden-state' class
                 function setVisibility(el, visible) {
                     if (!el) return;
                     if (visible) {
@@ -3956,10 +3960,12 @@ function custom_registration_form_behavior() {
                     setVisibility(stateField, false);
                     setVisibility(provinceField, false);
                     setVisibility(mexicanField, false);
+                    setVisibility(otherStateField, false);
 
                     toggleRequired(stateSelect, false);
                     toggleRequired(provinceSelect, false);
                     toggleRequired(mexicanSelect, false);
+                    toggleRequired(otherStateInput, false);
 
                     if (value === 'United States') {
                         setVisibility(stateField, true);
@@ -3973,10 +3979,12 @@ function custom_registration_form_behavior() {
                         if (mexicanLabel) {
                             mexicanLabel.textContent = 'States';
                         }
+                    } else {
+                        setVisibility(otherStateField, true);
+                        toggleRequired(otherStateInput, true);
                     }
                 }
 
-                // Event handler when either country selector changes
                 function handleChange(e) {
                     const value = e.target.value;
                     syncSelects(value);
@@ -3986,19 +3994,18 @@ function custom_registration_form_behavior() {
                 companyLocation.addEventListener('change', handleChange);
                 country.addEventListener('change', handleChange);
 
-                    [stateField, provinceField, mexicanField].forEach(el => {
-                        if (el) el.classList.add('hidden-state');
-                    });
+                // Hide all on load
+                [stateField, provinceField, mexicanField, otherStateField].forEach(el => {
+                    if (el) el.classList.add('hidden-state');
+                });
 
-                    // Initial sync and update if value exists
-                    const initialValue = companyLocation.value || country.value;
-                    if (initialValue) {
-                        syncSelects(initialValue);
-                        updateFields(initialValue);
-                    }
-
+                // Initial sync and update if value exists
+                const initialValue = companyLocation.value || country.value;
+                if (initialValue) {
+                    syncSelects(initialValue);
+                    updateFields(initialValue);
+                }
             });
-
         });
     </script>
     <?php
