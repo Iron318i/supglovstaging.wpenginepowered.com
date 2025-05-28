@@ -3493,12 +3493,26 @@ function custom_registration_form_behavior() {
                     label.insertAdjacentElement("afterend", errorContainer);
                 }
 
-                const isWhitelisted = whitelistedEmails.includes(email);
-                const isException = exceptionEmails.includes(email);
-
                 // Reset any previous error
                 errorContainer.innerHTML = "";
                 errorContainer.style.display = "none";
+
+                // Basic email format validation regex
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                // Check if email is empty or invalid
+                if (!email) {
+                    return false;
+                }
+
+                if (!emailRegex.test(email)) {
+                    errorContainer.innerHTML = "<li>Please enter a valid email address.</li>";
+                    errorContainer.style.display = "block";
+                    return false;
+                }
+
+                const isWhitelisted = whitelistedEmails.includes(email);
+                const isException = exceptionEmails.includes(email);
 
                 // If email is in exceptions list, always allow
                 if (isException) {
