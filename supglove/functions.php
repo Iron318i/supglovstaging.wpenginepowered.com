@@ -476,11 +476,16 @@ add_action( 'woocommerce_widget_shopping_cart_buttons', 'my_woocommerce_widget_s
 
 
 function my_woocommerce_widget_shopping_cart_proceed_to_checkout() {
-  echo 
-    '<a href="' . esc_url( wc_get_checkout_url() ) . '" class="wc-forward buttonogs btn_large btn_theme_color">' 
-      . esc_html__( 'Get Samples', 'woocommerce' ) 
-    . '</a>';
+    if ( is_user_logged_in() ) {
+        $url = wc_get_checkout_url();
+    } else {
+        $redirect_to = urlencode( wc_get_checkout_url() );
+        $url = wc_get_page_permalink( 'myaccount' ) . '?redirect_to=' . $redirect_to;
+    }
+
+    echo '<a href="' . esc_url( $url ) . '" class="wc-forward buttonogs btn_large btn_theme_color">' . esc_html__( 'Get Samples', 'woocommerce' ) . '</a>';
 }
+
 add_action( 'woocommerce_widget_shopping_cart_buttons', 'my_woocommerce_widget_shopping_cart_proceed_to_checkout', 20 );
 
 
