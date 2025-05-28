@@ -1,6 +1,6 @@
 <?php
 /**
- * Edit address form (Custom AFREG fields with Country-Based Logic)
+ * Edit address form (Custom AFREG fields for billing, custom shipping meta for shipping)
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -9,7 +9,7 @@ $page_title = ( 'billing' === $load_address ) ? esc_html__( 'Billing address', '
 
 $customer_id = get_current_user_id();
 
-$custom_fields = [
+$billing_fields = [
 	'afreg_additional_46385' => 'First Name',
 	'afreg_additional_46387' => 'Last Name',
 	'afreg_additional_46391' => 'Company Name',
@@ -25,8 +25,19 @@ $custom_fields = [
 	'afreg_additional_46390' => 'Email',
 ];
 
-$current_country = get_user_meta( $customer_id, 'afreg_additional_46397', true );
+$shipping_fields = [
+	'shipping_first_name' => 'First Name',
+	'shipping_last_name'  => 'Last Name',
+	'shipping_job_title'  => 'Job Title',
+	'shipping_phone'      => 'Phone',
+	'shipping_address_1'  => 'Address',
+	'shipping_address_2'  => 'Alt Address',
+	'shipping_city'       => 'City',
+	'shipping_state'      => 'State',
+	'shipping_postcode'   => 'Post Code',
+];
 
+$current_country = get_user_meta( $customer_id, 'afreg_additional_46397', true );
 ?>
 
 <?php if ( ! $load_address ) : ?>
@@ -40,18 +51,29 @@ $current_country = get_user_meta( $customer_id, 'afreg_additional_46397', true )
 		<h3><?php echo esc_html( $page_title ); ?></h3>
 		<div class="woocommerce-address-fields">
 			<div class="woocommerce-address-fields__field-wrapper">
-				<?php foreach ( $custom_fields as $key => $label ) : ?>
-					<?php if ($key === 'afreg_additional_46423' && $current_country !== 'Canada') continue; ?>
-					<?php if ($key === 'afreg_additional_46424' && $current_country !== 'Mexico') continue; ?>
-					<p class="form-row form-row-wide">
-						<label for="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $label ); ?></label>
-						<input type="text" class="input-text" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( get_user_meta( $customer_id, $key, true ) ); ?>">
-					</p>
-				<?php endforeach; ?>
+				<?php if ( 'billing' === $load_address ) : ?>
+					<?php foreach ( $billing_fields as $key => $label ) : ?>
+						<?php if ($key === 'afreg_additional_46423' && $current_country !== 'Canada') continue; ?>
+						<?php if ($key === 'afreg_additional_46424' && $current_country !== 'Mexico') continue; ?>
+						<p class="form-row form-row-wide">
+							<label for="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $label ); ?></label>
+							<input type="text" class="input-text" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( get_user_meta( $customer_id, $key, true ) ); ?>">
+						</p>
+					<?php endforeach; ?>
+				<?php else : ?>
+					<?php foreach ( $shipping_fields as $key => $label ) : ?>
+						<p class="form-row form-row-wide">
+							<label for="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $label ); ?></label>
+							<input type="text" class="input-text" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( get_user_meta( $customer_id, $key, true ) ); ?>">
+						</p>
+					<?php endforeach; ?>
+				<?php endif; ?>
 			</div>
 
 			<p>
-				<button type="submit" class="button" name="save_address" value="<?php esc_attr_e( 'Save address', 'woocommerce' ); ?>"><?php esc_html_e( 'Save address', 'woocommerce' ); ?></button>
+				<button type="submit" class="button" name="save_address" value="<?php esc_attr_e( 'Save address', 'woocommerce' ); ?>">
+					<?php esc_html_e( 'Save address', 'woocommerce' ); ?>
+				</button>
 				<?php wp_nonce_field( 'woocommerce-edit_address', 'woocommerce-edit-address-nonce' ); ?>
 				<input type="hidden" name="action" value="edit_address" />
 			</p>
@@ -60,4 +82,5 @@ $current_country = get_user_meta( $customer_id, 'afreg_additional_46397', true )
 <?php endif; ?>
 
 <?php do_action( 'woocommerce_after_edit_account_address_form' ); ?>
+
 

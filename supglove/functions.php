@@ -3030,20 +3030,20 @@ function handle_all_cf7_shortcodes($output, $tag, $atts, $m) {
 <div class="protected-form-wrp" id="form">
     <div class="protected-form">'. $output.'</div>
     <div class="protected-form-message">
-        <h2 style="margin-bottom: 0; font-size: 42px;">CREATE A FREE ACCOUNT</h2>
-        <h3 style="margin: 0;text-transform: none">Sign up once—no more forms</h3>
-        <p><span style="font-size: 1.3em;">Your info is saved so you can get what you need fast</span></p>
+        <h2 style="padding-top: 100px; margin-bottom: 0; font-size: 32px;">CREATE A FREE ACCOUNT</h2>
+        <h3 style="margin: 0;font-size: 28px; text-transform: none">Sign up once—no more forms</h3>
+        <p><span style="font-size: 1.1em;">Your info is saved so you can get what you need fast</span></p>
         <ul style="color: #1A1817!important;font-weight: 600;">
-            <li style="margin-bottom: 8px;">Free Samples</li>
-            <li style="margin-bottom: 8px;">Onsite services</li>
-            <li style="margin-bottom: 8px;">Expert advice</li>
-            <li style="margin-bottom: 8px;">Email updates</li>
-            <li style="margin-bottom: 8px;">And more!</li>
+            <li style="margin-bottom: 2px;">Free Samples</li>
+            <li style="margin-bottom: 2px;">Onsite services</li>
+            <li style="margin-bottom: 2px;">Expert advice</li>
+            <li style="margin-bottom: 2px;">Email updates</li>
+            <li style="margin-bottom: 2px;">And more!</li>
         </ul>
-        <div style="margin: 30px 0;">
+        <div style="margin: 20px 0;">
             <a href="'.esc_url($register_url).'" class="buttonogs btn_large btn_theme_color">SIGN UP</a>
         </div>
-        <p style="font-size: 14px;">Already have an account? <a href="'.esc_url($login_url).'" style="color:#fd8541; text-decoration: underline;">Sign In</a></p>
+        <p style="font-size: 14px; padding-bottom: 100px;">Already have an account? <a href="'.esc_url($login_url).'" style="color:#fd8541; text-decoration: underline;">Sign In</a></p>
     </div>
 </div>';
 
@@ -4062,14 +4062,6 @@ add_action( 'woocommerce_before_account_navigation', function() {
 });
 
 
-
-
-
-
-
-
-
-
 add_filter( 'woocommerce_checkout_fields', function( $fields ) {
     foreach ( [ 'billing', 'shipping', 'order' ] as $fieldset ) {
         if ( isset( $fields[ $fieldset ] ) ) {
@@ -4081,203 +4073,6 @@ add_filter( 'woocommerce_checkout_fields', function( $fields ) {
     }
     return $fields;
 });
-
-
-add_action('wp_enqueue_scripts', function () {
-	if (!is_checkout() || !is_user_logged_in()) return;
-
-	$current_user = wp_get_current_user();
-
-	$user_meta = [
-		'billing_first_name'  => get_user_meta($current_user->ID, 'afreg_additional_46385', true),
-		'billing_last_name'   => get_user_meta($current_user->ID, 'afreg_additional_46387', true),
-		'billing_company'     => get_user_meta($current_user->ID, 'afreg_additional_46391', true),
-		'billing_address_1'   => get_user_meta($current_user->ID, 'afreg_additional_46392', true),
-		'billing_address_2'   => get_user_meta($current_user->ID, 'afreg_additional_46393', true),
-		'billing_city'        => get_user_meta($current_user->ID, 'afreg_additional_46394', true),
-		'billing_postcode'    => get_user_meta($current_user->ID, 'afreg_additional_46396', true),
-		'billing_country'     => get_user_meta($current_user->ID, 'afreg_additional_46397', true),
-		'billing_phone'       => get_user_meta($current_user->ID, 'afreg_additional_46389', true),
-		'billing_email'       => get_user_meta($current_user->ID, 'afreg_additional_46390', true),
-		'billing_job_title'   => get_user_meta($current_user->ID, 'afreg_additional_46388', true),
-		'us_state'            => get_user_meta($current_user->ID, 'afreg_additional_46395', true),
-	];
-
-	$js_data = wp_json_encode($user_meta);
-
-	wp_add_inline_script('jquery', <<<JS
-document.addEventListener("DOMContentLoaded", function () {
-	const userData = $js_data;
-
-	// Step 1: Fill other fields
-	setTimeout(() => {
-		Object.entries(userData).forEach(([key, val]) => {
-			if (!val || key === 'us_state') return;
-			const el = document.querySelector(`[name="\${key}"]`);
-			if (el && el.value === "") {
-				el.value = val;
-				el.dispatchEvent(new Event("input", { bubbles: true }));
-				el.dispatchEvent(new Event("change", { bubbles: true }));
-			}
-		});
-	}, 300);
-
-	// Step 2: Set billing_country
-	setTimeout(() => {
-		const countryVal = userData.billing_country;
-		if (!countryVal || countryVal.toUpperCase() !== 'US') return;
-
-		const selectEl = document.querySelector("select[name='billing_country']");
-		const select2Container = document.querySelector("#select2-billing_country-container");
-		if (selectEl && select2Container) {
-			selectEl.value = 'US';
-			jQuery(selectEl).trigger("change").trigger("change.select2");
-		}
-	}, 500);
-
-	// Step 3: Brute-force states_usa match
-	setTimeout(() => {
-		const saved = userData.us_state;
-		if (!saved) return;
-
-		const stateLabelToCode = {
-			"michigan": "MI", "california": "CA", "new york": "NY", "texas": "TX"
-		};
-		let target = saved.trim().toLowerCase();
-		if (stateLabelToCode[target]) {
-			target = stateLabelToCode[target];
-		}
-
-		const interval = setInterval(() => {
-			const el = document.querySelector("[name='states_usa']");
-			if (!el || !el.options.length) return;
-
-			const options = Array.from(el.options);
-			const match = options.find(opt =>
-				opt.value.toLowerCase() === target || opt.textContent.trim().toLowerCase() === target
-			);
-
-			if (match) {
-				clearInterval(interval);
-
-				// Force value change by resetting first
-				el.value = '';
-				el.dispatchEvent(new Event("change", { bubbles: true }));
-				el.value = match.value;
-
-				// Fire everything to simulate user interaction
-				el.dispatchEvent(new Event("input", { bubbles: true }));
-				el.dispatchEvent(new Event("change", { bubbles: true }));
-				el.dispatchEvent(new Event("blur", { bubbles: true }));
-				el.dispatchEvent(new Event("click", { bubbles: true }));
-				if (window.jQuery) {
-					jQuery(el).val(match.value).trigger("change").trigger("change.select2");
-				}
-
-				console.log("FORCE-applied states_usa →", match.value);
-			}
-		}, 300);
-	}, 1200);
-});
-JS
-	);
-});
-
-
-
-
-
-
-
-
-
-
-
-
-// Save AFREG data as WooCommerce billing address
-add_action('woocommerce_checkout_create_order', function($order, $data) {
-	$afreg_map = [
-		'billing_first_name'  => 'afreg_additional_46385',
-		'billing_last_name'   => 'afreg_additional_46387',
-		'billing_company'     => 'afreg_additional_46391',
-		'billing_address_1'   => 'afreg_additional_46392',
-		'billing_address_2'   => 'afreg_additional_46393',
-		'billing_city'        => 'afreg_additional_46394',
-		'billing_state'       => 'afreg_additional_46395',
-		'billing_postcode'    => 'afreg_additional_46396',
-		'billing_country'     => 'afreg_additional_46397',
-		'billing_phone'       => 'afreg_additional_46389',
-		'billing_email'       => 'afreg_additional_46390',
-		'billing_job_title'   => 'afreg_additional_46388',
-	];
-
-	$billing_data = [];
-	$user_id = get_current_user_id();
-
-	foreach ($afreg_map as $wc_key => $afreg_key) {
-		$value = '';
-
-		// Use posted value if available, otherwise fallback to user meta
-		if (!empty($_POST[$afreg_key])) {
-			$value = sanitize_text_field($_POST[$afreg_key]);
-		} elseif ($user_id) {
-			$value = get_user_meta($user_id, $afreg_key, true);
-		}
-
-		// Normalize specific fields
-		if ($wc_key === 'billing_country' && $value) {
-			$value = strtoupper($value);
-			// fallback to US if invalid
-			if (!array_key_exists($value, WC()->countries->get_countries())) {
-				$value = 'US';
-			}
-		}
-
-		if ($wc_key === 'billing_phone' && $value) {
-			$value = preg_replace('/[^0-9+]/', '', $value);
-		}
-
-		if (!empty($value)) {
-			$billing_data[$wc_key] = $value;
-			update_user_meta($user_id, $wc_key, $value);
-		}
-	}
-
-	if (!empty($billing_data)) {
-		$order->set_address($billing_data, 'billing');
-	}
-}, 20, 2);
-
-add_action('woocommerce_checkout_process', function () {
-	$user_id = get_current_user_id();
-
-	// Fallback to AFREG if billing_phone is missing
-	if (empty($_POST['billing_phone'])) {
-		$phone = sanitize_text_field($_POST['afreg_additional_46389'] ?? get_user_meta($user_id, 'afreg_additional_46389', true));
-		if (!empty($phone)) {
-			$_POST['billing_phone'] = preg_replace('/[^0-9+]/', '', $phone);
-		}
-	}
-
-	// Fallback to AFREG if billing_country is missing or invalid
-	if (empty($_POST['billing_country'])) {
-		$country = strtoupper(sanitize_text_field($_POST['afreg_additional_46397'] ?? get_user_meta($user_id, 'afreg_additional_46397', true)));
-		if (array_key_exists($country, WC()->countries->get_countries())) {
-			$_POST['billing_country'] = $country;
-		} else {
-			$_POST['billing_country'] = 'US'; // fallback
-		}
-	}
-
-	// Fallback to AFREG if billing_state is missing
-	if (empty($_POST['billing_state'])) {
-		$state = sanitize_text_field($_POST['afreg_additional_46395'] ?? get_user_meta($user_id, 'afreg_additional_46395', true));
-		if (!empty($state)) {
-			$_POST['billing_state'] = strtoupper($state);
-		}
-	}
-});
-
 
 
 
@@ -4318,12 +4113,210 @@ add_action( 'woocommerce_account_samples_endpoint', 'woocommerce_account_orders'
 
 add_filter('woocommerce_registration_redirect', 'custom_redirect_after_registration');
 function custom_redirect_after_registration( $redirect ) {
-    return site_url('/thank-you/'); // <-- Change to your actual page slug or URL
+    return site_url('/thank-you-registration/'); // <-- Change to your actual page slug or URL
 }
 
 
-add_filter( 'woocommerce_order_again_button_text', 'custom_order_again_button_text' );
+// Auto-fill billing fields on checkout using AFREG user meta
+add_action('wp_enqueue_scripts', function () {
+	if (!is_checkout() || !is_user_logged_in()) return;
 
-function custom_order_again_button_text( $text ) {
-    return 'Request Again';
-}
+	$current_user = wp_get_current_user();
+	$user_id = $current_user->ID;
+
+	$user_role = strtolower(trim(get_user_meta($user_id, 'afreg_select_user_role', true)));
+
+	$job_title = ($user_role === 'safety_professional')
+		? get_user_meta($user_id, 'afreg_additional_46435', true)
+		: get_user_meta($user_id, 'afreg_additional_46388', true);
+
+	$country = get_user_meta($user_id, 'afreg_additional_46397', true);
+	$state_us = get_user_meta($user_id, 'afreg_additional_46395', true);        // default state
+	$state_ca = get_user_meta($user_id, 'afreg_additional_46423', true);        // province
+	$state_mx = get_user_meta($user_id, 'afreg_additional_46424', true);        // mexican states
+
+	$user_meta = [
+		'billing_first_name'  => get_user_meta($user_id, 'afreg_additional_46385', true),
+		'billing_last_name'   => get_user_meta($user_id, 'afreg_additional_46387', true),
+		'billing_company'     => get_user_meta($user_id, 'afreg_additional_46391', true),
+		'billing_address_1'   => get_user_meta($user_id, 'afreg_additional_46392', true),
+		'billing_address_2'   => get_user_meta($user_id, 'afreg_additional_46393', true),
+		'billing_city'        => get_user_meta($user_id, 'afreg_additional_46394', true),
+		'billing_postcode'    => get_user_meta($user_id, 'afreg_additional_46396', true),
+		'billing_country'     => $country,
+		'billing_phone'       => get_user_meta($user_id, 'afreg_additional_46389', true),
+		'billing_email'       => get_user_meta($user_id, 'afreg_additional_46390', true),
+		'billing_job_title'   => $job_title,
+		'states_usa'          => $state_us,
+		'canada_province'     => $state_ca,
+		'mexican_states'      => $state_mx,
+		'billing_state'       => $state_us, // fallback for other countries
+	];
+
+	$js_data = wp_json_encode($user_meta);
+
+	wp_add_inline_script('jquery', <<<JS
+document.addEventListener("DOMContentLoaded", function () {
+	const userData = $js_data;
+
+	setTimeout(() => {
+		// Autofill generic billing fields
+		Object.entries(userData).forEach(([key, val]) => {
+			if (!val || val.toLowerCase() === 'please choose') return;
+			const el = document.querySelector(`[name='\${key}']`) || document.getElementById(key);
+			if (el && el.value === "") {
+				el.value = val;
+				el.dispatchEvent(new Event("input", { bubbles: true }));
+				el.dispatchEvent(new Event("change", { bubbles: true }));
+			}
+		});
+
+		// Autofill the correct state field based on country
+		const country = userData.billing_country?.toLowerCase();
+		let stateValue = '';
+
+		switch (country) {
+			case 'canada':
+				stateValue = userData.canada_province;
+				document.querySelector('.select2-canada_province-container')?.innerText = stateValue;
+				document.querySelector('[name="canada_province"]')?.value = stateValue;
+				break;
+			case 'mexico':
+				stateValue = userData.mexican_states;
+				document.querySelector('.select2-mexican_states-container')?.innerText = stateValue;
+				document.querySelector('[name="mexican_states"]')?.value = stateValue;
+				break;
+			case 'united states':
+			case 'united states of america':
+			case 'us':
+			case 'usa':
+				stateValue = userData.states_usa;
+				document.querySelector('.select2-states_usa-container')?.innerText = stateValue;
+				document.querySelector('[name="states_usa"]')?.value = stateValue;
+				break;
+			default:
+				stateValue = userData.billing_state;
+				const fallback = document.querySelector('[name="billing_state"]');
+				if (fallback && fallback.value === "") {
+					fallback.value = stateValue;
+					fallback.dispatchEvent(new Event("input", { bubbles: true }));
+					fallback.dispatchEvent(new Event("change", { bubbles: true }));
+				}
+				break;
+		}
+	}, 400);
+});
+JS
+	);
+});
+
+
+// Fallback for missing checkout fields
+add_action('woocommerce_checkout_process', function () {
+	$user_id = get_current_user_id();
+
+	if (empty($_POST['billing_phone'])) {
+		$phone = sanitize_text_field($_POST['afreg_additional_46389'] ?? get_user_meta($user_id, 'afreg_additional_46389', true));
+		if (!empty($phone)) {
+			$_POST['billing_phone'] = preg_replace('/[^0-9+]/', '', $phone);
+		}
+	}
+
+	if (empty($_POST['billing_country'])) {
+		$country = strtoupper(sanitize_text_field($_POST['afreg_additional_46397'] ?? get_user_meta($user_id, 'afreg_additional_46397', true)));
+		if (array_key_exists($country, WC()->countries->get_countries())) {
+			$_POST['billing_country'] = $country;
+		} else {
+			$_POST['billing_country'] = 'US';
+		}
+	}
+
+	// Fallback for conditional job title
+	if (empty($_POST['billing_job_title'])) {
+		$role = get_user_meta($user_id, 'afreg_select_user_role', true);
+		$title = ($role === 'safety_professional')
+			? get_user_meta($user_id, 'afreg_additional_46435', true)
+			: get_user_meta($user_id, 'afreg_additional_46388', true);
+
+		if (!empty($title)) {
+			$_POST['billing_job_title'] = sanitize_text_field($title);
+		}
+	}
+});
+
+// Save AFREG billing fields into order
+add_action('woocommerce_checkout_create_order', function($order, $data) {
+	$user_id = get_current_user_id();
+	$user_role = strtolower(trim(get_user_meta($user_id, 'afreg_select_user_role', true)));
+	$job_title_field = ($user_role === 'safety_professional') ? 'afreg_additional_46435' : 'afreg_additional_46388';
+
+	$afreg_map = [
+		'billing_first_name'  => 'afreg_additional_46385',
+		'billing_last_name'   => 'afreg_additional_46387',
+		'billing_company'     => 'afreg_additional_46391',
+		'billing_address_1'   => 'afreg_additional_46392',
+		'billing_address_2'   => 'afreg_additional_46393',
+		'billing_city'        => 'afreg_additional_46394',
+		'billing_postcode'    => 'afreg_additional_46396',
+		'billing_country'     => 'afreg_additional_46397',
+		'billing_phone'       => 'afreg_additional_46389',
+		'billing_email'       => 'afreg_additional_46390',
+		'billing_job_title'   => $job_title_field,
+	];
+
+	$billing_data = [];
+
+	foreach ($afreg_map as $wc_key => $afreg_key) {
+		$value = '';
+
+		if (!empty($_POST[$afreg_key])) {
+			$value = sanitize_text_field($_POST[$afreg_key]);
+		} elseif ($user_id) {
+			$value = get_user_meta($user_id, $afreg_key, true);
+		}
+
+		if ($wc_key === 'billing_country' && $value) {
+			$value = strtoupper($value);
+			if (!array_key_exists($value, WC()->countries->get_countries())) {
+				$value = 'US';
+			}
+		}
+
+		if ($wc_key === 'billing_phone' && $value) {
+			$value = preg_replace('/[^0-9+]/', '', $value);
+		}
+
+		if (!empty($value)) {
+			$billing_data[$wc_key] = $value;
+			update_user_meta($user_id, $wc_key, $value);
+		}
+	}
+
+	// Add conditional billing_state mapping
+	$country = strtoupper($billing_data['billing_country'] ?? get_user_meta($user_id, 'afreg_additional_46397', true));
+	$state = '';
+
+	if ($country === 'CANADA') {
+		$state = sanitize_text_field($_POST['canada_province'] ?? get_user_meta($user_id, 'afreg_additional_46423', true));
+	} elseif ($country === 'MEXICO') {
+		$state = sanitize_text_field($_POST['mexican_states'] ?? get_user_meta($user_id, 'afreg_additional_46424', true));
+	} elseif (in_array($country, ['UNITED STATES', 'USA', 'US'])) {
+		$state = sanitize_text_field($_POST['states_usa'] ?? get_user_meta($user_id, 'afreg_additional_46395', true));
+	} else {
+		// Fallback for other countries
+		$state = sanitize_text_field($_POST['billing_state'] ?? get_user_meta($user_id, 'afreg_additional_46395', true));
+	}
+
+	if (!empty($state)) {
+		$billing_data['billing_state'] = $state;
+		update_user_meta($user_id, 'billing_state', $state);
+	}
+
+	// Save all to order
+	if (!empty($billing_data)) {
+		$order->set_address($billing_data, 'billing');
+	}
+}, 20, 2);
+
+
+
