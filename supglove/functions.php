@@ -4388,6 +4388,16 @@ function force_wc_rememberme_checkbox_checked() {
         <?php
     }
 }
+function thank_you_button_shortcode() {
+    if (!class_exists('WooCommerce')) {
+        return '';
+    }
 
-
-
+    if (WC()->cart->is_empty()) {
+        return '<a href="https://supglovstaging.wpenginepowered.com/whats-new/" class="buttonogs btn_small btn_theme_color" target="_self"><span>Discover More</span></a>';
+    } else {
+        $checkout_url = wc_get_checkout_url();
+        return '<a href="' . esc_url($checkout_url) . '" class="buttonogs btn_small btn_theme_color" target="_self"><span>Get Samples</span></a>';
+    }
+}
+add_shortcode('thank_you_btn', 'thank_you_button_shortcode');
