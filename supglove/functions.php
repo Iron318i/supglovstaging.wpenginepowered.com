@@ -78,7 +78,7 @@ function woocommerce_checkout_enquired_info() {
     }
     if ( $has_enquired_product ) {
         echo '<div class="enquired_product_info ml-15" style="display: none">';
-        echo '<small>*An item in your cart requires additional qualification and approval before a sample can be sent. Our sales team will contact you to discuss whether you meet qualification criteria to sample this product.</small>';
+        echo '<small>*This item requires additional qualification and approval before a sample can be sent. Our sales team will contact you to discuss whether you meet qualification criteria to sample this product.</small>';
         echo '</div>';
     }
 }
@@ -3909,6 +3909,7 @@ function custom_registration_form_behavior() {
             };
 
             // Main logic once elements are ready
+            // Main logic once elements are ready
             waitForElement('#afreg_additional_46360', () => {
 
                 const companyLocation = document.getElementById('afreg_additional_46360');
@@ -4006,6 +4007,8 @@ function custom_registration_form_behavior() {
                     updateFields(initialValue);
                 }
             });
+
+
         });
     </script>
     <?php
@@ -4369,6 +4372,22 @@ add_action('woocommerce_checkout_create_order', function($order, $data) {
 		$order->set_address($billing_data, 'billing');
 	}
 }, 20, 2);
+
+add_action('wp_footer', 'force_wc_rememberme_checkbox_checked');
+function force_wc_rememberme_checkbox_checked() {
+    if (is_account_page()) {
+        ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var rememberMe = document.querySelector('input[name="rememberme"]');
+                if (rememberMe) {
+                    rememberMe.checked = true;
+                }
+            });
+        </script>
+        <?php
+    }
+}
 
 
 
