@@ -474,7 +474,6 @@ add_action( 'wp_footer', 'supro_quick_view_modal' );
 
 /**
  * Add login modal to footer
- */
 
 if ( ! function_exists( 'supro_login_modal' ) ) :
 	function supro_login_modal() {
@@ -506,7 +505,8 @@ if ( ! function_exists( 'supro_login_modal' ) ) :
 
 endif;
 
-add_action( 'wp_footer', 'supro_login_modal' );
+//add_action( 'wp_footer', 'supro_login_modal' );
+ */
 
 /**
  * Add newsletter modal to footer

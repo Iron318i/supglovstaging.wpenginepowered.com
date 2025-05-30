@@ -3772,49 +3772,64 @@ function custom_registration_form_behavior() {
             function validateRequiredFields() {
                 const role = document.querySelector('#afreg_select_user_role').value;
                 const submitButton = document.querySelector('.woocommerce-form-register__submit');
-                const distributorCompanySize = document.querySelector('#afreg_additional_46361');
-                const companySize = document.querySelector('#afreg_additional_46359');
-                const companyLocation = document.querySelector('#afreg_additional_46360');
-                const businessEmail = document.querySelector('#afreg_additional_46362');
                 let isValid = true;
 
                 document.querySelectorAll('.required-field-error').forEach(el => {
                     el.classList.remove('required-field-error');
                 });
 
-                // First validate email
                 const emailValid = validateEmailDomain();
                 if (!emailValid) {
                     isValid = false;
                 }
 
+                const requiredFields = [
+                    '#afreg_additional_46385', // First Name
+                    '#afreg_additional_46387', // Last Name
+                    '#afreg_additional_46389', // Phone Number
+                    '#afreg_additional_46391', // Company Name
+                    '#afreg_additional_46392', // Street Address
+                    '#afreg_additional_46394', // City
+                    '#afreg_additional_46396', // Post Code
+                    '#afreg_additional_46397', // Country
+                    '#afreg_additional_46426'  // Preferred Language
+                ];
+
                 if (role === 'distributor') {
-                    if (!distributorCompanySize.value) {
-                        distributorCompanySize.classList.add('required-field-error');
-                        isValid = false;
-                    }
-                    if (!companyLocation.value) {
-                        companyLocation.classList.add('required-field-error');
-                        isValid = false;
-                    }
-                    if (!businessEmail.value || !/^\S+@\S+\.\S+$/.test(businessEmail.value)) {
-                        businessEmail.classList.add('required-field-error');
-                        isValid = false;
-                    }
+                    requiredFields.push(
+                        '#afreg_additional_46361', // Distributor Company Size
+                        '#afreg_additional_46388'  // Job Title (Distributor)
+                    );
+                } else if (role === 'safety_professional') {
+                    requiredFields.push(
+                        '#afreg_additional_46359', // Company Size
+                        '#afreg_additional_46435'  // Job Title (Safety Professional)
+                    );
                 }
-                else if (role === 'safety_professional') {
-                    if (!companySize.value) {
-                        companySize.classList.add('required-field-error');
-                        isValid = false;
+
+                requiredFields.forEach(selector => {
+                    const field = document.querySelector(selector);
+                    if (field) {
+                        const isSelect = field.tagName === 'SELECT';
+                        const isEmpty = isSelect ? field.value === '' || field.value === 'Choose Your Country' : field.value.trim() === '';
+
+                        if (isEmpty) {
+                            field.classList.add('required-field-error');
+                            isValid = false;
+                        }
                     }
-                    if (!companyLocation.value) {
-                        companyLocation.classList.add('required-field-error');
-                        isValid = false;
-                    }
-                    if (!businessEmail.value || !/^\S+@\S+\.\S+$/.test(businessEmail.value)) {
-                        businessEmail.classList.add('required-field-error');
-                        isValid = false;
-                    }
+                });
+
+                const companyLocation = document.querySelector('#afreg_additional_46360');
+                if (companyLocation && (companyLocation.value === '' || companyLocation.value === 'Choose Your Country')) {
+                    companyLocation.classList.add('required-field-error');
+                    isValid = false;
+                }
+
+                const businessEmail = document.querySelector('#afreg_additional_46362');
+                if (businessEmail && !businessEmail.value.trim()) {
+                    businessEmail.classList.add('required-field-error');
+                    isValid = false;
                 }
 
                 if (submitButton) {
@@ -3848,17 +3863,32 @@ function custom_registration_form_behavior() {
             }
 
             const formFields = [
-                '#afreg_additional_46359',
-                '#afreg_additional_46360',
-                '#afreg_additional_46361',
-                '#afreg_additional_46362'
+                '#afreg_additional_46359', // Company Size (Safety Professional)
+                '#afreg_additional_46360', // Company Location
+                '#afreg_additional_46361', // Distributor Company Size
+                '#afreg_additional_46362', // Business Email
+                '#afreg_additional_46385', // First Name
+                '#afreg_additional_46387', // Last Name
+                '#afreg_additional_46388', // Job Title (Distributor)
+                '#afreg_additional_46389', // Phone Number
+                '#afreg_additional_46391', // Company Name
+                '#afreg_additional_46392', // Street Address
+                '#afreg_additional_46394', // City
+                '#afreg_additional_46396', // Post Code
+                '#afreg_additional_46397', // Country
+                '#afreg_additional_46426', // Preferred Language
+                '#afreg_additional_46435'  // Job Title (Safety Professional)
             ];
 
             formFields.forEach(selector => {
                 const field = document.querySelector(selector);
                 if (field) {
                     field.addEventListener('change', validateRequiredFields);
-                    field.addEventListener('input', validateRequiredFields);
+                    field.addEventListener('input', function() {
+                        if (this.tagName !== 'SELECT') {
+                            validateRequiredFields();
+                        }
+                    });
                 }
             });
 
@@ -3909,7 +3939,6 @@ function custom_registration_form_behavior() {
                 observer.observe(document.body, { childList: true, subtree: true });
             };
 
-            // Main logic once elements are ready
             // Main logic once elements are ready
             waitForElement('#afreg_additional_46360', () => {
 
