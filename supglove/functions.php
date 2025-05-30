@@ -3403,31 +3403,32 @@ function validate_custom_email_domain() {
 */
 
 function get_email_whitelist_from_sheet() {
-    $sheet_url = 'https://docs.google.com/spreadsheets/d/1OKHwQq3j7jVOm-aFV6Ebe6243YSE1Nhp/export?format=csv'; // Replace with your real sheet ID
+    $sheet_url = 'https://docs.google.com/spreadsheets/d/1XBIo95osKErLMs5geGhgjh3mGAel-sa2/export?format=csv';
     $exception_sheet_url = 'https://docs.google.com/spreadsheets/d/1LjZVixRaJFlPAZRmJW9ZsRgOFm3iWG22/export?format=csv';
 
-    // Get main whitelist
+    $allowed_domains = [];
+    $exception_emails = [];
+
+    // Load allowed domains from main sheet
     $response = wp_remote_get($sheet_url);
-    $emails = [];
     if (!is_wp_error($response)) {
         $csv = wp_remote_retrieve_body($response);
         $lines = explode(PHP_EOL, $csv);
         foreach ($lines as $line) {
-            $email = trim(str_getcsv($line)[3]);
-            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $emails[] = strtolower($email);
+            $domain = trim(str_getcsv($line)[0]);
+            if (!empty($domain)) {
+                $allowed_domains[] = strtolower($domain);
             }
         }
     }
 
-    // Get exception whitelist
+    // Load exception full emails
     $exception_response = wp_remote_get($exception_sheet_url);
-    $exception_emails = [];
     if (!is_wp_error($exception_response)) {
-        $exception_csv = wp_remote_retrieve_body($exception_response);
-        $exception_lines = explode(PHP_EOL, $exception_csv);
-        foreach ($exception_lines as $line) {
-            $email = trim(str_getcsv($line)[0]); // Assuming emails are in first column
+        $csv = wp_remote_retrieve_body($exception_response);
+        $lines = explode(PHP_EOL, $csv);
+        foreach ($lines as $line) {
+            $email = trim(str_getcsv($line)[0]);
             if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $exception_emails[] = strtolower($email);
             }
@@ -3435,8 +3436,8 @@ function get_email_whitelist_from_sheet() {
     }
 
     return [
-        'whitelist' => $emails,
-        'exceptions' => $exception_emails
+        'domains' => $allowed_domains,
+        'exceptions' => $exception_emails,
     ];
 }
 
@@ -3446,7 +3447,7 @@ function custom_registration_form_behavior() {
     if (!is_account_page()) return;
 
     $email_lists = get_email_whitelist_from_sheet();
-    $whitelist_json = json_encode($email_lists['whitelist']);
+    $allowed_domains_json = json_encode($email_lists['domains']);
     $exceptions_json = json_encode($email_lists['exceptions']);
     ?>
     <script>
@@ -3466,7 +3467,7 @@ function custom_registration_form_behavior() {
                 "live.com", "msn.com"
             ];
 
-            const whitelistedEmails = <?php echo $whitelist_json; ?>;
+            const allowedDomains = <?php echo $allowed_domains_json; ?>;
             const exceptionEmails = <?php echo $exceptions_json; ?>;
 
             let isSyncing = false;
@@ -3536,7 +3537,7 @@ function custom_registration_form_behavior() {
                     return false;
                 }
 
-                const isWhitelisted = whitelistedEmails.includes(email);
+                const isDomainAllowed = allowedDomains.includes(emailDomain);
                 const isException = exceptionEmails.includes(email);
 
                 // If email is in exceptions list, always allow
@@ -3545,7 +3546,7 @@ function custom_registration_form_behavior() {
                 }
 
                 if (selectedRole === "distributor") {
-                    if (!isWhitelisted) {
+                    if (!isDomainAllowed) {
                         errorContainer.innerHTML = "<li>We cannot locate your email address in our distributor database. If this is an error, or if you would like to become a Superior Glove distributor, please call 800-265-7617 or 519-853-1920.</li>";
                         errorContainer.style.display = "block";
                         return false;
