@@ -3276,7 +3276,8 @@ add_action('wp_footer', function () {
             const helpMessage = document.createElement("p");
 
             helpMessage.className = "afreg_field_message";
-            helpMessage.innerText = "Samples are only available to safety professionals who manage safety at their company and to current Superior Glove distributors. Professional titles are verified."
+            helpMessage.innerText = "Accounts are only available to safety professionals who manage safety at their company and to current Superior Glove distributors. Professional titles are verified."
+
 
 ;
 
@@ -3364,7 +3365,7 @@ function validate_custom_email_domain() {
                     const emailDomain = email.split("@")[1] || "";
 
                     if (email && blockedDomains.includes(emailDomain)) {
-                        errorContainer.innerHTML = "<li>Please enter a valid business email address (no personal email domains).</li>";
+                        errorContainer.innerHTML = "<li>Please enter a valid business email address.</li>";
                         errorContainer.style.display = "block";
                         helpMessage.style.display = "block";
                         registerButton.style.display = "none";
@@ -3385,7 +3386,7 @@ function validate_custom_email_domain() {
 
                     if (email && blockedDomains.includes(emailDomain)) {
                         e.preventDefault();
-                        errorContainer.innerHTML = "<li>Please enter a valid business email address (no personal email domains).</li>";
+                        errorContainer.innerHTML = "<li>Please enter a valid business email address.</li>";
                         errorContainer.style.display = "block";
                         helpMessage.style.display = "block";
                         registerButton.style.display = "none";
@@ -3464,7 +3465,7 @@ function custom_registration_form_behavior() {
             const blockedDomains = [
                 "gmail.com", "yahoo.com", "hotmail.com",
                 "aol.com", "icloud.com", "outlook.com",
-                "live.com", "msn.com"
+                "live.com", "msn.com", "superiorglove.com"
             ];
 
             const allowedDomains = <?php echo $allowed_domains_json; ?>;
@@ -4044,28 +4045,42 @@ function custom_registration_form_behavior() {
     <?php
 }
 
-// Hook into CF7 form tag processing to dynamically fill email fields for logged-in users
-add_filter('wpcf7_form_tag', 'auto_fill_email_input_for_logged_user', 10, 2);
+add_filter('wpcf7_form_tag', 'auto_fill_cf7_fields_for_logged_user', 10, 2);
 
-function auto_fill_email_input_for_logged_user($tag, $unused) {
-    // Exit if the user is not logged in
+function auto_fill_cf7_fields_for_logged_user($tag, $unused) {
     if (!is_user_logged_in()) {
         return $tag;
     }
 
     $current_user = wp_get_current_user();
 
-    // Apply only to email-type fields
-    if ($tag['type'] === 'email' || $tag['basetype'] === 'email') {
-        // Only set value if no default values are already provided
+    // Pull email from AFREG custom meta field
+    $afreg_email = get_user_meta($current_user->ID, 'afreg_additional_46390', true);
+    $email_to_use = !empty($afreg_email) ? $afreg_email : $current_user->user_email;
+
+    // Auto-fill hidden email field
+    if ($tag['name'] === 'your-email') {
         if (empty($tag['values'])) {
-            $tag['values'][] = $current_user->user_email;
-            $tag['raw_values'][] = $current_user->user_email;
+            $tag['values'][] = $email_to_use;
+            $tag['raw_values'][] = $email_to_use;
+        }
+    }
+
+    // Auto-fill hidden user role field
+    if ($tag['name'] === 'user_role') {
+        $user_role = get_user_meta($current_user->ID, 'afreg_select_user_role', true);
+
+        if (!empty($user_role)) {
+            $tag['values'][] = $user_role;
+            $tag['raw_values'][] = $user_role;
         }
     }
 
     return $tag;
 }
+
+
+
 
 /**
  * Check cart items on the cart/checkout pages.
@@ -4232,93 +4247,250 @@ function thank_you_button_shortcode() {
 add_shortcode('thank_you_btn', 'thank_you_button_shortcode');
 
 
-// Autofill checkout fields from AFREG user meta
-add_action('wp_enqueue_scripts', function () {
-	if (!is_checkout() || !is_user_logged_in()) return;
 
-	$current_user = wp_get_current_user();
 
-	$job_title = get_user_meta($current_user->ID, 'afreg_additional_46435', true);
-	if (empty($job_title)) {
-		$job_title = get_user_meta($current_user->ID, 'afreg_additional_46388', true);
-	}
+// Registration Sync: Map AFREG Fields to WooCommerce Billing Meta
+add_action('user_register', function($user_id) {
 
-	$user_meta = [
-		'billing_first_name'  => get_user_meta($current_user->ID, 'afreg_additional_46385', true),
-		'billing_last_name'   => get_user_meta($current_user->ID, 'afreg_additional_46387', true),
-		'billing_company'     => get_user_meta($current_user->ID, 'afreg_additional_46391', true),
-		'billing_address_1'   => get_user_meta($current_user->ID, 'afreg_additional_46392', true),
-		'billing_address_2'   => get_user_meta($current_user->ID, 'afreg_additional_46393', true),
-		'billing_city'        => get_user_meta($current_user->ID, 'afreg_additional_46394', true),
-		'billing_state'       => get_user_meta($current_user->ID, 'afreg_additional_46395', true),
-		'billing_postcode'    => get_user_meta($current_user->ID, 'afreg_additional_46396', true),
-		'billing_country'     => get_user_meta($current_user->ID, 'afreg_additional_46397', true),
-		'billing_phone'       => get_user_meta($current_user->ID, 'afreg_additional_46389', true),
-		'billing_email'       => get_user_meta($current_user->ID, 'afreg_additional_46390', true),
-		'billing_job_title'   => $job_title,
-	];
+    // Core AFREG → WooCommerce field mappings
+    $afreg_to_wc = [
+        'afreg_additional_46385' => 'billing_first_name',
+        'afreg_additional_46387' => 'billing_last_name',
+        'afreg_additional_46391' => 'billing_company',
+        'afreg_additional_46392' => 'billing_address_1',
+        'afreg_additional_46393' => 'billing_address_2',
+        'afreg_additional_46394' => 'billing_city',
+        'afreg_additional_46396' => 'billing_postcode',
+        'afreg_additional_46389' => 'billing_phone',
+        'afreg_additional_46390' => 'billing_email',
+    ];
 
-	$js_data = wp_json_encode($user_meta);
+    foreach ($afreg_to_wc as $afreg_key => $wc_key) {
+        $value = get_user_meta($user_id, $afreg_key, true);
+        if (!empty($value)) {
+            update_user_meta($user_id, $wc_key, sanitize_text_field($value));
+        }
+    }
 
-	wp_add_inline_script('jquery', "
-		document.addEventListener('DOMContentLoaded', function () {
-			try {
-				const userData = $js_data;
-				Object.entries(userData).forEach(([key, val]) => {
-					if (!val) return;
-					const el = document.querySelector(`[name='\${key}']`);
-					if (el && el.value === '') {
-						el.value = val;
-						el.dispatchEvent(new Event('input', { bubbles: true }));
-						el.dispatchEvent(new Event('change', { bubbles: true }));
-					}
-				});
-			} catch (e) {
-				console.error('Autofill error:', e);
-			}
-		});
-	");
+    // Country Mapping (46360 is our master)
+    $country = get_user_meta($user_id, 'afreg_additional_46360', true);
+    $country_map = [
+        'United States' => 'US',
+        'Canada' => 'CA',
+        'Mexico' => 'MX',
+        'US' => 'US',
+        'CA' => 'CA',
+        'MX' => 'MX',
+    ];
+    $country = isset($country_map[$country]) ? $country_map[$country] : $country;
+    update_user_meta($user_id, 'billing_country', sanitize_text_field($country));
+
+    // State Fields Mapping — fully corrected based on your actual AFREG form:
+    $state_fields = [
+        'US' => 'afreg_additional_46395',  // US select dropdown
+        'CA' => 'afreg_additional_46423',  // CA select dropdown
+        'MX' => 'afreg_additional_46424',  // MX select dropdown
+        'Other' => 'afreg_additional_46525' // Other text input
+    ];
+
+    $field_key = isset($state_fields[$country]) ? $state_fields[$country] : $state_fields['Other'];
+    $state_value = trim(get_user_meta($user_id, $field_key, true));
+
+    // Handle dropdowns and text field separately
+    if ($country === 'Other') {
+        if (!empty($state_value)) {
+            update_user_meta($user_id, 'billing_state', sanitize_text_field($state_value));
+        } else {
+            update_user_meta($user_id, 'billing_state', '');
+        }
+    } else {
+        if (!empty($state_value) && strtolower($state_value) !== 'please choose...') {
+            update_user_meta($user_id, 'billing_state', sanitize_text_field($state_value));
+        } else {
+            update_user_meta($user_id, 'billing_state', '');
+        }
+    }
+
+    // Job Title Mapping (Safety Professional Logic)
+    $job_title = get_user_meta($user_id, 'afreg_additional_46435', true);
+    if (empty($job_title)) {
+        $job_title = get_user_meta($user_id, 'afreg_additional_46388', true);
+    }
+    if (!empty($job_title)) {
+        update_user_meta($user_id, 'billing_job_title', sanitize_text_field($job_title));
+    }
 });
 
-// Save AFREG data as WooCommerce billing address
-add_action('woocommerce_checkout_create_order', function($order, $data) {
-	$job_title = '';
-	if (!empty($_POST['afreg_additional_46435'])) {
-		$job_title = sanitize_text_field($_POST['afreg_additional_46435']);
-	} elseif (!empty($_POST['afreg_additional_46388'])) {
-		$job_title = sanitize_text_field($_POST['afreg_additional_46388']);
-	}
+// Autofill Billing Fields into Checkout from WooCommerce Billing Meta
+add_action('wp_enqueue_scripts', function () {
+    if (!is_checkout() || !is_user_logged_in()) return;
 
-	$afreg_map = [
-		'billing_first_name'  => 'afreg_additional_46385',
-		'billing_last_name'   => 'afreg_additional_46387',
-		'billing_company'     => 'afreg_additional_46391',
-		'billing_address_1'   => 'afreg_additional_46392',
-		'billing_address_2'   => 'afreg_additional_46393',
-		'billing_city'        => 'afreg_additional_46394',
-		'billing_state'       => 'afreg_additional_46395',
-		'billing_postcode'    => 'afreg_additional_46396',
-		'billing_country'     => 'afreg_additional_46397',
-		'billing_phone'       => 'afreg_additional_46389',
-		'billing_email'       => 'afreg_additional_46390',
-	];
+    $current_user = wp_get_current_user();
 
-	$billing_data = [];
+    $user_meta = [
+        'billing_first_name' => get_user_meta($current_user->ID, 'billing_first_name', true),
+        'billing_last_name' => get_user_meta($current_user->ID, 'billing_last_name', true),
+        'billing_company' => get_user_meta($current_user->ID, 'billing_company', true),
+        'billing_address_1' => get_user_meta($current_user->ID, 'billing_address_1', true),
+        'billing_address_2' => get_user_meta($current_user->ID, 'billing_address_2', true),
+        'billing_city' => get_user_meta($current_user->ID, 'billing_city', true),
+        'billing_state' => get_user_meta($current_user->ID, 'billing_state', true),
+        'billing_postcode' => get_user_meta($current_user->ID, 'billing_postcode', true),
+        'billing_country' => get_user_meta($current_user->ID, 'billing_country', true),
+        'billing_phone' => get_user_meta($current_user->ID, 'billing_phone', true),
+        'billing_email' => get_user_meta($current_user->ID, 'billing_email', true),
+        'billing_job_title' => get_user_meta($current_user->ID, 'billing_job_title', true),
+    ];
 
-	foreach ($afreg_map as $wc_key => $afreg_key) {
-		if (!empty($_POST[$afreg_key])) {
-			$value = sanitize_text_field($_POST[$afreg_key]);
-			$billing_data[$wc_key] = $value;
-			update_user_meta(get_current_user_id(), $wc_key, $value);
-		}
-	}
+    $js_data = wp_json_encode($user_meta);
 
-	if (!empty($job_title)) {
-		$billing_data['billing_job_title'] = $job_title;
-		update_user_meta(get_current_user_id(), 'billing_job_title', $job_title);
-	}
+    wp_add_inline_script('jquery', "
+        document.addEventListener('DOMContentLoaded', function () {
+            try {
+                const userData = $js_data;
+                const fieldMap = {
+                    'billing_first_name': 'billing_first_name',
+                    'billing_last_name': 'billing_last_name',
+                    'billing_company': 'billing_company',
+                    'billing_address_1': 'billing_address_1',
+                    'billing_address_2': 'billing_address_2',
+                    'billing_city': 'billing_city',
+                    'billing_state': 'billing_state',
+                    'billing_postcode': 'billing_postcode',
+                    'billing_country': 'billing_country',
+                    'billing_phone': 'billing_phone',
+                    'billing_email': 'billing_email',
+                    'billing_job_title': 'billing_job_title'
+                };
 
-	if (!empty($billing_data)) {
-		$order->set_address($billing_data, 'billing');
-	}
-}, 20, 2);
+                Object.entries(userData).forEach(([key, val]) => {
+                    if (!val) return;
+                    const fieldName = fieldMap[key];
+                    const el = document.querySelector(`[name='\${fieldName}']`);
+                    if (el && el.value === '') {
+                        el.value = val;
+                        el.dispatchEvent(new Event('input', { bubbles: true }));
+                        el.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+            } catch (e) {
+                console.error('Autofill error:', e);
+            }
+        });
+    ");
+});
+
+
+
+
+add_filter('request', function($request){
+    if (isset($_POST['save_account_details'])) {
+
+        if (empty($_POST['account_first_name'])) {
+            $_POST['account_first_name'] = ' ';
+        }
+
+        if (empty($_POST['account_last_name'])) {
+            $_POST['account_last_name'] = ' ';
+        }
+    }
+
+    return $request;
+});
+
+
+// Allow saving account details without requiring password
+add_filter('woocommerce_customer_save_account_details_errors', function($errors, $user) {
+    if (empty($_POST['password_1']) && empty($_POST['password_current']) && empty($_POST['password_2'])) {
+        $errors->remove('current_password');
+        $errors->remove('new_password');
+        $errors->remove('confirm_password');
+    }
+    return $errors;
+}, 10, 2);
+
+// Save User Role to Order Meta
+add_action('woocommerce_checkout_update_order_meta', function($order_id) {
+    $order = wc_get_order($order_id);
+    $user_id = $order->get_user_id();
+
+    if (!$user_id) return;
+
+    // User Role
+    $user_role = get_user_meta($user_id, 'afreg_select_user_role', true);
+    if (!empty($user_role)) {
+        update_post_meta($order_id, '_billing_user_role', $user_role);
+    }
+});
+
+// Display User Role inside WooCommerce Admin
+add_action('woocommerce_admin_order_data_after_billing_address', function($order){
+    $user_role = get_post_meta($order->get_id(), '_billing_user_role', true);
+    if ($user_role) {
+        echo '<p><strong>User Role:</strong> ' . esc_html($user_role) . '</p>';
+    }
+});
+
+add_action('user_register', function($user_id) {
+
+    $customer = new WC_Customer( $user_id );
+
+    // Business Size
+    $business_size = get_user_meta($user_id, 'afreg_additional_46399', true);
+    if (!empty($business_size)) {
+        $customer->update_meta_data('business_size', $business_size);
+    }
+
+    // Job Title with fallback
+    $job_title = get_user_meta($user_id, 'afreg_additional_46435', true);
+    if (empty($job_title)) {
+        $job_title = get_user_meta($user_id, 'afreg_additional_46388', true);
+    }
+    if (!empty($job_title)) {
+        $customer->update_meta_data('job_title', $job_title);
+    }
+
+    // Email Opt In
+    $email_opt_in = get_user_meta($user_id, 'afreg_additional_46410', true);
+    if (!empty($email_opt_in)) {
+        $customer->update_meta_data('email_opt_in', $email_opt_in);
+    }
+
+    // Language
+    $language = get_user_meta($user_id, 'afreg_additional_46398', true);
+    if (!empty($language)) {
+        $customer->update_meta_data('language', $language);
+    }
+
+    $customer->save();
+
+});
+add_filter('automatewoo/custom_user_variables', function($variables) {
+
+    $variables['business_size'] = [
+        'label' => 'Business Size',
+        'meta_key' => 'business_size',
+        'meta_type' => 'customer'  // <-- This is the key AutomateWoo needs for WC_Customer meta
+    ];
+
+    $variables['job_title'] = [
+        'label' => 'Job Title',
+        'meta_key' => 'job_title',
+        'meta_type' => 'customer'
+    ];
+
+    $variables['email_opt_in'] = [
+        'label' => 'Email Opt In',
+        'meta_key' => 'email_opt_in',
+        'meta_type' => 'customer'
+    ];
+
+    $variables['language'] = [
+        'label' => 'Language',
+        'meta_key' => 'language',
+        'meta_type' => 'customer'
+    ];
+
+    return $variables;
+});
+
