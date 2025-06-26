@@ -4246,66 +4246,7 @@ function thank_you_button_shortcode() {
 }
 add_shortcode('thank_you_btn', 'thank_you_button_shortcode');
 
-// Brad's Webhook code
 
-add_filter('woocommerce_webhook_payload', 'add_custom_user_meta_to_webhook', 10, 4);
-
-function add_custom_user_meta_to_webhook($payload, $resource, $resource_id, $webhook) {
-    // Only apply to order or customer webhooks
-    if ($resource !== 'order' && $resource !== 'customer') return $payload;
-
-    $user_id = null;
-
-    if ($resource === 'order') {
-        $order = wc_get_order($resource_id);
-        if (!$order) return $payload;
-        $user_id = $order->get_user_id();
-    }
-
-    if ($resource === 'customer') {
-        $user = get_user_by('id', $resource_id);
-        if (!$user) return $payload;
-        $user_id = $user->ID;
-    }
-
-    if (!$user_id) return $payload;
-
-    // Resolve job title (Safety Pro takes priority, fallback to Distributor)
-    $job_title = get_user_meta($user_id, 'afreg_additional_46435', true); // Safety Professional
-    if (empty($job_title)) {
-        $job_title = get_user_meta($user_id, 'afreg_additional_46388', true); // Distributor fallback
-    }
-
-    // Collect relevant user meta fields 
-    // PLEASE DON'T CHANGE FIELD NAMES LINKED TO ZAPIER MAPPING THANK YOU - Brad
-    $user_meta = [
-        'user_role'     => get_user_meta($user_id, 'afreg_select_user_role', true),     // User role (e.g., distributor, safety_professional, other)
-        'afreg_additional_46385'     => get_user_meta($user_id, 'afreg_additional_46385', true),     // First name
-        'afreg_additional_46387'     => get_user_meta($user_id, 'afreg_additional_46387', true),     // Last name
-        'user_job_title'             => $job_title,                                                   // Job title (resolved)
-        'afreg_additional_46391'     => get_user_meta($user_id, 'afreg_additional_46391', true),     // Company name
-        'afreg_additional_46360'     => get_user_meta($user_id, 'afreg_additional_46360', true),     // Company country
-        'afreg_additional_46359'     => get_user_meta($user_id, 'afreg_additional_46359', true),     // Company size
-        'afreg_additional_46398'     => get_user_meta($user_id, 'afreg_additional_46426', true), // Preferred language
-        
-        'afreg_additional_46410'     => get_user_meta($user_id, 'afreg_additional_46383', true),     // Email marketing opt-in (Yes/No)
-        'product_sku_1' => get_post_meta($resource_id, 'product_sku_1', true), // Product Sku 1
-        
-        'product_sku_2' => get_post_meta($resource_id, 'product_sku_2', true), // Product Sku 2
-        
-        'product_sku_3' => get_post_meta($resource_id, 'product_sku_3', true), // Product Sku 3<br>
-        '_billing_business_size' => get_post_meta($resource_id, '_billing_business_size', true), // Company size
-        'Billing-Country'       => get_post_meta($resource_id, '_billing_country', true),       // Country
-        'Email-Opt-in'  => get_post_meta($resource_id, '_billing_email_opt_in', true),  // Email opt-in
-        '_billing_language'     => get_post_meta($resource_id, '_billing_language', true),     // Job title
-        '_bhww_prosubtitle'      => get_post_meta($resource_id, '_bhww_prosubtitle', true),      // Product subtitle (if relevant to product orders)
-    ];
-
-    // Add user data to payload
-    $payload['custom_user_data'] = $user_meta;
-
-    return $payload;
-}
 
 // Registration Sync: Map AFREG Fields to WooCommerce Billing Meta
 add_action('user_register', function($user_id) {
