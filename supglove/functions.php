@@ -424,7 +424,7 @@ function additional_prod_scripts() {
     'site_language' => $weglot_site_language,
   );
 
-  wp_register_script( 'additional-prod-script', get_stylesheet_directory_uri() . '/additional-prod-script.js', array('jquery'), '1.13.0.1', true );
+  wp_register_script( 'additional-prod-script', get_stylesheet_directory_uri() . '/additional-prod-script.js', array('jquery'), '1.13.0.8', true );
   wp_localize_script( 'additional-prod-script', 'sg_ajax_data', $sg_ajax_data );
   wp_enqueue_script( 'additional-prod-script' );
 }
