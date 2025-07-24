@@ -29,34 +29,37 @@ function print_terms($terms, $filter_id, $term_type, $active_term, $parent = 0, 
                     $term_name = $term->name;
                 }
 
-                // Сформируем уникальный ID для input и label
-                $input_id = esc_attr($filter_id) . '_sg_filter_' . $term_type .
-                    ((!empty($default_term) && $default_term->slug == $term->slug)
-                        ? '_default'
-                        : '_' . $term->term_id);
-
-                echo '<div 
-                    class="sg-filter-form__input-wrapper sg-filter-form__input-wrapper--radio sg-filter-form__input-wrapper--dropdown ' . esc_attr($term->slug) . '-wrapper" 
-                    data-parent-id="' . esc_attr($term->parent) . '"'
-                    . (!empty($ancestors)
+                // "' . esc_attr( $filter_id ) . '_sg_filter_' . $term_type . '[' . $key . ']"
+                echo
+                    '<div 
+            class="sg-filter-form__input-wrapper sg-filter-form__input-wrapper--radio sg-filter-form__input-wrapper--dropdown ' . $term->slug . '-wrapper" 
+            data-parent-id="' . esc_attr($term->parent) . '"'
+                    . (
+                    !empty($ancestors)
                         ? ' data-parents="' . esc_attr(implode(',', $ancestors)) . '" data-level="' . count($ancestors) . '"'
-                        : ' data-level="0"') .
-                    '>
-                    <input 
-                        type="radio" 
-                        name="' . esc_attr($filter_id) . '_sg_filter_' . $term_type . '" 
-                        value="' . esc_attr($term->slug) . '" 
-                        id="' . $input_id . '"  
-                        class="sg-filter-form__radio sg-filter-form__radio--dropdown sg-filter-form__radio--' . esc_attr($term_type) . ' sg-filter-form__radio--level-' . (!empty($ancestors) ? count($ancestors) : '0') . '"'
+                        : ' data-level="0"'
+                    ) . '
+          >
+            <input 
+              type="radio" 
+              name="' . esc_attr($filter_id) . '_sg_filter_' . $term_type . '" 
+              value="' . $term->slug . '" 
+              id="' . esc_attr($filter_id) . '_sg_filter_' . $term_type
+                    . ((!empty($default_term) && $default_term->slug == $term->slug) ? '_default' : '[' . $key . ']') . '"  
+              class="sg-filter-form__radio sg-filter-form__radio--dropdown sg-filter-form__radio--' . $term_type . ' sg-filter-form__radio--level-'
+                    . (!empty($ancestors) ? count($ancestors) : '0') . '"'
                     . ((!empty($active_term) && is_string($active_term) && ($term->slug == $active_term)) ? ' checked="checked"' : '')
-                    . (!empty($language_code) ? ' data-language_code="' . esc_attr($language_code) . '"' : '') . '
-                    />
-                    <label 
-                        class="sg-filter-form__label sg-filter-form__label--radio sg-filter-form__label--' . esc_attr($term_type) . ' sg-filter-form__label--dropdown sg-filter-form__label--radio-level-' . (!empty($ancestors) ? count($ancestors) : '0') . '" 
-                        for="' . $input_id . '" 
-                        data-text="' . esc_attr($term_name) . '"
-                    >' . esc_html($term_name) . '</label>
-                </div>';
+                    . (!empty($language_code) ? ' data-language_code="' . esc_attr($language_code) . '"' : '')
+                    . ' 
+            />
+            <label 
+              class="sg-filter-form__label sg-filter-form__label--radio sg-filter-form__label--' . $term_type . ' sg-filter-form__label--dropdown '
+                    . 'sg-filter-form__label--radio-level-' . (!empty($ancestors) ? count($ancestors) : '0')
+                    . '" 
+              for="' . esc_attr($filter_id) . '_sg_filter_' . $term_type . '" 
+              data-text="' . esc_attr($term_name) . '"
+            >' . esc_html($term_name) . '</label>
+          </div>';
 
                 print_terms($terms, $filter_id, $term_type, $active_term, $term->term_id, $ancestors, $default_term);
             }
@@ -299,6 +302,7 @@ if (empty($args['filter_active_language'])) {
                                 </div>
                             </fieldset>
                         <?php endif; ?>
+
                         <?php if (!empty($args['filter_nav_menu'])) : ?>
                             <fieldset class="sg-filter-form__fieldset sg-filter-form__fieldset--nav">
                                 <legend class="sg-filter-form__legend sg-filter-form__legend--nav"><span class="sg-filter-form__legend-text sg-filter-form__legend-text--nav"><?php

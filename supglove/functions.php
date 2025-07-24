@@ -424,7 +424,7 @@ function additional_prod_scripts() {
     'site_language' => $weglot_site_language,
   );
 
-  wp_register_script( 'additional-prod-script', get_stylesheet_directory_uri() . '/additional-prod-script.js', array('jquery'), '1.13.0.8', true );
+  wp_register_script( 'additional-prod-script', get_stylesheet_directory_uri() . '/additional-prod-script.js', array('jquery'), '1.13.0.3', true );
   wp_localize_script( 'additional-prod-script', 'sg_ajax_data', $sg_ajax_data );
   wp_enqueue_script( 'additional-prod-script' );
 }
@@ -2774,7 +2774,7 @@ function hide_top_bar_when_print() {
 add_action('wp_head', 'hide_top_bar_when_print');
 
 
-
+/*
 function change_all_add_to_cart_buttons_dynamic() {
     ?>
     <script type="text/javascript">
@@ -2800,14 +2800,17 @@ function change_all_add_to_cart_buttons_dynamic() {
     </script>
     <?php
 }
-
-add_action('wp_footer', 'change_all_add_to_cart_buttons_dynamic');
+*/
+// add_action('wp_footer', 'change_all_add_to_cart_buttons_dynamic');
 
 function shortcode_sample_box_products($atts) {
   $atts = shortcode_atts([
     'ids' => '', // comma-separated product IDs
-    'title' => "What's in the Box"
+    'title' => "What's in the Box",
+    'hide_add_to_cart' => false
   ], $atts);
+
+  $hide_add_to_cart = filter_var($atts['hide_add_to_cart'], FILTER_VALIDATE_BOOLEAN);
 
   $product_ids = array_filter(array_map('intval', explode(',', $atts['ids'])));
   if (empty($product_ids)) return '';
@@ -2828,7 +2831,7 @@ function shortcode_sample_box_products($atts) {
               'title'                => '',
               'subtitle'             => '',
               'layout'               => 'columns-2',
-              'hide_add_to_cart'     => false,
+              'hide_add_to_cart'     => $hide_add_to_cart,
               'show_product_id'      => true,
               'add_to_cart_link'     => $product->get_permalink(),
               'add_to_cart_text'     => false,
@@ -2980,6 +2983,7 @@ add_action('template_redirect', function() {
         }
     }
 });
+/*
 add_filter('wpcf7_form_elements', 'disable_cf7_form_for_guests');
 function disable_cf7_form_for_guests($form) {
     if (!is_user_logged_in()) {
@@ -2994,7 +2998,7 @@ function disable_cf7_form_for_guests($form) {
 
     return $form;
 }
-
+*/
 add_filter('wp_nav_menu_objects', 'replace_login_menu_item', 10, 2);
 function replace_login_menu_item($items, $args) {
     foreach ($items as &$item) {
@@ -3012,6 +3016,11 @@ function replace_login_menu_item($items, $args) {
 }
 
 //Add Logged-Out State UI for All Contact Forms (Staging Only)
+
+function strip_cf7_form_tag($html) {
+    // Remove the outer <form ...>...</form> while keeping inner content
+    return preg_replace('/<form[^>]*>(.*?)<\/form>/is', '$1', $html);
+}
 
 add_filter('do_shortcode_tag', 'handle_all_cf7_shortcodes', 10, 4);
 function handle_all_cf7_shortcodes($output, $tag, $atts, $m) {
@@ -3033,7 +3042,7 @@ function handle_all_cf7_shortcodes($output, $tag, $atts, $m) {
 
     $html = '
 <div class="protected-form-wrp" id="form">
-    <div class="protected-form">'. $output.'</div>
+    <div class="protected-form"><div class="wpcf7-form">'. strip_cf7_form_tag($output) .'</div></div>
     <div class="protected-form-message">
         <h2 style="padding-top: 100px; margin-bottom: 0; font-size: 32px;">CREATE A FREE ACCOUNT</h2>
         <h3 style="margin: 0;font-size: 28px; text-transform: none">Sign up once—no more forms</h3>
@@ -4279,27 +4288,24 @@ function add_custom_user_meta_to_webhook($payload, $resource, $resource_id, $web
     // Collect relevant user meta fields 
     // PLEASE DON'T CHANGE FIELD NAMES LINKED TO ZAPIER MAPPING THANK YOU - Brad
     $user_meta = [
-        'user_role'     => get_user_meta($user_id, 'afreg_select_user_role', true),     // User role (e.g., distributor, safety_professional, other)
-        'afreg_additional_46385'     => get_user_meta($user_id, 'afreg_additional_46385', true),     // First name
-        'afreg_additional_46387'     => get_user_meta($user_id, 'afreg_additional_46387', true),     // Last name
-        'user_job_title'             => $job_title,                                                   // Job title (resolved)
-        'afreg_additional_46391'     => get_user_meta($user_id, 'afreg_additional_46391', true),     // Company name
-        'afreg_additional_46360'     => get_user_meta($user_id, 'afreg_additional_46360', true),     // Company country
-        'afreg_additional_46359'     => get_user_meta($user_id, 'afreg_additional_46359', true),     // Company size
-        'afreg_additional_46398'     => get_user_meta($user_id, 'afreg_additional_46426', true), // Preferred language
-        
-        'afreg_additional_46410'     => get_user_meta($user_id, 'afreg_additional_46383', true),     // Email marketing opt-in (Yes/No)
-        'product_sku_1' => get_post_meta($resource_id, 'product_sku_1', true), // Product Sku 1
-        
-        'product_sku_2' => get_post_meta($resource_id, 'product_sku_2', true), // Product Sku 2
-        
-        'product_sku_3' => get_post_meta($resource_id, 'product_sku_3', true), // Product Sku 3<br>
-        '_billing_business_size' => get_post_meta($resource_id, '_billing_business_size', true), // Company size
-        'Billing-Country'       => get_post_meta($resource_id, '_billing_country', true),       // Country
-        'Email-Opt-in'  => get_post_meta($resource_id, '_billing_email_opt_in', true),  // Email opt-in
-        '_billing_language'     => get_post_meta($resource_id, '_billing_language', true),     // Job title
-        '_bhww_prosubtitle'      => get_post_meta($resource_id, '_bhww_prosubtitle', true),      // Product subtitle (if relevant to product orders)
-    ];
+    'user_role'     => get_user_meta($user_id, 'afreg_select_user_role', true),
+    'afreg_additional_46385' => get_user_meta($user_id, 'afreg_additional_46385', true),
+    'afreg_additional_46387' => get_user_meta($user_id, 'afreg_additional_46387', true),
+    'user_job_title'         => $job_title,
+    'afreg_additional_46391' => get_user_meta($user_id, 'afreg_additional_46391', true),
+    'afreg_additional_46360' => get_user_meta($user_id, 'afreg_additional_46360', true),
+    'afreg_additional_46359' => get_user_meta($user_id, 'afreg_additional_46359', true),
+    'afreg_additional_46426' => get_user_meta($user_id, 'afreg_additional_46426', true), // Language 
+    'afreg_additional_46383' => get_user_meta($user_id, 'afreg_additional_46383', true), // Email opt-in 
+    'product_sku_1' => get_post_meta($resource_id, 'product_sku_1', true),
+    'product_sku_2' => get_post_meta($resource_id, 'product_sku_2', true),
+    'product_sku_3' => get_post_meta($resource_id, 'product_sku_3', true),
+    '_billing_business_size' => get_post_meta($resource_id, '_billing_business_size', true),
+    'Billing-Country' => get_post_meta($resource_id, '_billing_country', true),
+    'Email-Opt-in' => get_post_meta($resource_id, '_billing_email_opt_in', true),
+    '_billing_language' => get_post_meta($resource_id, '_billing_language', true),
+    '_bhww_prosubtitle' => get_post_meta($resource_id, '_bhww_prosubtitle', true),
+];
 
     // Add user data to payload
     $payload['custom_user_data'] = $user_meta;

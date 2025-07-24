@@ -192,6 +192,7 @@ $producthazards_all = [
   __( 'Puncture (Probe)', 'woocommerce' ) => ( $puncture_probe_hazards = implode(", ", array_values( wc_get_product_terms( $product->id, 'pa_puncture_probe', array( 'fields' => 'names' ) ) ) ) ) ? $puncture_probe_hazards : __( 'N/A', 'woocommerce' ),
   __( 'Puncture (Hypodermic Needle)', 'woocommerce' ) => ( $puncture_hypodermic_needle_hazards = implode(", ", array_values( wc_get_product_terms( $product->id, 'pa_hypodermic_needle', array( 'fields' => 'names' ) ) ) ) ) ? $puncture_hypodermic_needle_hazards : __( 'N/A', 'woocommerce' ),
   __( 'Vibration', 'woocommerce' ) => ( $vibration_hazards = implode(", ", array_values( wc_get_product_terms( $product->id, 'pa_vibration', array( 'fields' => 'names' ) ) ) ) ) ? $vibration_hazards : __( 'N/A', 'woocommerce' ),
+
 ];
 
 

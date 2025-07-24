@@ -45,7 +45,7 @@ if ( $product->is_in_stock() ) : ?>
 				value="<?php echo esc_attr( $product->get_id() ); ?>"
 				class="single_add_to_cart_button button alt"
 			>
-				<?php echo esc_html( $product->single_add_to_cart_text() ); ?> <i class="t-icon icon-ion-android-add"></i>
+                <?php _e( 'ADD TO SAMPLE BOX', 'supro' ); ?> <span style='font-weight:bold;'>+</span>
 			</button>
 		<?php else : ?>
 			<button

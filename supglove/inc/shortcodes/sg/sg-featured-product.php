@@ -228,22 +228,22 @@ if ( !empty($args['featured_product']) ) :
               <?php endforeach; ?>
             </div>
           <?php endif; ?>
-
-            <?php if (!$args['hide_add_to_cart']) :
-                $args['add_to_cart_text'] = (
-                isset($args['add_to_cart_text'])
-                    ? (
-                ($args['add_to_cart_text'] === false)
-                    ? ''
-                    : (
-                !empty($args['add_to_cart_text'])
-                    ? esc_html($args['add_to_cart_text'])
-                    : "ADD TO SAMPLE BOX <span style='font-weight:bold;'>+</span>"
+          
+          <?php if ( !$args['hide_add_to_cart'] ) : 
+            $args['add_to_cart_text'] = (
+              isset( $args['add_to_cart_text'] )
+                ? ( 
+                  ( $args['add_to_cart_text'] === false ) 
+                    ? '' 
+                    : ( 
+                      !empty( $args['add_to_cart_text'] ) 
+                        ? esc_html( $args['add_to_cart_text'] ) 
+                        : "ADD TO SAMPLE BOX <span style='font-weight:bold;'>+</span>"
+                  )
                 )
-                )
-                    : "ADD TO SAMPLE BOX <span style='font-weight:bold;'>+</span>"
-                );
-                ?>
+                : "ADD TO SAMPLE BOX <span style='font-weight:bold;'>+</span>"
+            );   
+          ?>
             <div class="sg-featured-product__add-to-cart sg-featured-product__add-to-cart--layout-<?php 
               echo esc_attr( 
                 $args['layout'] . 
@@ -286,7 +286,7 @@ if ( !empty($args['featured_product']) ) :
                     esc_attr( $product->get_sku() ),
                     $product->is_purchasable() ? 'add_to_cart_button' : '',
                     esc_attr( $product->get_type() ),
-                    esc_html( $product->add_to_cart_text() )
+                    "ADD TO SAMPLE BOX <span style='font-weight:bold;'>+</span>"
                   ),
                   $product 
                 );

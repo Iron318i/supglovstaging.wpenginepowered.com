@@ -48,18 +48,9 @@
         #defaultLanguage = '';
 
         constructor($filterElement, filterElementID, $resourceSectionElements) {
-            console.log($filterElement, filterElementID, $resourceSectionElements);
-            console.log('[DEBUG] Initializing SGFilter');
-
             this.#filterID = (filterElementID ? filterElementID.trim() : null);
             this.#filter = ($filterElement.length ? $filterElement : null);
             this.#resourceSections = ($resourceSectionElements.length ? $resourceSectionElements : null);
-
-            if (!this.#filter || !this.#filterID || !this.#resourceSections) {
-                console.log('[DEBUG] Initialization failed - missing required elements');
-                return;
-            }
-
             let _this = this;
 
             if (!this.#filter || !this.#filterID || !this.#resourceSections) return;
@@ -437,6 +428,8 @@
         }
 
         #performFiltering() {
+            console.log('[SGFilter] #performFiltering triggered');
+            console.log('[SGFilter] Checking if filtering should happen:', {
                 old: this.#fieldsState,
                 new: this.#fieldsNewState
             });
@@ -464,10 +457,11 @@
             }
 
             if ($weglotLink && $weglotLink.length) {
-                setTimeout(function () {
-                    window.location.href = $weglotLink.attr('href');
-                }, 100);
-                return;
+                /*
+                let weglotClick = new Event('click', {bubbles: true, cancelable: true});
+                $weglotLink.get(0).dispatchEvent(weglotClick);
+                 */
+                window.location.href = $weglotLink.attr('href');
             } else {
                 if (sg_ajax_data && typeof sg_ajax_data === 'object' && sg_ajax_data.hasOwnProperty('ajax_url') && sg_ajax_data.ajax_url) {
                     // deactivate the filter
@@ -731,6 +725,7 @@
             if (this.#languageInputs) {
                 this.#languageInputs.on('change', function () {
                     _this.#updateNewFieldsState('language');
+                    console.log('[SGFilter] Language changed to:', _this.#fieldsNewState.language);
                     _this.#performFiltering();
 
                     if (_this.#languagesDropdown) {
@@ -1007,6 +1002,7 @@
             });
         }
     }
+
 
     // Hide the next button for Sample Box form (Safety professionals Company Size)
     function hideNextbutton() {

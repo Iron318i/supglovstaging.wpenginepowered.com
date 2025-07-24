@@ -752,11 +752,11 @@ class Supro_WooCommerce {
      */
 	function product_glovelabels() {
     $html_icons = $this->get_product_attribute_icons( array( 
-      'cut', 'abrasion', 'arch_flash', 'hazards_cold',  'hazards_heat',  'impact', 
-      'puncture_probe', 'hypodermic_needle', 'flame', 'crush', 'vibration', 
+      'ansi-isea-105', /*'cut', 'abrasion',*/ 'arch_flash', 'hazards_cold',  'hazards_heat',  'impact',
+      /*'puncture_probe',*/ 'hypodermic_needle', 'flame', 'crush', 'vibration',
       'features_and_technology', 'ce_en388_certification_code', 'other_ce_certification_codes'
     ) );
-    
+
     if ( $html_icons ) {
       $html_icons = '<ul class="glovelabels">' . $html_icons . '</ul>';
     }
@@ -783,10 +783,12 @@ class Supro_WooCommerce {
 
         if ( !empty($attribute_slugs) ) {
           foreach( $attribute_slugs as $attribute_value ) {
-            $icon_path = '/img/product_attribute_icons/'. $attribute .'/'. $attribute_value .'.png';
+              if ($attribute === 'ansi-isea-105') {
+                  $attribute_value = strtoupper($attribute_value);
+              }
+            $icon_path = 'img/product_attribute_icons/'. $attribute .'/'. $attribute_value .'.png';
             $icon_root_path = $root_path .'/'. $icon_path;
             $icon_uri_path = $uri_path .'/'. $icon_path;
-
             if( file_exists($icon_root_path) ) {
               $html_icons .= '<li><img src="'. $icon_uri_path .'?'. time() .'" alt="" /></li>';
             }
