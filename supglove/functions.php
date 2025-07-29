@@ -4537,3 +4537,44 @@ function enqueue_update_sizing_inputs_script() {
     </script>
     <?php
 }
+add_filter('woocommerce_add_cart_item_data', 'add_enquired_flag_to_cart_item', 10, 3);
+function add_enquired_flag_to_cart_item($cart_item_data, $product_id, $variation_id) {
+    $is_enquired = get_post_meta($product_id, '_enquired_product', true);
+    if ($is_enquired === 'yes') {
+        $cart_item_data['_enquired_product'] = 'yes';
+    }
+    return $cart_item_data;
+}
+
+add_action('woocommerce_checkout_create_order_line_item', 'save_enquired_meta_to_order', 10, 4);
+function save_enquired_meta_to_order($item, $cart_item_key, $values, $order) {
+    if (!empty($values['_enquired_product']) && $values['_enquired_product'] === 'yes') {
+        $item->add_meta_data('_enquired_product', 'yes', true);
+    }
+}
+
+add_action('woocommerce_checkout_update_order_meta', 'save_enquired_flag_to_order_meta');
+function save_enquired_flag_to_order_meta($order_id) {
+    $order = wc_get_order($order_id);
+    $has_enquired = false;
+
+    foreach ($order->get_items() as $item) {
+        if ($item->get_meta('_enquired_product') === 'yes') {
+            $has_enquired = true;
+            break;
+        }
+    }
+
+    update_post_meta($order_id, '_has_enquired_product', $has_enquired ? 'yes' : 'no');
+}
+
+add_action('woocommerce_admin_order_data_after_order_details', 'display_enquired_product_flag_in_order_admin');
+function display_enquired_product_flag_in_order_admin($order) {
+    $flag = get_post_meta($order->get_id(), '_has_enquired_product', true);
+    ?>
+    <p style="padding-top: 15px!important;clear: both;">
+        <strong>Enquired Product in Order:</strong>
+        <span><?php echo $flag === 'yes' ? 'Yes' : 'No'; ?></span>
+    </p>
+    <?php
+}
