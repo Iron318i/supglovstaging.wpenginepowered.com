@@ -481,18 +481,41 @@ if (
           $the_permalink = $new_permalink;
         }
 
-        if ( function_exists('rwmb_meta') ) {
-          $the_title = rwmb_meta( 'sg_post_custom_title' );
-          $the_subtitle = rwmb_meta( 'sg_post_custom_subtitle' );
-        }
-        
-        if ( empty($the_title) ) {
-          $the_title = apply_filters( 'the_title', get_the_title(), get_the_ID() );
-        }
-        
-        if ( !isset($the_subtitle) ) {
-          $the_subtitle = '';
-        }
+          if ( function_exists('rwmb_meta') ) {
+              $the_title = '';
+              $the_subtitle = '';
+
+              if ( function_exists('weglot_get_current_language') ) {
+                  $current_lang = weglot_get_current_language();
+
+                  switch ( $current_lang ) {
+                      case 'fr':
+                          $the_title = rwmb_meta( 'sg_post_custom_title_fr' );
+                          $the_subtitle = rwmb_meta( 'sg_post_custom_subtitle_fr' );
+                          break;
+                      case 'pt-br':
+                          $the_title = rwmb_meta( 'sg_post_custom_title_pt' );
+                          $the_subtitle = rwmb_meta( 'sg_post_custom_subtitle_pt' );
+                          break;
+                      case 'en':
+                      default:
+                          $the_title = rwmb_meta( 'sg_post_custom_title' );
+                          $the_subtitle = rwmb_meta( 'sg_post_custom_subtitle' );
+                          break;
+                  }
+              } else {
+                  $the_title = rwmb_meta( 'sg_post_custom_title' );
+                  $the_subtitle = rwmb_meta( 'sg_post_custom_subtitle' );
+              }
+
+              if ( empty($the_title) ) {
+                  $the_title = apply_filters( 'the_title', get_the_title(), get_the_ID() );
+              }
+
+              if ( !isset($the_subtitle) || empty($the_subtitle) ) {
+                  $the_subtitle = '';
+              }
+          }
       ?>
         <div 
           id="resource-item--<?php echo $the_slug; ?>" 

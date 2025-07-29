@@ -2142,31 +2142,51 @@ add_filter( 'rwmb_meta_boxes', 'sg_language_meta_boxes' );
 
 // Fields for custom post and page titles
 if ( ! function_exists('sg_post_page_custom_titles_subtitles') ) {
-  function sg_post_page_custom_titles_subtitles( $meta_boxes ) {
-    $prefix = 'sg_';
+    function sg_post_page_custom_titles_subtitles( $meta_boxes ) {
+        $prefix = 'sg_';
 
-    $meta_boxes[] = [
-      'title'      => esc_html__( 'Custom Titles', 'SuperiorGlove' ),
-      'id'         => 'sg_titles_settings',
-      'post_types' => ['post', 'page'],
-      'context'    => 'normal',
-      'priority'   => 'high',
-      'fields'     => [
-        [
-          'type' => 'text',
-          'name' => esc_html__( 'Title', 'SuperiorGlove' ),
-          'id'   => $prefix . 'post_custom_title',
-        ],
-        [
-          'type' => 'text',
-          'name' => esc_html__( 'Subtitle', 'SuperiorGlove' ),
-          'id'   => $prefix . 'post_custom_subtitle',
-        ],
-      ],
-    ];
+        $meta_boxes[] = [
+            'title'      => esc_html__( 'Custom Titles', 'SuperiorGlove' ),
+            'id'         => 'sg_titles_settings',
+            'post_types' => ['post', 'page'],
+            'context'    => 'normal',
+            'priority'   => 'high',
+            'fields'     => [
+                [
+                    'type' => 'text',
+                    'name' => esc_html__( 'Title (English)', 'SuperiorGlove' ),
+                    'id'   => $prefix . 'post_custom_title',
+                ],
+                [
+                    'type' => 'text',
+                    'name' => esc_html__( 'Subtitle (English)', 'SuperiorGlove' ),
+                    'id'   => $prefix . 'post_custom_subtitle',
+                ],
+                [
+                    'type' => 'text',
+                    'name' => esc_html__( 'Title (French)', 'SuperiorGlove' ),
+                    'id'   => $prefix . 'post_custom_title_fr',
+                ],
+                [
+                    'type' => 'text',
+                    'name' => esc_html__( 'Subtitle (French)', 'SuperiorGlove' ),
+                    'id'   => $prefix . 'post_custom_subtitle_fr',
+                ],
+                [
+                    'type' => 'text',
+                    'name' => esc_html__( 'Title (Portuguese)', 'SuperiorGlove' ),
+                    'id'   => $prefix . 'post_custom_title_pt',
+                ],
+                [
+                    'type' => 'text',
+                    'name' => esc_html__( 'Subtitle (Portuguese)', 'SuperiorGlove' ),
+                    'id'   => $prefix . 'post_custom_subtitle_pt',
+                ],
+            ],
+        ];
 
-    return $meta_boxes;
-  }
+        return $meta_boxes;
+    }
 }
 add_filter( 'rwmb_meta_boxes', 'sg_post_page_custom_titles_subtitles' );
 
