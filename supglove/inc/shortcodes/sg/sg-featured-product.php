@@ -32,9 +32,9 @@ if ( !empty($args['featured_product']) ) :
   $material_icon_urls = array();
   
   $attributes = array(
-      'ansi-isea-105', 'cut-360', /*'cut', 'abrasion',*/ 'arch_flash', 'hazards_cold',  'hazards_heat',  'impact',
-      /*'puncture_probe',*/ 'hypodermic_needle', 'flame', 'crush', 'vibration',
-      'features_and_technology', 'ce_en388_certification_code', 'other_ce_certification_codes'
+    'cut', 'abrasion', 'arch_flash', 'hazards_cold', 'hazards_heat', 'impact', 'puncture_probe', 
+    'hypodermic_needle', 'flame', 'crush', 'vibration', 'features_and_technology', 
+    'ce_en388_certification_code', 'other_ce_certification_codes' 
   );
   $all_attributes = $product->get_attributes();
   
@@ -44,30 +44,27 @@ if ( !empty($args['featured_product']) ) :
     }
     
     $attribute_slugs = $all_attributes['pa_'. $attribute]->get_slugs();
-
-
+    
     if ( !empty($attribute_slugs) ) {
-        foreach ( $attribute_slugs as $attribute_value ) {
-            if ($attribute === 'ansi-isea-105') {
-                $attribute_value = strtoupper($attribute_value);
-            }
-            $icon_path = '/img/product_attribute_icons/'. $attribute .'/'. $attribute_value .'.png';
-
-            $icon_root_path = get_template_directory() .'/'. $icon_path;
-            $icon_uri_path = get_template_directory_uri() .'/'. $icon_path;
-
-            if ( file_exists($icon_root_path) ) {
-                $material_icon_urls[] = $icon_uri_path .'?'. time();
-            }
+      foreach ( $attribute_slugs as $attribute_value ) {
+        $icon_path = '/img/product_attribute_icons/'. $attribute .'/'. $attribute_value .'.png';
+        
+        $icon_root_path = get_template_directory() .'/'. $icon_path;
+        $icon_uri_path = get_template_directory_uri() .'/'. $icon_path;
+        
+        if ( file_exists($icon_root_path) ) {
+          $material_icon_urls[] = $icon_uri_path .'?'. time();
         }
+      }
     }
   }
+  
   $additional_icons = explode( '|', get_post_meta($product->get_id(), 'supglove_icons', true) );
-
+  
   if ( $additional_icons ) {
     foreach ( $additional_icons as $icon ) {
       $attachment_name = sanitize_title( $icon );
-      $icon_id = $wpdb->get_results( $wpdb->prepare(
+      $icon_id = $wpdb->get_results( $wpdb->prepare( 
         "SELECT * FROM wpilce_posts ps WHERE ps.post_type = 'attachment' AND ps.post_name = '%s'", $attachment_name 
       ) );
 			

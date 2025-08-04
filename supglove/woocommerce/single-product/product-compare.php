@@ -392,25 +392,12 @@ foreach ( $products_to_compare as $thecompareproduct ) {
                         href="<?php echo $someproduct->get_permalink(); ?>" data-id="<?php echo esc_attr( $someproduct->get_id() ); ?>" class="buttonogs btn_small btn_dark2"><span
                           class="hidebuttxt"><?php _e( 'View Item', 'supro' ); ?></span><i class="showmobile t-icon icon-eye"></i></a></div>
                     </div>
-                      <div class="comparedetails">
-                          <h3 class="text-center">
-                              <a href="<?php echo esc_url($someproduct->get_permalink()); ?>">
-                                  <?php
-                                  $product_name = html_entity_decode($someproduct->get_name());
-                                  $parts = explode(' ', $product_name);
-                                  if (count($parts) > 1) {
-                                      $last_part = array_pop($parts);
-                                      echo htmlspecialchars(implode(' ', $parts)) . '<br>' . htmlspecialchars($last_part);
-                                  } else {
-                                      echo htmlspecialchars($product_name);
-                                  }
-                                  ?>
-                              </a>
-                          </h3>
-                          <?php if (!empty($someproduct_tag_names)) : ?>
-                              <div class="productdetails2"><?php echo $someproduct_tag_names; ?></div>
-                          <?php endif; ?>
-                      </div>
+                    <div class="comparedetails">
+                      <h3><a href="<?php echo esc_url( $someproduct->get_permalink() ); ?>"><?php echo $someproduct->get_name(); ?></a></h3>
+                      <?php if ( ! empty( $someproduct_tag_names ) ) : ?>
+                        <div class="productdetails2"><?php echo $someproduct_tag_names; ?></div>
+                      <?php endif; ?>
+                    </div>
                   </div>
               <?php
                   // $sentinal++;
