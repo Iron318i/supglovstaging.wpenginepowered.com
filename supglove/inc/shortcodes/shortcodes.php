@@ -50,29 +50,138 @@ add_shortcode( 'boc_spacing', 'boc_shortcode_spacing' );
 
 // Button Link
 if ( !function_exists('shortcode_boc_button') ) {
-  function shortcode_boc_button( $atts, $content = null ) {
-    $atts = vc_map_get_attributes( 'boc_button', $atts );
+    function shortcode_boc_button( $atts, $content = null ) {
+        $atts = vc_map_get_attributes( 'boc_button', $atts );
 
-    extract( $atts );
+        extract( $atts );
 
-    $target = ( $target ? " target='" . $target . "'" : '' );
-    $icon = ( $icon ? " <i class='" . $icon . "'></i> " : '' );
-    $icon_pos = ( $icon ? $icon_pos : '' );
-    $icon_effect = ( ($icon && isset($icon_effect) && ($icon_effect != 'none')) ? $icon_effect : '' );
-    $icon_before = ( $icon_pos == 'icon_pos_before' ? wp_kses_post($icon) : '' );
-    $icon_after = ( $icon_pos == 'icon_pos_after' ? wp_kses_post($icon) : '' );
+        // Initialize $href and $icon based on product_id
+        $final_href = esc_url( $href ); // Default to the provided href
+        $final_icon = ( $icon ? " <i class='" . $icon . "'></i> " : '' ); // Default to the provided icon
 
-    return  '<a	href="' . esc_url( $href ) . '" class="buttonogs '
+        // If a product is selected, override the URL and add the cart icon
+        if ( !empty( $product_id ) && function_exists( 'wc_get_product' ) ) {
+            $product = wc_get_product( $product_id );
+            if ( $product ) {
+                $final_href = esc_url( $product->add_to_cart_url() ); // WooCommerce add to cart URL
+                if ( empty( $icon ) ) { // Only add default icon if no icon was explicitly chosen
+                    $final_icon = " <i class='t-icon icon-cartboxadd'></i> ";
+                }
+            }
+        }
+
+
+        $target = ( $target ? " target='" . $target . "'" : '' );
+        // Use $final_icon instead of $icon here
+        $icon_pos = ( $final_icon ? $icon_pos : '' );
+        $icon_effect = ( ($final_icon && isset($icon_effect) && ($icon_effect != 'none')) ? $icon_effect : '' );
+        $icon_before = ( $icon_pos == 'icon_pos_before' ? wp_kses_post($final_icon) : '' );
+        $icon_after = ( $icon_pos == 'icon_pos_after' ? wp_kses_post($final_icon) : '' );
+
+
+        return  '<a href="' . $final_href . '" class="buttonogs ' // Use $final_href
             . esc_attr( $size . ' ' . $color . ' ' . $icon_pos . ' ' . $icon_effect . ' ' . $css_classes ) . '" ' . wp_kses_post( $target ) . '>'
-              . $icon_before . '<span>' . do_shortcode( esc_html($btn_content) ) . '</span>' . $icon_after
+            . $icon_before . '<span>' . do_shortcode( esc_html($btn_content) ) . '</span>' . $icon_after
             . '</a>';
-  }
+    }
 
-  add_shortcode( 'boc_button', 'shortcode_boc_button' );
+    add_shortcode( 'boc_button', 'shortcode_boc_button' );
 }
 
+// Функция обратного вызова для выбранного товара
+// Функция для поиска товаров (рендеринг вариантов)
+function vc_autocomplete_product_render($query) {
+    // Логирование для отладки
+    error_log('Render query: ' . print_r($query, true));
 
-// Font Icon 
+    // Получаем поисковый запрос
+    $search_term = '';
+    if (is_array($query) && isset($query['query'])) {
+        $search_term = sanitize_text_field($query['query']);
+    } elseif (is_string($query)) {
+        $search_term = sanitize_text_field($query);
+    }
+
+    if (empty($search_term)) {
+        return array();
+    }
+
+    // Ищем товары
+    $args = array(
+        'post_type' => 'product',
+        'post_status' => 'publish',
+        'posts_per_page' => 10,
+        's' => $search_term,
+        'suppress_filters' => false
+    );
+
+    $products = get_posts($args);
+    $results = array();
+
+    foreach ($products as $product) {
+        $product_obj = wc_get_product($product->ID);
+        if ($product_obj) {
+            $results[] = array(
+                'value' => $product_obj->get_id(),
+                'label' => $product_obj->get_name() . ' (ID: ' . $product_obj->get_id() . ')'
+            );
+        }
+    }
+
+    error_log('Render results: ' . print_r($results, true));
+    return $results;
+}
+
+// Функция обратного вызова для выбранного товара
+function vc_autocomplete_product_callback($query) {
+    // Логирование для отладки
+    error_log('Callback query: ' . print_r($query, true));
+
+    // Обрабатываем разные форматы входящих данных
+    $product_id = 0;
+    if (is_array($query) && isset($query['value'])) {
+        $product_id = (int)$query['value'];
+    } elseif (is_numeric($query)) {
+        $product_id = (int)$query;
+    } elseif (is_string($query)) {
+        // Если пришла строка - попробуем найти товар по названию
+        $found = get_page_by_title($query, OBJECT, 'product');
+        if ($found) {
+            $product_id = $found->ID;
+        }
+    }
+
+    if ($product_id <= 0) {
+        return array();
+    }
+
+    $product = wc_get_product($product_id);
+    if (!$product) {
+        return array();
+    }
+
+    $result = array(
+        'value' => $product->get_id(),
+        'label' => $product->get_name() . ' (ID: ' . $product->get_id() . ')'
+    );
+
+    error_log('Callback result: ' . print_r($result, true));
+    return $result;
+}
+
+// Регистрация обработчиков с проверкой зависимостей
+add_action('vc_before_init', function() {
+    if (!class_exists('WooCommerce')) {
+        error_log('WooCommerce is not active - product autocomplete disabled');
+        return;
+    }
+
+    add_filter('vc_autocomplete_boc_button_product_id_render', 'vc_autocomplete_product_render', 10, 1);
+    add_filter('vc_autocomplete_boc_button_product_id_callback', 'vc_autocomplete_product_callback', 10, 1);
+
+    error_log('Product autocomplete handlers re-registered');
+});
+// Font Icon
 if ( !function_exists('shortcode_vc_boc_icon') ) {
   function shortcode_vc_boc_icon( $atts, $content = null ) {
     $atts = vc_map_get_attributes( 'boc_icon', $atts );

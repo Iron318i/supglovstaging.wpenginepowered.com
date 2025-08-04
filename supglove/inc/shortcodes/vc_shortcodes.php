@@ -16,7 +16,7 @@ if ( !function_exists( 'boc_extend_VC_shortcodes' )) {
 		// Include Icon Font array
 		load_template( trailingslashit( get_template_directory() ) . 'inc/shortcodes/vc/boc_heading.php');
 		load_template( trailingslashit( get_template_directory() ) . 'inc/shortcodes/vc/boc_button.php');	
-		load_template( trailingslashit( get_template_directory() ) . 'inc/shortcodes/vc/boc_mobilespacer.php');	
+		load_template( trailingslashit( get_template_directory() ) . 'inc/shortcodes/vc/boc_mobilespacer.php');
 		load_template( trailingslashit( get_template_directory() ) . 'inc/shortcodes/vc/boc_iconpicker.php');
 		load_template( trailingslashit( get_template_directory() ) . 'inc/shortcodes/vc/boc_divider.php');
 		load_template( trailingslashit( get_template_directory() ) . 'inc/shortcodes/vc/boc_icon.php');
