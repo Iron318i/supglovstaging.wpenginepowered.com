@@ -2182,6 +2182,16 @@ if ( ! function_exists('sg_post_page_custom_titles_subtitles') ) {
                     'name' => esc_html__( 'Subtitle (Portuguese)', 'SuperiorGlove' ),
                     'id'   => $prefix . 'post_custom_subtitle_pt',
                 ],
+                [
+                    'type' => 'text',
+                    'name' => esc_html__( 'Title (Spanish)', 'SuperiorGlove' ),
+                    'id'   => $prefix . 'post_custom_title_es',
+                ],
+                [
+                    'type' => 'text',
+                    'name' => esc_html__( 'Subtitle (Spanish)', 'SuperiorGlove' ),
+                    'id'   => $prefix . 'post_custom_subtitle_es',
+                ],
             ],
         ];
 

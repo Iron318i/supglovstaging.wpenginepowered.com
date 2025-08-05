@@ -497,6 +497,10 @@ if (
                           $the_title = rwmb_meta( 'sg_post_custom_title_pt' );
                           $the_subtitle = rwmb_meta( 'sg_post_custom_subtitle_pt' );
                           break;
+                      case 'es':
+                          $the_title = rwmb_meta( 'sg_post_custom_title_es' );
+                          $the_subtitle = rwmb_meta( 'sg_post_custom_subtitle_es' );
+                          break;
                       case 'en':
                       default:
                           $the_title = rwmb_meta( 'sg_post_custom_title' );
