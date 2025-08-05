@@ -50,26 +50,53 @@ add_shortcode( 'boc_spacing', 'boc_shortcode_spacing' );
 
 // Button Link
 if ( !function_exists('shortcode_boc_button') ) {
-  function shortcode_boc_button( $atts, $content = null ) {
-    $atts = vc_map_get_attributes( 'boc_button', $atts );
+    function shortcode_boc_button( $atts, $content = null ) {
+        $atts = vc_map_get_attributes( 'boc_button', $atts );
+        extract( $atts );
 
-    extract( $atts );
+        $target = ( $target ? " target='" . esc_attr($target) . "'" : '' );
+        $icon = ( $icon ? " <i class='" . esc_attr($icon) . "'></i> " : '' );
+        $icon_pos = ( $icon ? $icon_pos : '' );
+        $icon_effect = ( ($icon && isset($icon_effect) && ($icon_effect != 'none')) ? $icon_effect : '' );
+        $icon_before = ( $icon_pos == 'icon_pos_before' ? wp_kses_post($icon) : '' );
+        $icon_after = ( $icon_pos == 'icon_pos_after' ? wp_kses_post($icon) : '' );
 
-    $target = ( $target ? " target='" . $target . "'" : '' );
-    $icon = ( $icon ? " <i class='" . $icon . "'></i> " : '' );
-    $icon_pos = ( $icon ? $icon_pos : '' );
-    $icon_effect = ( ($icon && isset($icon_effect) && ($icon_effect != 'none')) ? $icon_effect : '' );
-    $icon_before = ( $icon_pos == 'icon_pos_before' ? wp_kses_post($icon) : '' );
-    $icon_after = ( $icon_pos == 'icon_pos_after' ? wp_kses_post($icon) : '' );
+        // Default output
+        $classes = 'buttonogs ' . esc_attr($size . ' ' . $color . ' ' . $icon_pos . ' ' . $icon_effect . ' ' . $css_classes);
 
-    return  '<a	href="' . esc_url( $href ) . '" class="buttonogs '
-            . esc_attr( $size . ' ' . $color . ' ' . $icon_pos . ' ' . $icon_effect . ' ' . $css_classes ) . '" ' . wp_kses_post( $target ) . '>'
-              . $icon_before . '<span>' . do_shortcode( esc_html($btn_content) ) . '</span>' . $icon_after
-            . '</a>';
-  }
+        // Проверим, есть ли в ссылке ?add-to-cart=ID
+        if (preg_match('/\?add-to-cart=(\d+)/', $href, $matches)) {
+            $product_id = absint($matches[1]);
+            $product = wc_get_product($product_id);
 
-  add_shortcode( 'boc_button', 'shortcode_boc_button' );
+            if ($product) {
+                $product_url = get_permalink($product_id);
+                $product_sku = $product->get_sku();
+                $product_name = $product->get_name();
+
+                return '<a href="' . esc_url($href) . '" 
+          aria-describedby="woocommerce_loop_add_to_cart_link_describedby_' . $product_id . '" 
+          data-quantity="1" 
+          class="' . $classes . 'product_type_simple add_to_cart_button ajax_add_to_cart" 
+          data-product_id="' . $product_id . '" 
+          data-product_sku="' . esc_attr($product_sku) . '" 
+          aria-label="Add to cart: “' . esc_attr($product_name) . '”" 
+          rel="nofollow" 
+          data-success_message="“' . esc_attr($product_name) . '” has been added to your cart">'
+                    .'<span>' . do_shortcode( esc_html($btn_content) ) . '</span> <i class="t-icon icon-cartboxadd"></i>'
+                    . '</a>';
+            }
+        }
+
+        // Стандартный вывод, если не add-to-cart
+        return '<a href="' . esc_url($href) . '" class="' . $classes . '" ' . $target . '>'
+            . $icon_before . '<span>' . do_shortcode( esc_html($btn_content) ) . '</span>' . $icon_after .
+            '</a>';
+    }
+
+    add_shortcode( 'boc_button', 'shortcode_boc_button' );
 }
+
 
 
 // Font Icon 
@@ -227,7 +254,6 @@ if ( !function_exists('sanitize_positive_number') ) {
     return $positive_number;
   }
 }
-
 
 if ( !function_exists('validate_shortcode_sg_resources_filter_list_to_array_filter_callback') ) {
   function validate_shortcode_sg_resources_filter_list_to_array_filter_callback( $sanitize = false, $sanitization_func = 'sanitize_key' ) {
