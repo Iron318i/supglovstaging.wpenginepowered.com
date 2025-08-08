@@ -735,7 +735,40 @@ if (
         }
         
         $subtype_image_id = null;
-        $subtype_image_url = get_term_meta( $subtype->term_id, 'type_featured_image_url', true );
+// Check if the Weglot plugin is active
+          if ( function_exists('weglot_get_current_language') ) {
+              $current_lang = weglot_get_current_language();
+              $subtype_image_url = '';
+
+              // Use a switch statement to get the correct image URL based on the current language
+              switch ( $current_lang ) {
+                  case 'fr':
+                      // Try to get the French image URL
+                      $subtype_image_url = get_term_meta( $subtype->term_id, 'type_featured_image_url_fr', true );
+                      break;
+                  case 'pt-br':
+                      // Try to get the Portuguese image URL
+                      $subtype_image_url = get_term_meta( $subtype->term_id, 'type_featured_image_url_pt', true );
+                      break;
+                  case 'es':
+                      // Try to get the Spanish image URL
+                      $subtype_image_url = get_term_meta( $subtype->term_id, 'type_featured_image_url_es', true );
+                      break;
+                  case 'en':
+                  default:
+                      // For English or any other language, we will get the default meta field later
+                      break;
+              }
+
+              // Fallback: If the language-specific field is empty, use the default one.
+              if ( empty( $subtype_image_url ) ) {
+                  $subtype_image_url = get_term_meta( $subtype->term_id, 'type_featured_image_url', true );
+              }
+
+          } else {
+              // If Weglot is not active, fall back to the default meta field
+              $subtype_image_url = get_term_meta( $subtype->term_id, 'type_featured_image_url', true );
+          }
         
         if ( $subtype_image_url ) {
           $subtype_image_id = attachment_url_to_postid( $subtype_image_url );
@@ -879,9 +912,42 @@ if (
         }
         
         $top_type_image_id = null;
-        $top_type_image_url = get_term_meta( $top_type->term_id, 'type_featured_image_url', true );
-        
-        if ( $top_type_image_url ) {
+          // Check if the Weglot plugin is active to determine the current language.
+          if ( function_exists('weglot_get_current_language') ) {
+              $current_lang = weglot_get_current_language();
+              $top_type_image_url = '';
+
+              // Use a switch statement to get the correct language-specific image URL.
+              switch ( $current_lang ) {
+                  case 'fr':
+                      // Try to get the French image URL.
+                      $top_type_image_url = get_term_meta( $top_type->term_id, 'type_featured_image_url_fr', true );
+                      break;
+                  case 'pt-br':
+                      // Try to get the Portuguese image URL.
+                      $top_type_image_url = get_term_meta( $top_type->term_id, 'type_featured_image_url_pt', true );
+                      break;
+                  case 'es':
+                      // Try to get the Spanish image URL.
+                      $top_type_image_url = get_term_meta( $top_type->term_id, 'type_featured_image_url_es', true );
+                      break;
+                  case 'en':
+                  default:
+                      // For English or any other language, we'll get the default URL in the next step.
+                      break;
+              }
+
+              // Fallback: If the language-specific field is empty, use the default image URL.
+              if ( empty( $top_type_image_url ) ) {
+                  $top_type_image_url = get_term_meta( $top_type->term_id, 'type_featured_image_url', true );
+              }
+
+          } else {
+              // If Weglot is not active, always use the default meta field.
+              $top_type_image_url = get_term_meta( $top_type->term_id, 'type_featured_image_url', true );
+          }
+
+          if ( $top_type_image_url ) {
           $top_type_image_id = attachment_url_to_postid( $top_type_image_url );
         }
         

@@ -1850,6 +1850,173 @@ if ( ! function_exists('sg_update_type_image_url_meta') ) {
 }
 add_action( 'edited_sg_type', 'sg_update_type_image_url_meta', 10, 2 );
 
+// Add featured image URL field for French language on new term form
+if ( ! function_exists('sg_add_type_image_url_field_fr') ) {
+    function sg_add_type_image_url_field_fr( $taxonomy ) {
+        ?><div class="form-field term-type_featured_image_url_fr">
+        <label for="type_featured_image_url_fr"><?php _e('Featured Image URL (French)', 'SuperiorGlove'); ?></label>
+        <input id="type_featured_image_url_fr" class="postform" type="url" name="type_featured_image_url_fr" pattern="https://.*" value="" />
+        </div><?php
+    }
+}
+add_action( 'sg_type_add_form_fields', 'sg_add_type_image_url_field_fr', 10, 2 );
+
+// Save featured image URL meta for French language when a new term is created
+if ( ! function_exists('sg_save_type_image_url_meta_fr') ) {
+    function sg_save_type_image_url_meta_fr( $term_id, $tt_id ){
+        if ( isset($_POST['type_featured_image_url_fr']) && ('' !== $_POST['type_featured_image_url_fr']) ) {
+            $image_url = sanitize_url( $_POST['type_featured_image_url_fr'] );
+            add_term_meta( $term_id, 'type_featured_image_url_fr', $image_url, false );
+        } else {
+            add_term_meta( $term_id, 'type_featured_image_url_fr', '', false );
+        }
+    }
+}
+add_action( 'created_sg_type', 'sg_save_type_image_url_meta_fr', 10, 2 );
+
+// Add featured image URL field for French language on edit term form
+if ( ! function_exists('sg_edit_type_image_url_field_fr') ) {
+    function sg_edit_type_image_url_field_fr( $term, $taxonomy ){
+        $image_url = get_term_meta( $term->term_id, 'type_featured_image_url_fr', true );
+        ?><tr class="form-field term-type_featured_image_url_fr-wrap">
+        <th scope="row"><label for="type_featured_image_url_fr"><?php _e('Featured Image URL (French)', 'SuperiorGlove'); ?></label></th>
+        <td><input
+                    id="type_featured_image_url_fr"
+                    class="postform"
+                    type="url"
+                    name="type_featured_image_url_fr"
+                    pattern="https://.*"
+                    value="<?php echo esc_attr( $image_url ); ?>"
+            /></td>
+        </tr><?php
+    }
+}
+add_action( 'sg_type_edit_form_fields', 'sg_edit_type_image_url_field_fr', 10, 2 );
+
+// Update featured image URL meta for French language when a term is edited
+if ( ! function_exists('sg_update_type_image_url_meta_fr') ) {
+    function sg_update_type_image_url_meta_fr( $term_id, $tt_id ){
+        if ( isset($_POST['type_featured_image_url_fr']) && ('' !== $_POST['type_featured_image_url_fr']) ) {
+            $image_url = sanitize_url( $_POST['type_featured_image_url_fr'] );
+            update_term_meta( $term_id, 'type_featured_image_url_fr', $image_url );
+        } else {
+            update_term_meta( $term_id, 'type_featured_image_url_fr', '' );
+        }
+    }
+}
+add_action( 'edited_sg_type', 'sg_update_type_image_url_meta_fr', 10, 2 );
+
+// Add featured image URL field for Portuguese language on new term form
+if ( ! function_exists('sg_add_type_image_url_field_pt') ) {
+    function sg_add_type_image_url_field_pt( $taxonomy ) {
+        ?><div class="form-field term-type_featured_image_url_pt">
+        <label for="type_featured_image_url_pt"><?php _e('Featured Image URL (Portuguese)', 'SuperiorGlove'); ?></label>
+        <input id="type_featured_image_url_pt" class="postform" type="url" name="type_featured_image_url_pt" pattern="https://.*" value="" />
+        </div><?php
+    }
+}
+add_action( 'sg_type_add_form_fields', 'sg_add_type_image_url_field_pt', 10, 2 );
+
+// Save featured image URL meta for Portuguese language when a new term is created
+if ( ! function_exists('sg_save_type_image_url_meta_pt') ) {
+    function sg_save_type_image_url_meta_pt( $term_id, $tt_id ){
+        if ( isset($_POST['type_featured_image_url_pt']) && ('' !== $_POST['type_featured_image_url_pt']) ) {
+            $image_url = sanitize_url( $_POST['type_featured_image_url_pt'] );
+            add_term_meta( $term_id, 'type_featured_image_url_pt', $image_url, false );
+        } else {
+            add_term_meta( $term_id, 'type_featured_image_url_pt', '', false );
+        }
+    }
+}
+add_action( 'created_sg_type', 'sg_save_type_image_url_meta_pt', 10, 2 );
+
+// Add featured image URL field for Portuguese language on edit term form
+if ( ! function_exists('sg_edit_type_image_url_field_pt') ) {
+    function sg_edit_type_image_url_field_pt( $term, $taxonomy ){
+        $image_url = get_term_meta( $term->term_id, 'type_featured_image_url_pt', true );
+        ?><tr class="form-field term-type_featured_image_url_pt-wrap">
+        <th scope="row"><label for="type_featured_image_url_pt"><?php _e('Featured Image URL (Portuguese)', 'SuperiorGlove'); ?></label></th>
+        <td><input
+                    id="type_featured_image_url_pt"
+                    class="postform"
+                    type="url"
+                    name="type_featured_image_url_pt"
+                    pattern="https://.*"
+                    value="<?php echo esc_attr( $image_url ); ?>"
+            /></td>
+        </tr><?php
+    }
+}
+add_action( 'sg_type_edit_form_fields', 'sg_edit_type_image_url_field_pt', 10, 2 );
+
+// Update featured image URL meta for Portuguese language when a term is edited
+if ( ! function_exists('sg_update_type_image_url_meta_pt') ) {
+    function sg_update_type_image_url_meta_pt( $term_id, $tt_id ){
+        if ( isset($_POST['type_featured_image_url_pt']) && ('' !== $_POST['type_featured_image_url_pt']) ) {
+            $image_url = sanitize_url( $_POST['type_featured_image_url_pt'] );
+            update_term_meta( $term_id, 'type_featured_image_url_pt', $image_url );
+        } else {
+            update_term_meta( $term_id, 'type_featured_image_url_pt', '' );
+        }
+    }
+}
+add_action( 'edited_sg_type', 'sg_update_type_image_url_meta_pt', 10, 2 );
+
+// Add featured image URL field for Spanish language on new term form
+if ( ! function_exists('sg_add_type_image_url_field_es') ) {
+    function sg_add_type_image_url_field_es( $taxonomy ) {
+        ?><div class="form-field term-type_featured_image_url_es">
+        <label for="type_featured_image_url_es"><?php _e('Featured Image URL (Spanish)', 'SuperiorGlove'); ?></label>
+        <input id="type_featured_image_url_es" class="postform" type="url" name="type_featured_image_url_es" pattern="https://.*" value="" />
+        </div><?php
+    }
+}
+add_action( 'sg_type_add_form_fields', 'sg_add_type_image_url_field_es', 10, 2 );
+
+// Save featured image URL meta for Spanish language when a new term is created
+if ( ! function_exists('sg_save_type_image_url_meta_es') ) {
+    function sg_save_type_image_url_meta_es( $term_id, $tt_id ){
+        if ( isset($_POST['type_featured_image_url_es']) && ('' !== $_POST['type_featured_image_url_es']) ) {
+            $image_url = sanitize_url( $_POST['type_featured_image_url_es'] );
+            add_term_meta( $term_id, 'type_featured_image_url_es', $image_url, false );
+        } else {
+            add_term_meta( $term_id, 'type_featured_image_url_es', '', false );
+        }
+    }
+}
+add_action( 'created_sg_type', 'sg_save_type_image_url_meta_es', 10, 2 );
+
+// Add featured image URL field for Spanish language on edit term form
+if ( ! function_exists('sg_edit_type_image_url_field_es') ) {
+    function sg_edit_type_image_url_field_es( $term, $taxonomy ){
+        $image_url = get_term_meta( $term->term_id, 'type_featured_image_url_es', true );
+        ?><tr class="form-field term-type_featured_image_url_es-wrap">
+        <th scope="row"><label for="type_featured_image_url_es"><?php _e('Featured Image URL (Spanish)', 'SuperiorGlove'); ?></label></th>
+        <td><input
+                    id="type_featured_image_url_es"
+                    class="postform"
+                    type="url"
+                    name="type_featured_image_url_es"
+                    pattern="https://.*"
+                    value="<?php echo esc_attr( $image_url ); ?>"
+            /></td>
+        </tr><?php
+    }
+}
+add_action( 'sg_type_edit_form_fields', 'sg_edit_type_image_url_field_es', 10, 2 );
+
+// Update featured image URL meta for Spanish language when a term is edited
+if ( ! function_exists('sg_update_type_image_url_meta_es') ) {
+    function sg_update_type_image_url_meta_es( $term_id, $tt_id ){
+        if ( isset($_POST['type_featured_image_url_es']) && ('' !== $_POST['type_featured_image_url_es']) ) {
+            $image_url = sanitize_url( $_POST['type_featured_image_url_es'] );
+            update_term_meta( $term_id, 'type_featured_image_url_es', $image_url );
+        } else {
+            update_term_meta( $term_id, 'type_featured_image_url_es', '' );
+        }
+    }
+}
+add_action( 'edited_sg_type', 'sg_update_type_image_url_meta_es', 10, 2 );
 
 // Custom archive link for sg_type terms
 if ( ! function_exists('sg_add_type_archive_url_field') ) {

@@ -5053,3 +5053,7 @@ select + .woocommerce-error{
 .woocommerce-thank-you-page-order_details__order_item_total{
   display: none!important;
 }
+
+a.buttonogs+a.added_to_cart{
+  display: none!important;
+}
