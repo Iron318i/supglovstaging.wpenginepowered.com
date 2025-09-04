@@ -735,7 +735,8 @@ if (
         }
         
         $subtype_image_id = null;
-// Check if the Weglot plugin is active
+
+          // Check if the Weglot plugin is active
           if ( function_exists('weglot_get_current_language') ) {
               $current_lang = weglot_get_current_language();
               $subtype_image_url = '';
@@ -769,7 +770,7 @@ if (
               // If Weglot is not active, fall back to the default meta field
               $subtype_image_url = get_term_meta( $subtype->term_id, 'type_featured_image_url', true );
           }
-        
+
         if ( $subtype_image_url ) {
           $subtype_image_id = attachment_url_to_postid( $subtype_image_url );
         }
@@ -946,8 +947,8 @@ if (
               // If Weglot is not active, always use the default meta field.
               $top_type_image_url = get_term_meta( $top_type->term_id, 'type_featured_image_url', true );
           }
-
-          if ( $top_type_image_url ) {
+        
+        if ( $top_type_image_url ) {
           $top_type_image_id = attachment_url_to_postid( $top_type_image_url );
         }
         

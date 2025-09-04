@@ -149,8 +149,8 @@ if ( $is_sample_box ) {
   $box_products_title = get_post_meta( $post_id, 'sg_sample_box_products_section_title', true );
   //$box_products = array_filter( array_map( 'wc_get_product', $product->get_children() ), 'wc_products_array_filter_visible_grouped' );
   $box_products = get_post_meta( $product->get_id(), 'sg_sample_box_products' );
-  
-  if ( empty($box_products) ) {
+
+    if ( empty($box_products) ) {
     $box_products = null;
   }
 
@@ -793,8 +793,8 @@ if ( $is_sample_box ) {
             <h2 class="sample-box__products-title"><?php echo esc_textarea( $box_products_title ); ?></h2>
 
             <div class="sg-new-products sg-new-products--layout-columns-2 sg-new-products--columns-3 sg-new-products--sample-box">
-              <?php 
-                foreach ( $box_products as $box_product_id ) { 
+              <?php
+                foreach ( $box_products as $box_product_id ) {
                   $box_product = wc_get_product( $box_product_id );
 
                   if ( !empty($box_product) ) {

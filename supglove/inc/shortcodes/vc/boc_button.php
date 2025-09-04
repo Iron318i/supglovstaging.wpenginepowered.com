@@ -7,6 +7,7 @@
 
 
 // Map Shortcode in Visual Composer
+	
 
 vc_map( array(
 	"name" 		=> __("SuperiorGlove Button", 'SuperiorGlove'),

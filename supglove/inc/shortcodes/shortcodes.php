@@ -64,7 +64,6 @@ if ( !function_exists('shortcode_boc_button') ) {
         // Default output
         $classes = 'buttonogs ' . esc_attr($size . ' ' . $color . ' ' . $icon_pos . ' ' . $icon_effect . ' ' . $css_classes);
 
-        // Проверим, есть ли в ссылке ?add-to-cart=ID
         if (preg_match('/\?add-to-cart=(\d+)/', $href, $matches)) {
             $product_id = absint($matches[1]);
             $product = wc_get_product($product_id);
@@ -87,8 +86,6 @@ if ( !function_exists('shortcode_boc_button') ) {
                     . '</a>';
             }
         }
-
-        // Стандартный вывод, если не add-to-cart
         return '<a href="' . esc_url($href) . '" class="' . $classes . '" ' . $target . '>'
             . $icon_before . '<span>' . do_shortcode( esc_html($btn_content) ) . '</span>' . $icon_after .
             '</a>';
@@ -96,7 +93,6 @@ if ( !function_exists('shortcode_boc_button') ) {
 
     add_shortcode( 'boc_button', 'shortcode_boc_button' );
 }
-
 
 
 // Font Icon 
@@ -254,6 +250,7 @@ if ( !function_exists('sanitize_positive_number') ) {
     return $positive_number;
   }
 }
+
 
 if ( !function_exists('validate_shortcode_sg_resources_filter_list_to_array_filter_callback') ) {
   function validate_shortcode_sg_resources_filter_list_to_array_filter_callback( $sanitize = false, $sanitization_func = 'sanitize_key' ) {

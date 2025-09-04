@@ -30,12 +30,12 @@ if ( !empty($args['featured_product']) ) :
   }
   
   $material_icon_urls = array();
-  
-  $attributes = array(
-    'cut', 'abrasion', 'arch_flash', 'hazards_cold', 'hazards_heat', 'impact', 'puncture_probe', 
-    'hypodermic_needle', 'flame', 'crush', 'vibration', 'features_and_technology', 
-    'ce_en388_certification_code', 'other_ce_certification_codes' 
-  );
+
+    $attributes = array(
+        'ansi-isea-105', 'cut-360', /*'cut', 'abrasion',*/ 'arch_flash', 'hazards_cold',  'hazards_heat',  'impact',
+        /*'puncture_probe',*/ 'hypodermic_needle', 'flame', 'crush', 'vibration',
+        'features_and_technology', 'ce_en388_certification_code', 'other_ce_certification_codes'
+    );
   $all_attributes = $product->get_attributes();
   
   foreach ( $attributes as $attribute ) {
@@ -47,6 +47,9 @@ if ( !empty($args['featured_product']) ) :
     
     if ( !empty($attribute_slugs) ) {
       foreach ( $attribute_slugs as $attribute_value ) {
+          if ($attribute === 'ansi-isea-105') {
+              $attribute_value = strtoupper($attribute_value);
+          }
         $icon_path = '/img/product_attribute_icons/'. $attribute .'/'. $attribute_value .'.png';
         
         $icon_root_path = get_template_directory() .'/'. $icon_path;

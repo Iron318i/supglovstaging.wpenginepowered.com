@@ -5053,7 +5053,17 @@ select + .woocommerce-error{
 .woocommerce-thank-you-page-order_details__order_item_total{
   display: none!important;
 }
-
-a.buttonogs+a.added_to_cart{
-  display: none!important;
+.sg-free-account-section .sg-left-column{
+  text-align: center;
+}
+.sg-free-account-section .sg-left-column .vc_row.vc_row-flex{
+  justify-content: center;
+}
+.sg-free-account-section .do-you-quality-box .vc_column-inner{
+  padding-right: clamp(15px, 3.75vw, 60px);
+}
+@media (min-width: 768px) {
+    .sg-free-account-section .vc_col-sm-1\/5 {
+        width: auto;
+    }
 }

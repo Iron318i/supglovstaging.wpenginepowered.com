@@ -2018,6 +2018,7 @@ if ( ! function_exists('sg_update_type_image_url_meta_es') ) {
 }
 add_action( 'edited_sg_type', 'sg_update_type_image_url_meta_es', 10, 2 );
 
+
 // Custom archive link for sg_type terms
 if ( ! function_exists('sg_add_type_archive_url_field') ) {
   function sg_add_type_archive_url_field( $taxonomy ) {
@@ -2802,6 +2803,7 @@ add_filter( 'rwmb_meta_boxes', function ( $meta_boxes ) {
         'post_type'   => 'product',
         'field_type'  => 'select_advanced',
         'multiple'    => true,
+        'ajax'        => true,
         'query_args'  => array( 
           'post_status'    => 'publish',
           'posts_per_page' => - 1,
@@ -2809,7 +2811,7 @@ add_filter( 'rwmb_meta_boxes', function ( $meta_boxes ) {
       ),
     ),
   );
-  
+
   // Call to Action section
   $meta_boxes[] = array( 
     'title'       => 'Call to Action',
@@ -2962,7 +2964,7 @@ add_action( 'widgets_init', 'register_custom_sidebars' );
 function hide_top_bar_when_print() {
     if (isset($_GET['action']) && $_GET['action'] === 'print') {
         echo '<style>
-            div#wpfront-notification-bar {
+            div#wpfront-notification-bar, div#wpfront-notification-bar.hidden {
                 display: none !important;
             }
         </style>';
@@ -4734,6 +4736,7 @@ function enqueue_update_sizing_inputs_script() {
     </script>
     <?php
 }
+
 add_filter('woocommerce_add_cart_item_data', 'add_enquired_flag_to_cart_item', 10, 3);
 function add_enquired_flag_to_cart_item($cart_item_data, $product_id, $variation_id) {
     $is_enquired = get_post_meta($product_id, '_enquired_product', true);
