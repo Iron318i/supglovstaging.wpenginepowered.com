@@ -4778,3 +4778,29 @@ function display_enquired_product_flag_in_order_admin($order) {
     </p>
     <?php
 }
+
+function enqueue_salesforce_chat() {
+    if (is_user_logged_in()) {
+        ?>
+        <script type='text/javascript'>
+            function initEmbeddedMessaging() {
+                try {
+                    embeddedservice_bootstrap.settings.language = 'en_US'; // For example, enter 'en' or 'en-US'
+                    embeddedservice_bootstrap.init(
+                        '00Di0000000dad5',
+                        'Website_Live_Chat',
+                        'https://superiorglove.my.site.com/ESWWebsiteLiveChat1756400992389',
+                        {
+                            scrt2URL: 'https://superiorglove.my.salesforce-scrt.com'
+                        }
+                    );
+                } catch (err) {
+                    console.error('Error loading Embedded Messaging: ', err);
+                }
+            }
+        </script>
+        <script type='text/javascript' src='https://superiorglove.my.site.com/ESWWebsiteLiveChat1756400992389/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
+        <?php
+    }
+}
+add_action('wp_footer', 'enqueue_salesforce_chat');

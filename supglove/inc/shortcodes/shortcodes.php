@@ -64,6 +64,15 @@ if ( !function_exists('shortcode_boc_button') ) {
         // Default output
         $classes = 'buttonogs ' . esc_attr($size . ' ' . $color . ' ' . $icon_pos . ' ' . $icon_effect . ' ' . $css_classes);
 
+        if ( trim($btn_content) === 'Return to All Resources' ) {
+            global $wp;
+            // Get current page URL
+            $current_url = home_url( add_query_arg( array(), $wp->request ) );
+
+            // Remove last segment
+            $href = trailingslashit( dirname( untrailingslashit( $current_url ) ) );
+        }
+
         if (preg_match('/\?add-to-cart=(\d+)/', $href, $matches)) {
             $product_id = absint($matches[1]);
             $product = wc_get_product($product_id);
