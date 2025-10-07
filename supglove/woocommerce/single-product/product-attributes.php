@@ -249,7 +249,7 @@ ob_start();
   <div class="acc_holder specsaccord border">
 
     <?php
-    // SPECIFICATIONS ACCORDION ITEM
+        // SPECIFICATIONS ACCORDION ITEM
     if ( ! empty( $filtered_productspecs ) ) :
       $colsx = array_chunk( $filtered_productspecs, ceil(count($filtered_productspecs)/3), true );
     ?>

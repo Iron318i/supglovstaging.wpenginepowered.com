@@ -879,7 +879,7 @@ if ( $is_sample_box ) {
 
       <?php
       add_action('woocommerce_after_single_product_summary_2', 'woocommerce_upsell_display', 15);
-      add_action('woocommerce_after_single_product_summary_2', 'woocommerce_output_related_products', 20);
+     add_action('woocommerce_after_single_product_summary_2', 'woocommerce_output_related_products', 20);
       do_action('woocommerce_after_single_product_summary_2');
       ?>
 

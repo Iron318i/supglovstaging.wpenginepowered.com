@@ -20,7 +20,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $columns = intval( supro_get_option( 'related_products_columns' ) );
-
 if ( $related_products ) : ?>
 <div class="product therelatedones">
 	

@@ -752,7 +752,7 @@ class Supro_WooCommerce {
      */
 	function product_glovelabels() {
     $html_icons = $this->get_product_attribute_icons( array(
-        'ansi-isea-105', 'cut-360', /*'cut', 'abrasion',*/ 'arch_flash', 'hazards_cold',  'hazards_heat',  'impact',
+        'ansi-isea-105', 'cut-360', 'cut', /*'abrasion',*/ 'arch_flash', 'hazards_cold',  'hazards_heat',  'impact',
         /*'puncture_probe',*/ 'hypodermic_needle', 'flame', 'crush', 'vibration',
         'features_and_technology', 'ce_en388_certification_code', 'other_ce_certification_codes'
     ) );
@@ -782,17 +782,26 @@ class Supro_WooCommerce {
         $attribute_slugs = $all_attributes['pa_'. $attribute]->get_slugs();
 
         if ( !empty($attribute_slugs) ) {
-          foreach( $attribute_slugs as $attribute_value ) {
-              if ($attribute === 'ansi-isea-105') {
-                  $attribute_value = strtoupper($attribute_value);
-              }
-            $icon_path = 'img/product_attribute_icons/'. $attribute .'/'. $attribute_value .'.png';
-            $icon_root_path = $root_path .'/'. $icon_path;
-            $icon_uri_path = $uri_path .'/'. $icon_path;
-            if( file_exists($icon_root_path) ) {
-              $html_icons .= '<li class="'.$attribute.'"><img src="'. $icon_uri_path .'?'. time() .'" alt="" /></li>';
+            foreach( $attribute_slugs as $attribute_value ) {
+                if ($attribute === 'ansi-isea-105') {
+                    $attribute_value = strtoupper($attribute_value);
+                }
+
+                if ($attribute === 'cut') {
+                    if (strpos($attribute_value, '360') !== false) {
+                        $attribute_value = 'cut-360';
+                    } else {
+                        continue;
+                    }
+                }
+
+                $icon_path = 'img/product_attribute_icons/'. $attribute .'/'. $attribute_value .'.png';
+                $icon_root_path = $root_path .'/'. $icon_path;
+                $icon_uri_path = $uri_path .'/'. $icon_path;
+                if( file_exists($icon_root_path) ) {
+                    $html_icons .= '<li class="'.$attribute.'"><img src="'. $icon_uri_path .'?'. time() .'" alt="" /></li>';
+                }
             }
-          }
         }
       }
       
