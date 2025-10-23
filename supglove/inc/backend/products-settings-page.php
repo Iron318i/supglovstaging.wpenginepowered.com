@@ -166,15 +166,18 @@ if ( ! function_exists( 'product_settings_repeater_callback' ) ) {
         $wc_attributes = get_wc_product_attributes();
 
         echo '<table class="form-table product-settings-repeater" data-option-name="' . esc_attr( $option_name ) . '">';
-        echo '<thead><tr><th>Name</th><th>WC Attribute</th><th></th></tr></thead>';
-        echo '<tbody>';
+        echo '<thead><tr><th></th><th>Name</th><th>WC Attribute</th><th>Actions</th></tr></thead>';
+        echo '<tbody class="sortable-table-body">';
 
         if ( ! empty( $items ) && is_array( $items ) ) {
             foreach ( $items as $index => $item ) {
                 $item_name = isset( $item['item_name'] ) ? esc_attr( $item['item_name'] ) : '';
                 $item_attr = isset( $item['item_attribute'] ) ? esc_attr( $item['item_attribute'] ) : '';
 
-                echo '<tr class="product-setting-row">';
+                echo '<tr class="product-setting-row sortable-row">';
+                echo '<td class="drag-handle">';
+                echo '<span class="dashicons dashicons-menu"></span>';
+                echo '</td>';
                 echo '<td>';
                 echo '<input type="text" name="' . esc_attr( $option_name ) . '[item_name][]" value="' . $item_name . '" class="regular-text" placeholder="e.g. Size Label" />';
                 echo '</td>';
@@ -198,6 +201,9 @@ if ( ! function_exists( 'product_settings_repeater_callback' ) ) {
 
         // Empty row for template
         echo '<tr class="product-setting-row template-row" style="display: none;">';
+        echo '<td class="drag-handle">';
+        echo '<span class="dashicons dashicons-menu"></span>';
+        echo '</td>';
         echo '<td>';
         echo '<input type="text" name="' . esc_attr( $option_name ) . '[item_name][]" value="" class="regular-text" placeholder="e.g. Size Label" />';
         echo '</td>';
@@ -221,7 +227,7 @@ if ( ! function_exists( 'product_settings_repeater_callback' ) ) {
         echo '<button type="button" class="button button-primary add-new-row">Add New Item</button>';
 
         // Display helper text
-        echo '<p class="description">Add items that will be used in the ' . esc_html( $tab_id ) . ' section. Each item can be linked to a WooCommerce attribute.</p>';
+        echo '<p class="description">Add items that will be used in the ' . esc_html( $tab_id ) . ' section. Each item can be linked to a WooCommerce attribute. Drag and drop to reorder items.</p>';
     }
 }
 
@@ -233,8 +239,9 @@ if ( ! function_exists( 'product_settings_enqueue_scripts' ) ) {
             return;
         }
 
-        // Enqueue jQuery (already available in WordPress admin)
+        // Enqueue jQuery and jQuery UI Sortable
         wp_enqueue_script( 'jquery' );
+        wp_enqueue_script( 'jquery-ui-sortable' );
 
         // We don't load external file, but embed script directly in footer
         add_action( 'admin_footer', 'product_settings_inline_script' );
@@ -254,6 +261,7 @@ if ( ! function_exists( 'product_settings_inline_script' ) ) {
                     var templateRow = repeaterTable.find('.template-row').clone();
 
                     templateRow.removeClass('template-row');
+                    templateRow.addClass('sortable-row');
                     templateRow.show();
                     templateRow.insertBefore(repeaterTable.find('.template-row'));
                 });
@@ -266,6 +274,32 @@ if ( ! function_exists( 'product_settings_inline_script' ) ) {
                     } else {
                         alert('At least one item must remain');
                     }
+                });
+
+                // 3. Initialize sortable functionality
+                $('.sortable-table-body').sortable({
+                    handle: '.drag-handle',
+                    axis: 'y',
+                    placeholder: 'sortable-placeholder',
+                    forcePlaceholderSize: true,
+                    opacity: 0.7,
+                    tolerance: 'pointer',
+                    start: function(e, ui) {
+                        ui.placeholder.height(ui.item.height());
+                        ui.placeholder.css('visibility', 'visible');
+                    },
+                    update: function(event, ui) {
+                        // Optional: Add any logic to run after reordering
+                        console.log('Items reordered');
+                    }
+                });
+
+                // 4. Disable text selection on drag handle for better UX
+                $('.drag-handle').css({
+                    'user-select': 'none',
+                    '-webkit-user-select': 'none',
+                    '-moz-user-select': 'none',
+                    '-ms-user-select': 'none'
                 });
             });
         </script>
@@ -280,10 +314,17 @@ if ( ! function_exists( 'product_settings_inline_script' ) ) {
             .product-settings-repeater td {
                 padding: 8px 10px;
                 border: 1px solid #ccd0d4;
+                vertical-align: middle;
             }
             .product-settings-repeater th {
                 background: #f8f9fa;
                 font-weight: 600;
+            }
+            .product-settings-repeater th:first-child {
+                width: 30px;
+            }
+            .product-settings-repeater th:last-child {
+                width: 100px;
             }
             .product-settings-repeater input.regular-text {
                 width: 100%;
@@ -293,6 +334,39 @@ if ( ! function_exists( 'product_settings_inline_script' ) ) {
             }
             .add-new-row {
                 margin-top: 10px;
+            }
+
+            /* Drag handle styles */
+            .drag-handle {
+                text-align: center;
+                cursor: move;
+                width: 30px;
+            }
+            .drag-handle .dashicons {
+                color: #72777c;
+                font-size: 16px;
+            }
+            .drag-handle:hover .dashicons {
+                color: #0073aa;
+            }
+
+            /* Sortable styles */
+            .sortable-row {
+                cursor: move;
+            }
+            .sortable-placeholder {
+                background: #f0f0f1;
+                border: 2px dashed #c3c4c7;
+                height: 50px;
+            }
+            .sortable-table-body tr.ui-sortable-helper {
+                background: #fff;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+
+            /* Improve row appearance during drag */
+            .ui-sortable-helper {
+                display: table;
             }
         </style>
         <?php
