@@ -4780,16 +4780,17 @@ function display_enquired_product_flag_in_order_admin($order) {
 }
 
 function enqueue_salesforce_chat() {
-    if (is_user_logged_in()) {
+    if (is_user_logged_in() && current_user_can('administrator')) {
         ?>
         <script type='text/javascript'>
             function initEmbeddedMessaging() {
                 try {
                     embeddedservice_bootstrap.settings.language = 'en_US'; // For example, enter 'en' or 'en-US'
+
                     embeddedservice_bootstrap.init(
                         '00Di0000000dad5',
-                        'Website_Live_Chat',
-                        'https://superiorglove.my.site.com/ESWWebsiteLiveChat1756400992389',
+                        'Messaging_Channel',
+                        'https://superiorglove.my.site.com/ESWMessagingChannel1759349582188',
                         {
                             scrt2URL: 'https://superiorglove.my.salesforce-scrt.com'
                         }
@@ -4797,9 +4798,9 @@ function enqueue_salesforce_chat() {
                 } catch (err) {
                     console.error('Error loading Embedded Messaging: ', err);
                 }
-            }
+            };
         </script>
-        <script type='text/javascript' src='https://superiorglove.my.site.com/ESWWebsiteLiveChat1756400992389/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
+        <script type='text/javascript' src='https://superiorglove.my.site.com/ESWMessagingChannel1759349582188/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
         <?php
     }
 }

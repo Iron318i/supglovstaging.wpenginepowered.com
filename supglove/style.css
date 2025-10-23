@@ -22825,6 +22825,7 @@ body .wpcf7-form input[type="checkbox"]:checked:before {
 
 .glovelabels li img {
     max-height: 75px !important;
+    width: 100%;
 }
 .glovelabels li.ansi-isea-105{
     padding-top: 0;

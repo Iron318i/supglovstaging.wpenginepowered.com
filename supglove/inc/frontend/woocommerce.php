@@ -783,23 +783,24 @@ class Supro_WooCommerce {
 
         if ( !empty($attribute_slugs) ) {
             foreach( $attribute_slugs as $attribute_value ) {
+                $icon_path = 'img/product_attribute_icons/'. $attribute .'/'. $attribute_value .'.png';
+                $icon_root_path = $root_path .'/'. $icon_path;
+                $icon_uri_path = $uri_path .'/'. $icon_path;
+
                 if ($attribute === 'ansi-isea-105') {
-                    $attribute_value = strtoupper($attribute_value);
+                    $icon_uri_path = get_template_directory_uri() . '/img/product_attribute_icons/svg/A2-X-X.svg';
+                    $icon_root_path = $root_path . '/img/product_attribute_icons/svg/A2-X-X.svg';
                 }
 
                 if ($attribute === 'cut') {
                     if (strpos($attribute_value, '360') !== false) {
-                        $attribute_value = 'cut-360';
-                    } else {
-                        continue;
+                    $icon_uri_path = get_template_directory_uri() . '/img/product_attribute_icons/svg/cut-360.svg';
+                    $icon_root_path = $root_path . '/img/product_attribute_icons/svg/cut-360.svg';
                     }
                 }
 
-                $icon_path = 'img/product_attribute_icons/'. $attribute .'/'. $attribute_value .'.png';
-                $icon_root_path = $root_path .'/'. $icon_path;
-                $icon_uri_path = $uri_path .'/'. $icon_path;
                 if( file_exists($icon_root_path) ) {
-                    $html_icons .= '<li class="'.$attribute.'"><img src="'. $icon_uri_path .'?'. time() .'" alt="" /></li>';
+                    $html_icons .= '<li class="'.$attribute.'"><img src="'. $icon_uri_path .'?'. time() .'" alt="'.$attribute_value.'" /></li>';
                 }
             }
         }
