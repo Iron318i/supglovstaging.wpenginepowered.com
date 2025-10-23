@@ -318,6 +318,7 @@ if ( is_admin() ) {
 	require get_template_directory() . '/inc/backend/ajax.php';
 }
 
+require_once get_template_directory() . '/inc/backend/products-settings-page.php';
 
 // Initialize Visual Composer as part of the theme
 if ( function_exists('vc_set_as_theme') ) {
