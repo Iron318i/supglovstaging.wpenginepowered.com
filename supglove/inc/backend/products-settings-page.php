@@ -93,7 +93,6 @@ if ( ! function_exists( 'product_settings_content' ) ) {
     }
 }
 
-
 // === 5. SETTINGS API: Регистрация секций, полей и очистка данных ===
 if ( ! function_exists( 'product_settings_register_sections' ) ) {
     function product_settings_register_sections() {
@@ -124,7 +123,7 @@ if ( ! function_exists( 'product_settings_register_sections' ) ) {
                     'product_settings_repeater_callback', // Callback-функция для вывода репитера
                     $option_name,                 // Slug группы настроек
                     $tab_id . '_section',         // ID секции
-                    [ 'option_name' => $option_name ] // Аргументы для callback
+                    [ 'option_name' => $option_name, 'tab_id' => $tab_id ] // Аргументы для callback
             );
         }
     }
@@ -162,57 +161,64 @@ if ( ! function_exists( 'product_settings_sanitize_repeater' ) ) {
 if ( ! function_exists( 'product_settings_repeater_callback' ) ) {
     function product_settings_repeater_callback( $args ) {
         $option_name = $args['option_name'];
+        $tab_id = $args['tab_id'];
         $items = get_option( $option_name, [] );
         $wc_attributes = get_wc_product_attributes();
-
-        // Шаблон строки репитера
-        $row_template = '
-            <tr class="product-setting-row">
-                <td>
-                    <input type="text" name="' . esc_attr( $option_name ) . '[item_name][]" 
-                           value="%1$s" class="regular-text" placeholder="e.g. Size Label" />
-                </td>
-                <td>
-                    <select name="' . esc_attr( $option_name ) . '[item_attribute][]">
-                        <option value="">Выберите атрибут...</option>
-                        %2$s
-                    </select>
-                </td>
-                <td>
-                    <button type="button" class="button button-secondary remove-row">Удалить</button>
-                </td>
-            </tr>
-        ';
-
-        // Создание опций для SELECT
-        $select_options = '';
-        foreach ( $wc_attributes as $slug => $label ) {
-            $select_options .= '<option value="' . esc_attr( $slug ) . '">%s' . esc_html( $label ) . '</option>';
-        }
 
         echo '<table class="form-table product-settings-repeater" data-option-name="' . esc_attr( $option_name ) . '">';
         echo '<thead><tr><th>Название</th><th>Атрибут WC</th><th></th></tr></thead>';
         echo '<tbody>';
 
         if ( ! empty( $items ) && is_array( $items ) ) {
-            foreach ( $items as $item ) {
+            foreach ( $items as $index => $item ) {
                 $item_name = isset( $item['item_name'] ) ? esc_attr( $item['item_name'] ) : '';
                 $item_attr = isset( $item['item_attribute'] ) ? esc_attr( $item['item_attribute'] ) : '';
 
-                // Вывод сохраненной строки
-                $current_options = str_replace(
-                        sprintf( '<option value="%s">', $item_attr ),
-                        sprintf( '<option value="%s" selected="selected">', $item_attr ),
-                        $select_options
-                );
+                echo '<tr class="product-setting-row">';
+                echo '<td>';
+                echo '<input type="text" name="' . esc_attr( $option_name ) . '[item_name][]" value="' . $item_name . '" class="regular-text" placeholder="e.g. Size Label" />';
+                echo '</td>';
+                echo '<td>';
+                echo '<select name="' . esc_attr( $option_name ) . '[item_attribute][]">';
+                echo '<option value="">Выберите атрибут...</option>';
 
-                printf( $row_template, $item_name, $current_options );
+                foreach ( $wc_attributes as $slug => $label ) {
+                    $selected = selected( $item_attr, $slug, false );
+                    echo '<option value="' . esc_attr( $slug ) . '" ' . $selected . '>' . esc_html( $label ) . '</option>';
+                }
+
+                echo '</select>';
+                echo '</td>';
+                echo '<td>';
+                echo '<button type="button" class="button button-secondary remove-row">Удалить</button>';
+                echo '</td>';
+                echo '</tr>';
             }
         }
 
+        // Пустая строка для шаблона
+        echo '<tr class="product-setting-row template-row" style="display: none;">';
+        echo '<td>';
+        echo '<input type="text" name="' . esc_attr( $option_name ) . '[item_name][]" value="" class="regular-text" placeholder="e.g. Size Label" />';
+        echo '</td>';
+        echo '<td>';
+        echo '<select name="' . esc_attr( $option_name ) . '[item_attribute][]">';
+        echo '<option value="">Выберите атрибут...</option>';
+
+        foreach ( $wc_attributes as $slug => $label ) {
+            echo '<option value="' . esc_attr( $slug ) . '">' . esc_html( $label ) . '</option>';
+        }
+
+        echo '</select>';
+        echo '</td>';
+        echo '<td>';
+        echo '<button type="button" class="button button-secondary remove-row">Удалить</button>';
+        echo '</td>';
+        echo '</tr>';
+
         echo '</tbody>';
         echo '</table>';
-        echo '<button type="button" class="button button-primary add-new-row" data-template="' . esc_attr( urlencode( $row_template ) ) . '">Добавить элемент</button>';
+        echo '<button type="button" class="button button-primary add-new-row">Добавить элемент</button>';
     }
 }
 
@@ -224,6 +230,9 @@ if ( ! function_exists( 'product_settings_enqueue_scripts' ) ) {
             return;
         }
 
+        // Подключаем jQuery (уже есть в админке WordPress)
+        wp_enqueue_script( 'jquery' );
+
         // Мы не подключаем внешний файл, а встраиваем скрипт прямо в footer
         add_action( 'admin_footer', 'product_settings_inline_script' );
     }
@@ -233,53 +242,47 @@ if ( ! function_exists( 'product_settings_enqueue_scripts' ) ) {
 // === 9. JS: Встроенный скрипт для обработки репитера ===
 if ( ! function_exists( 'product_settings_inline_script' ) ) {
     function product_settings_inline_script() {
-        // Создание опций для SELECT
-        $wc_attributes = get_wc_product_attributes();
-        $select_options_html = '<option value="">Выберите атрибут...</option>';
-        foreach ( $wc_attributes as $slug => $label ) {
-            $select_options_html .= '<option value="' . esc_attr( $slug ) . '">' . esc_html( $label ) . '</option>';
-        }
-
-        // PHP-переменные для использования в JS
-        $js_vars = [
-                'select_options_html' => $select_options_html,
-                'row_template_html'   => '
-                <tr class="product-setting-row">
-                    <td>
-                        <input type="text" name="__NAME__[item_name][]" value="" class="regular-text" placeholder="e.g. Size Label" />
-                    </td>
-                    <td>
-                        <select name="__NAME__[item_attribute][]">__OPTIONS__</select>
-                    </td>
-                    <td>
-                        <button type="button" class="button button-secondary remove-row">Удалить</button>
-                    </td>
-                </tr>
-            ',
-        ];
         ?>
         <script type="text/javascript">
             jQuery(document).ready(function($) {
-                var repeaterData = <?php echo wp_json_encode( $js_vars ); ?>;
-
                 // 1. Добавление новой строки
                 $('.add-new-row').on('click', function() {
                     var repeaterTable = $(this).prev('.product-settings-repeater');
-                    var optionName = repeaterTable.data('option-name');
+                    var templateRow = repeaterTable.find('.template-row').clone();
 
-                    var newRowHtml = repeaterData.row_template_html
-                        .replace(/__NAME__/g, optionName)
-                        .replace(/__OPTIONS__/g, repeaterData.select_options_html);
-
-                    repeaterTable.find('tbody').append(newRowHtml);
+                    templateRow.removeClass('template-row');
+                    templateRow.show();
+                    templateRow.insertBefore(repeaterTable.find('.template-row'));
                 });
 
                 // 2. Удаление строки
                 $(document).on('click', '.remove-row', function() {
-                    $(this).closest('tr').remove();
+                    // Не удаляем последнюю строку, чтобы всегда была хотя бы одна
+                    if ($(this).closest('tbody').find('.product-setting-row:not(.template-row)').length > 1) {
+                        $(this).closest('.product-setting-row').remove();
+                    } else {
+                        alert('Должен остаться хотя бы один элемент');
+                    }
                 });
             });
         </script>
+
+        <style type="text/css">
+            .product-settings-repeater {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+            .product-settings-repeater th,
+            .product-settings-repeater td {
+                padding: 8px 10px;
+            }
+            .product-settings-repeater input.regular-text {
+                width: 100%;
+            }
+            .product-settings-repeater select {
+                width: 100%;
+            }
+        </style>
         <?php
     }
 }
